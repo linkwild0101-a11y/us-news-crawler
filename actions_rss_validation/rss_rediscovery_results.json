@@ -1,0 +1,4762 @@
+{
+  "generated_at": "2026-02-16T11:27:37.572905+00:00",
+  "source_file": "rss_validation_report_20260216_091927.json",
+  "stats": {
+    "failed_entries": 186,
+    "unique_domains": 159,
+    "found_domains": 39,
+    "unresolved_domains": 120,
+    "entry_updates": 44,
+    "elapsed_seconds": 971.14
+  },
+  "domain_results": [
+    {
+      "domain": "38north.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://38north.org/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://38north.org/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://38north.org/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://38north.org/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://38north.org/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://38north.org/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "500.co",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://500.co/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://500.co/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://500.co/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://500.co/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://500.co/blog/rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://500.co/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "aei.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://aei.org/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://aei.org/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://aei.org/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://aei.org/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://aei.org/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://aei.org/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "af.edu",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://af.edu/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://af.edu/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://af.edu/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://af.edu/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://af.edu/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://af.edu/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "americanbanker.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://americanbanker.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://americanbanker.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://americanbanker.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://americanbanker.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://americanbanker.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://americanbanker.com/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "americanprogress.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://americanprogress.org/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://americanprogress.org/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://americanprogress.org/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://americanprogress.org/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://americanprogress.org/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://americanprogress.org/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "apnews.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://apnews.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://apnews.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://apnews.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://apnews.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://apnews.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://apnews.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "army.mil",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://army.mil/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://army.mil/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://army.mil/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://army.mil/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://army.mil/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://army.mil/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "armyuniversity.edu",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://armyuniversity.edu/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://armyuniversity.edu/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://armyuniversity.edu/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://armyuniversity.edu/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://armyuniversity.edu/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://armyuniversity.edu/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "atlanticcouncil.org",
+      "found": true,
+      "feed_url": "https://www.atlanticcouncil.org/feed/",
+      "entries_count": 100,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 17,
+      "total_candidates": 32
+    },
+    {
+      "domain": "australiandefence.com.au",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://australiandefence.com.au/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://australiandefence.com.au/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://australiandefence.com.au/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://australiandefence.com.au/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://australiandefence.com.au/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://australiandefence.com.au/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "axios.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://axios.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://axios.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://axios.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://axios.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://axios.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://axios.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "balloonsanddrones.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://balloonsanddrones.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://balloonsanddrones.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://balloonsanddrones.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://balloonsanddrones.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://balloonsanddrones.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://balloonsanddrones.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "ballotpedia.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://ballotpedia.org/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://ballotpedia.org/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://ballotpedia.org/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://ballotpedia.org/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://ballotpedia.org/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://ballotpedia.org/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "bankautomationnews.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://bankautomationnews.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://bankautomationnews.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://bankautomationnews.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://bankautomationnews.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://bankautomationnews.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://bankautomationnews.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "bankrate.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://bankrate.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://bankrate.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://bankrate.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://bankrate.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://bankrate.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://bankrate.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "bbc.com",
+      "found": true,
+      "feed_url": "https://feeds.bbci.co.uk/news/rss.xml",
+      "entries_count": 33,
+      "http_status": 200,
+      "content_type": "text/xml; charset=utf-8",
+      "tried_count": 13,
+      "total_candidates": 32
+    },
+    {
+      "domain": "blogspot.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://blogspot.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://blogspot.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://blogspot.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://blogspot.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://blogspot.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://blogspot.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "bls.gov",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://bls.gov/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://bls.gov/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://bls.gov/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://bls.gov/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://bls.gov/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://bls.gov/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "bluestarfam.org",
+      "found": true,
+      "feed_url": "https://bluestarfam.org/feed/",
+      "entries_count": 10,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 8,
+      "total_candidates": 32
+    },
+    {
+      "domain": "blueyonder.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://blueyonder.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://blueyonder.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://blueyonder.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://blueyonder.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://blueyonder.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://blueyonder.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "bostonglobe.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://bostonglobe.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://bostonglobe.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://bostonglobe.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://bostonglobe.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://bostonglobe.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://bostonglobe.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "breakingdefense.com",
+      "found": true,
+      "feed_url": "https://breakingdefense.com/feed/",
+      "entries_count": 15,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 1,
+      "total_candidates": 32
+    },
+    {
+      "domain": "brookings.edu",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://brookings.edu/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://brookings.edu/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://brookings.edu/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://brookings.edu/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://brookings.edu/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://brookings.edu/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "businessinsider.com",
+      "found": true,
+      "feed_url": "https://feeds.businessinsider.com/custom/all",
+      "entries_count": 20,
+      "http_status": 200,
+      "content_type": "application/atom+xml",
+      "tried_count": 14,
+      "total_candidates": 32
+    },
+    {
+      "domain": "canadiandefencereview.ca",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://canadiandefencereview.ca/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://canadiandefencereview.ca/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://canadiandefencereview.ca/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://canadiandefencereview.ca/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://canadiandefencereview.ca/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://canadiandefencereview.ca/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "carnegieendowment.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://carnegieendowment.org/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://carnegieendowment.org/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://carnegieendowment.org/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://carnegieendowment.org/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://carnegieendowment.org/blog/rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://carnegieendowment.org/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "cato.org",
+      "found": true,
+      "feed_url": "https://www.cato.org/rss.xml",
+      "entries_count": 1,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=utf-8",
+      "tried_count": 15,
+      "total_candidates": 32
+    },
+    {
+      "domain": "cbo.gov",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://cbo.gov/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://cbo.gov/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://cbo.gov/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://cbo.gov/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://cbo.gov/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://cbo.gov/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "census.gov",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://census.gov/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://census.gov/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://census.gov/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://census.gov/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://census.gov/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://census.gov/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "centerforpolitics.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://centerforpolitics.org/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://centerforpolitics.org/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://centerforpolitics.org/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://centerforpolitics.org/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://centerforpolitics.org/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://centerforpolitics.org/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "centralbanking.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://centralbanking.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://centralbanking.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://centralbanking.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://centralbanking.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://centralbanking.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://centralbanking.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "cfr.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://cfr.org/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://cfr.org/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://cfr.org/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://cfr.org/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://cfr.org/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://cfr.org/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "chicagotribune.com",
+      "found": true,
+      "feed_url": "https://www.chicagotribune.com/feed/",
+      "entries_count": 10,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 1,
+      "total_candidates": 32
+    },
+    {
+      "domain": "chime.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://chime.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://chime.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://chime.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://chime.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://chime.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://chime.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "cleveland.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://cleveland.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://cleveland.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://cleveland.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://cleveland.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://cleveland.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://cleveland.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "cnn.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://cnn.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://cnn.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://cnn.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://cnn.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://cnn.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://cnn.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "co.il",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://co.il/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://co.il/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://co.il/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://co.il/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://co.il/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://co.il/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "commerce.gov",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://commerce.gov/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://commerce.gov/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://commerce.gov/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://commerce.gov/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://commerce.gov/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://commerce.gov/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "congress.gov",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://congress.gov/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://congress.gov/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://congress.gov/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://congress.gov/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://congress.gov/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://congress.gov/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "cookpolitical.com",
+      "found": true,
+      "feed_url": "https://www.cookpolitical.com/rss.xml",
+      "entries_count": 10,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=utf-8",
+      "tried_count": 15,
+      "total_candidates": 32
+    },
+    {
+      "domain": "cqpress.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://cqpress.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://cqpress.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://cqpress.com/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://cqpress.com/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://cqpress.com/blog/rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://cqpress.com/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "crooksandliars.com",
+      "found": true,
+      "feed_url": "https://crooksandliars.com/feeds/latest",
+      "entries_count": 25,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=utf-8",
+      "tried_count": 9,
+      "total_candidates": 32
+    },
+    {
+      "domain": "csbaonline.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://csbaonline.org/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://csbaonline.org/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://csbaonline.org/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://csbaonline.org/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://csbaonline.org/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://csbaonline.org/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "cyberscoop.com",
+      "found": true,
+      "feed_url": "https://cyberscoop.com/feed/",
+      "entries_count": 10,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 1,
+      "total_candidates": 32
+    },
+    {
+      "domain": "dallasfed.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://dallasfed.org/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://dallasfed.org/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://dallasfed.org/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dallasfed.org/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dallasfed.org/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dallasfed.org/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "dallasnews.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://dallasnews.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dallasnews.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dallasnews.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dallasnews.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dallasnews.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dallasnews.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "dau.edu",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://dau.edu/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://dau.edu/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://dau.edu/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://dau.edu/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://dau.edu/blog/rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://dau.edu/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "defiprime.com",
+      "found": true,
+      "feed_url": "https://defiprime.com/feed.xml",
+      "entries_count": 5,
+      "http_status": 200,
+      "content_type": "application/xml",
+      "tried_count": 7,
+      "total_candidates": 32
+    },
+    {
+      "domain": "denverpost.com",
+      "found": true,
+      "feed_url": "https://www.denverpost.com/feed/",
+      "entries_count": 10,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 1,
+      "total_candidates": 32
+    },
+    {
+      "domain": "dfas.mil",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://dfas.mil/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dfas.mil/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dfas.mil/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dfas.mil/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dfas.mil/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dfas.mil/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "dha.mil",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://dha.mil/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dha.mil/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dha.mil/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dha.mil/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dha.mil/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dha.mil/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "directedenergy.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://directedenergy.org/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://directedenergy.org/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://directedenergy.org/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://directedenergy.org/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://directedenergy.org/blog/rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://directedenergy.org/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "dla.mil",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://dla.mil/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dla.mil/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dla.mil/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dla.mil/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dla.mil/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dla.mil/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "dowjones.io",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://dowjones.io/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dowjones.io/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dowjones.io/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dowjones.io/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dowjones.io/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://dowjones.io/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "dronesandrobotics.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://dronesandrobotics.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://dronesandrobotics.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://dronesandrobotics.com/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://dronesandrobotics.com/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://dronesandrobotics.com/blog/rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://dronesandrobotics.com/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "electronicwarfare.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://electronicwarfare.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://electronicwarfare.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://electronicwarfare.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://electronicwarfare.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://electronicwarfare.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://electronicwarfare.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "entrepreneur.com",
+      "found": true,
+      "feed_url": "https://www.entrepreneur.com/?feed=rss2",
+      "entries_count": 15,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 1,
+      "total_candidates": 32
+    },
+    {
+      "domain": "fas.org",
+      "found": true,
+      "feed_url": "https://fas.org/feed/",
+      "entries_count": 1,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 1,
+      "total_candidates": 32
+    },
+    {
+      "domain": "fec.gov",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://fec.gov/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://fec.gov/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://fec.gov/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://fec.gov/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://fec.gov/blog/rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://fec.gov/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "federalreserve.gov",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://federalreserve.gov/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://federalreserve.gov/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://federalreserve.gov/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://federalreserve.gov/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://federalreserve.gov/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://federalreserve.gov/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "feedblitz.com",
+      "found": true,
+      "feed_url": "https://www.feedblitz.com/feed/",
+      "entries_count": 25,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 1,
+      "total_candidates": 32
+    },
+    {
+      "domain": "feedburner.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://feedburner.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://feedburner.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://feedburner.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://feedburner.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://feedburner.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://feedburner.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "fifthdomain.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://fifthdomain.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://fifthdomain.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://fifthdomain.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://fifthdomain.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://fifthdomain.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://fifthdomain.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "fintechfutures.com",
+      "found": true,
+      "feed_url": "https://www.fintechfutures.com/rss.xml",
+      "entries_count": 50,
+      "http_status": 200,
+      "content_type": "text/xml; charset=utf-8",
+      "tried_count": 15,
+      "total_candidates": 32
+    },
+    {
+      "domain": "fisherhouse.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://fisherhouse.org/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://fisherhouse.org/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://fisherhouse.org/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://fisherhouse.org/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://fisherhouse.org/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://fisherhouse.org/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "focus-economics.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://focus-economics.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://focus-economics.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://focus-economics.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://focus-economics.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://focus-economics.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://focus-economics.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "fool.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://fool.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://fool.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://fool.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://fool.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://fool.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://fool.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "forbes.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://forbes.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://forbes.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://forbes.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://forbes.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://forbes.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://forbes.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "freakonomics.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://freakonomics.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://freakonomics.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://freakonomics.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://freakonomics.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://freakonomics.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://freakonomics.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "globalbankingandfinance.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://globalbankingandfinance.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://globalbankingandfinance.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://globalbankingandfinance.com/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://globalbankingandfinance.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://globalbankingandfinance.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://globalbankingandfinance.com/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "gonzobanker.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://gonzobanker.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://gonzobanker.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://gonzobanker.com/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://gonzobanker.com/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://gonzobanker.com/blog/rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://gonzobanker.com/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "govexec.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://govexec.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://govexec.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://govexec.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://govexec.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://govexec.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://govexec.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "govtrack.us",
+      "found": true,
+      "feed_url": "https://govtracknews.wordpress.com/feed/",
+      "entries_count": 10,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 4,
+      "total_candidates": 32
+    },
+    {
+      "domain": "gwu.edu",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://gwu.edu/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://gwu.edu/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://gwu.edu/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://gwu.edu/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://gwu.edu/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://gwu.edu/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "hbr.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://hbr.org/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://hbr.org/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://hbr.org/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://hbr.org/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://hbr.org/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://hbr.org/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "health.mil",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://health.mil/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://health.mil/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://health.mil/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://health.mil/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://health.mil/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://health.mil/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "hireheroesusa.org",
+      "found": true,
+      "feed_url": "https://www.hireheroesusa.org/feed/",
+      "entries_count": 10,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 1,
+      "total_candidates": 32
+    },
+    {
+      "domain": "house.gov",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://house.gov/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://house.gov/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://house.gov/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://house.gov/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://house.gov/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://house.gov/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "houstonchronicle.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://houstonchronicle.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://houstonchronicle.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://houstonchronicle.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://houstonchronicle.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://houstonchronicle.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://houstonchronicle.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "huffpost.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://huffpost.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://huffpost.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://huffpost.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://huffpost.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://huffpost.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://huffpost.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "hypersonicweapons.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://hypersonicweapons.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://hypersonicweapons.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://hypersonicweapons.com/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://hypersonicweapons.com/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://hypersonicweapons.com/blog/rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://hypersonicweapons.com/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "imf.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://imf.org/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://imf.org/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://imf.org/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://imf.org/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://imf.org/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://imf.org/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "informationdissemination.net",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://informationdissemination.net/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://informationdissemination.net/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://informationdissemination.net/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://informationdissemination.net/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://informationdissemination.net/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://informationdissemination.net/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "inquirer.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://inquirer.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://inquirer.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://inquirer.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://inquirer.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://inquirer.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://inquirer.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "insideelections.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://insideelections.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://insideelections.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://insideelections.com/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://insideelections.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://insideelections.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://insideelections.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "intelligenceonline.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://intelligenceonline.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://intelligenceonline.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://intelligenceonline.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://intelligenceonline.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://intelligenceonline.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://intelligenceonline.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "investopedia.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://investopedia.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://investopedia.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://investopedia.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://investopedia.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://investopedia.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://investopedia.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "justsecurity.org",
+      "found": true,
+      "feed_url": "https://www.justsecurity.org/feed/",
+      "entries_count": 10,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 1,
+      "total_candidates": 32
+    },
+    {
+      "domain": "legistorm.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://legistorm.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://legistorm.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://legistorm.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://legistorm.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://legistorm.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://legistorm.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "manufacturingdigital.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://manufacturingdigital.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://manufacturingdigital.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://manufacturingdigital.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://manufacturingdigital.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://manufacturingdigital.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://manufacturingdigital.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "marketwatch.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://marketwatch.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://marketwatch.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://marketwatch.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://marketwatch.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://marketwatch.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://marketwatch.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "miamiherald.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://miamiherald.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://miamiherald.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://miamiherald.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://miamiherald.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://miamiherald.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://miamiherald.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "military.com",
+      "found": true,
+      "feed_url": "https://www.military.com/rss.xml",
+      "entries_count": 10,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=utf-8",
+      "tried_count": 15,
+      "total_candidates": 32
+    },
+    {
+      "domain": "militarybenefits.info",
+      "found": true,
+      "feed_url": "https://veteran.com/feed/",
+      "entries_count": 10,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 1,
+      "total_candidates": 32
+    },
+    {
+      "domain": "militaryfamily.org",
+      "found": true,
+      "feed_url": "https://www.militaryfamily.org/feed/",
+      "entries_count": 10,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 1,
+      "total_candidates": 32
+    },
+    {
+      "domain": "militarylogistics.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://militarylogistics.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://militarylogistics.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://militarylogistics.com/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://militarylogistics.com/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://militarylogistics.com/blog/rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://militarylogistics.com/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "militaryonesource.mil",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://militaryonesource.mil/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://militaryonesource.mil/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://militaryonesource.mil/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://militaryonesource.mil/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://militaryonesource.mil/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://militaryonesource.mil/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "militarypay.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://militarypay.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://militarypay.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://militarypay.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://militarypay.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://militarypay.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://militarypay.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "militaryspouse.com",
+      "found": true,
+      "feed_url": "https://www.militaryspouse.com/feed/",
+      "entries_count": 3,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 1,
+      "total_candidates": 32
+    },
+    {
+      "domain": "morningstar.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://morningstar.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://morningstar.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://morningstar.com/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://morningstar.com/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://morningstar.com/blog/rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://morningstar.com/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "multihousingnews.com",
+      "found": true,
+      "feed_url": "https://www.multihousingnews.com/feed/",
+      "entries_count": 100,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 1,
+      "total_candidates": 32
+    },
+    {
+      "domain": "mybanktracker.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://mybanktracker.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://mybanktracker.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://mybanktracker.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://mybanktracker.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://mybanktracker.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://mybanktracker.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "nationaljournal.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://nationaljournal.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://nationaljournal.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://nationaljournal.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://nationaljournal.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://nationaljournal.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://nationaljournal.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "nationalmortgagenews.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://nationalmortgagenews.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://nationalmortgagenews.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://nationalmortgagenews.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://nationalmortgagenews.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://nationalmortgagenews.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://nationalmortgagenews.com/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "nbcnews.com",
+      "found": true,
+      "feed_url": "https://feeds.nbcnews.com/nbcnews/public/news",
+      "entries_count": 25,
+      "http_status": 200,
+      "content_type": "text/xml; charset=UTF-8",
+      "tried_count": 6,
+      "total_candidates": 32
+    },
+    {
+      "domain": "nber.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://nber.org/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://nber.org/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://nber.org/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://nber.org/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://nber.org/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://nber.org/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "ndu.edu",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://ndu.edu/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://ndu.edu/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://ndu.edu/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://ndu.edu/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://ndu.edu/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://ndu.edu/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "newsmax.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://newsmax.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://newsmax.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://newsmax.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://newsmax.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://newsmax.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://newsmax.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "newsweek.com",
+      "found": true,
+      "feed_url": "https://www.newsweek.com/rss",
+      "entries_count": 20,
+      "http_status": 200,
+      "content_type": "application/xml; charset=UTF-8",
+      "tried_count": 14,
+      "total_candidates": 32
+    },
+    {
+      "domain": "noobpreneur.com",
+      "found": true,
+      "feed_url": "https://www.noobpreneur.com/blog/feed/",
+      "entries_count": 10,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 4,
+      "total_candidates": 32
+    },
+    {
+      "domain": "opensecrets.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://opensecrets.org/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://opensecrets.org/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://opensecrets.org/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://opensecrets.org/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://opensecrets.org/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://opensecrets.org/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "operationhomefront.org",
+      "found": true,
+      "feed_url": "https://operationhomefront.org/feed/",
+      "entries_count": 10,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 1,
+      "total_candidates": 32
+    },
+    {
+      "domain": "patriotguard.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://patriotguard.org/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://patriotguard.org/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://patriotguard.org/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://patriotguard.org/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://patriotguard.org/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://patriotguard.org/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "paymentsource.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://paymentsource.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://paymentsource.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://paymentsource.com/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://paymentsource.com/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://paymentsource.com/blog/rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://paymentsource.com/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "pewresearch.org",
+      "found": true,
+      "feed_url": "https://www.pewresearch.org/feed/",
+      "entries_count": 50,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 1,
+      "total_candidates": 32
+    },
+    {
+      "domain": "piie.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://piie.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://piie.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://piie.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://piie.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://piie.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://piie.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "politico.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://politico.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://politico.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://politico.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://politico.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://politico.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://politico.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "reuters.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://reuters.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://reuters.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://reuters.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://reuters.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://reuters.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://reuters.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "rollcall.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://rollcall.com/?feed=rss2",
+          "reason": "xml_parse_error"
+        },
+        {
+          "url": "https://rollcall.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://rollcall.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://rollcall.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://rollcall.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://rollcall.com/feed",
+          "reason": "xml_parse_error"
+        }
+      ]
+    },
+    {
+      "domain": "rollingthunder.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://rollingthunder.org/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://rollingthunder.org/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://rollingthunder.org/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://rollingthunder.org/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://rollingthunder.org/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://rollingthunder.org/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "rsn.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://rsn.org/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://rsn.org/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://rsn.org/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://rsn.org/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://rsn.org/blog/rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://rsn.org/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "seattletimes.com",
+      "found": true,
+      "feed_url": "https://www.seattletimes.com/feed/",
+      "entries_count": 34,
+      "http_status": 200,
+      "content_type": "text/xml; charset=UTF-8",
+      "tried_count": 4,
+      "total_candidates": 32
+    },
+    {
+      "domain": "sec.gov",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://sec.gov/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://sec.gov/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://sec.gov/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://sec.gov/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://sec.gov/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://sec.gov/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "semperfifund.org",
+      "found": true,
+      "feed_url": "https://thefund.org/sitemap.rss",
+      "entries_count": 50,
+      "http_status": 200,
+      "content_type": "text/xml; charset=UTF-8",
+      "tried_count": 15,
+      "total_candidates": 32
+    },
+    {
+      "domain": "senate.gov",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://senate.gov/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://senate.gov/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://senate.gov/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://senate.gov/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://senate.gov/blog/rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://senate.gov/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "siteintelgroup.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://siteintelgroup.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://siteintelgroup.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://siteintelgroup.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://siteintelgroup.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://siteintelgroup.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://siteintelgroup.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "solarium.gov",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://solarium.gov/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://solarium.gov/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://solarium.gov/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://solarium.gov/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://solarium.gov/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://solarium.gov/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "spaceforcetimes.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://spaceforcetimes.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://spaceforcetimes.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://spaceforcetimes.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://spaceforcetimes.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://spaceforcetimes.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://spaceforcetimes.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "spacenews.com",
+      "found": true,
+      "feed_url": "https://spacenews.com/feed/",
+      "entries_count": 24,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 1,
+      "total_candidates": 32
+    },
+    {
+      "domain": "ssv.org",
+      "found": true,
+      "feed_url": "https://ssv.org/feed/",
+      "entries_count": 10,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 1,
+      "total_candidates": 32
+    },
+    {
+      "domain": "startribune.com",
+      "found": true,
+      "feed_url": "https://www.startribune.com/rss",
+      "entries_count": 8,
+      "http_status": 200,
+      "content_type": "text/xml; charset=utf-8",
+      "tried_count": 14,
+      "total_candidates": 32
+    },
+    {
+      "domain": "sustainmenttimes.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://sustainmenttimes.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://sustainmenttimes.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://sustainmenttimes.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://sustainmenttimes.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://sustainmenttimes.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://sustainmenttimes.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "taps.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://taps.org/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://taps.org/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://taps.org/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://taps.org/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://taps.org/blog/rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://taps.org/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "thedailybeast.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://thedailybeast.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://thedailybeast.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://thedailybeast.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://thedailybeast.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://thedailybeast.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://thedailybeast.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "thedefiant.io",
+      "found": true,
+      "feed_url": "https://thedefiant.io/api/feed",
+      "entries_count": 100,
+      "http_status": 200,
+      "content_type": "application/xml;charset=utf-8",
+      "tried_count": 4,
+      "total_candidates": 32
+    },
+    {
+      "domain": "thefinancialbrand.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://thefinancialbrand.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://thefinancialbrand.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://thefinancialbrand.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://thefinancialbrand.com/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://thefinancialbrand.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://thefinancialbrand.com/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "themanufacturer.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://themanufacturer.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://themanufacturer.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://themanufacturer.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://themanufacturer.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://themanufacturer.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://themanufacturer.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "thestrategybridge.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://thestrategybridge.org/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://thestrategybridge.org/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://thestrategybridge.org/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://thestrategybridge.org/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://thestrategybridge.org/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://thestrategybridge.org/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "thestreet.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://thestreet.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://thestreet.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://thestreet.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://thestreet.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://thestreet.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://thestreet.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "tradingeconomics.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://tradingeconomics.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://tradingeconomics.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://tradingeconomics.com/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://tradingeconomics.com/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://tradingeconomics.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://tradingeconomics.com/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "treasury.gov",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://treasury.gov/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://treasury.gov/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://treasury.gov/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://treasury.gov/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://treasury.gov/blog/rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://treasury.gov/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "treasurydirect.gov",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://treasurydirect.gov/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://treasurydirect.gov/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://treasurydirect.gov/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://treasurydirect.gov/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://treasurydirect.gov/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://treasurydirect.gov/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "unmanned-aerial.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://unmanned-aerial.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://unmanned-aerial.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://unmanned-aerial.com/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://unmanned-aerial.com/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://unmanned-aerial.com/blog/rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://unmanned-aerial.com/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "usatoday.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://usatoday.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://usatoday.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://usatoday.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://usatoday.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://usatoday.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://usatoday.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "usma.edu",
+      "found": true,
+      "feed_url": "https://www.westpoint.edu/rss.xml",
+      "entries_count": 10,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=utf-8",
+      "tried_count": 15,
+      "total_candidates": 32
+    },
+    {
+      "domain": "usnews.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://usnews.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://usnews.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://usnews.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://usnews.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://usnews.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://usnews.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "usnwc.edu",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://usnwc.edu/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://usnwc.edu/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://usnwc.edu/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://usnwc.edu/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://usnwc.edu/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://usnwc.edu/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "ustr.gov",
+      "found": true,
+      "feed_url": "https://ustr.gov/rss.xml",
+      "entries_count": 10,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=utf-8",
+      "tried_count": 15,
+      "total_candidates": 32
+    },
+    {
+      "domain": "va.gov",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://va.gov/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://va.gov/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://va.gov/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://va.gov/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://va.gov/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://va.gov/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "valuewalk.com",
+      "found": true,
+      "feed_url": "https://www.valuewalk.com/feed/",
+      "entries_count": 10,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 6,
+      "total_candidates": 32
+    },
+    {
+      "domain": "warisboring.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://warisboring.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://warisboring.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://warisboring.com/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://warisboring.com/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://warisboring.com/blog/rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://warisboring.com/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    },
+    {
+      "domain": "washingtonpost.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://washingtonpost.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://washingtonpost.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://washingtonpost.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://washingtonpost.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://washingtonpost.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://washingtonpost.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "washingtontimes.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://washingtontimes.com/?feed=rss2",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://washingtontimes.com/?output=rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://washingtontimes.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://washingtontimes.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://washingtontimes.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://washingtontimes.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "whitehouse.gov",
+      "found": true,
+      "feed_url": "https://www.whitehouse.gov/news/feed/",
+      "entries_count": 10,
+      "http_status": 200,
+      "content_type": "application/rss+xml; charset=UTF-8",
+      "tried_count": 11,
+      "total_candidates": 32
+    },
+    {
+      "domain": "worldbank.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://worldbank.org/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://worldbank.org/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://worldbank.org/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://worldbank.org/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://worldbank.org/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://worldbank.org/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "woundedwarriorproject.org",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://woundedwarriorproject.org/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://woundedwarriorproject.org/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://woundedwarriorproject.org/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://woundedwarriorproject.org/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://woundedwarriorproject.org/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://woundedwarriorproject.org/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "yahoo.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://www.yahoo.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://www.yahoo.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://www.yahoo.com/atom.xml",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://www.yahoo.com/blog/feed",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://www.yahoo.com/blog/rss",
+          "reason": "request_failed"
+        },
+        {
+          "url": "https://www.yahoo.com/feed",
+          "reason": "request_failed"
+        }
+      ]
+    },
+    {
+      "domain": "zacks.com",
+      "found": false,
+      "reason": "no_valid_feed_found",
+      "tried_count": 32,
+      "total_candidates": 32,
+      "sample_failures": [
+        {
+          "url": "https://www.zacks.com/?feed=rss2",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://www.zacks.com/?output=rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://www.zacks.com/atom.xml",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://www.zacks.com/blog/feed",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://www.zacks.com/blog/rss",
+          "reason": "not_feed_like"
+        },
+        {
+          "url": "https://www.zacks.com/feed",
+          "reason": "not_feed_like"
+        }
+      ]
+    }
+  ],
+  "entry_updates": [
+    {
+      "id": 1,
+      "name": "Blue Star Families",
+      "category": "military",
+      "old_rss_url": "https://bluestarfam.org/news/feed",
+      "new_rss_url": "https://bluestarfam.org/feed/",
+      "domain": "bluestarfam.org",
+      "discovered_entries_count": 10
+    },
+    {
+      "id": 5,
+      "name": "Operation Homefront",
+      "category": "military",
+      "old_rss_url": "https://operationhomefront.org/news/feed",
+      "new_rss_url": "https://operationhomefront.org/feed/",
+      "domain": "operationhomefront.org",
+      "discovered_entries_count": 10
+    },
+    {
+      "id": 6,
+      "name": "Semper Fi & America's Fund",
+      "category": "military",
+      "old_rss_url": "https://semperfifund.org/news/feed",
+      "new_rss_url": "https://thefund.org/sitemap.rss",
+      "domain": "semperfifund.org",
+      "discovered_entries_count": 50
+    },
+    {
+      "id": 9,
+      "name": "CyberScoop - Defense",
+      "category": "military",
+      "old_rss_url": "https://cyberscoop.com/category/defense/feed",
+      "new_rss_url": "https://cyberscoop.com/feed/",
+      "domain": "cyberscoop.com",
+      "discovered_entries_count": 10
+    },
+    {
+      "id": 12,
+      "name": "Breaking Defense - Cyber",
+      "category": "military",
+      "old_rss_url": "https://breakingdefense.com/category/cyber/feed",
+      "new_rss_url": "https://breakingdefense.com/feed/",
+      "domain": "breakingdefense.com",
+      "discovered_entries_count": 15
+    },
+    {
+      "id": 15,
+      "name": "SpaceNews - Military",
+      "category": "military",
+      "old_rss_url": "https://spacenews.com/category/military/feed",
+      "new_rss_url": "https://spacenews.com/feed/",
+      "domain": "spacenews.com",
+      "discovered_entries_count": 24
+    },
+    {
+      "id": 20,
+      "name": "Combating Terrorism Center",
+      "category": "military",
+      "old_rss_url": "https://ctc.usma.edu/feed",
+      "new_rss_url": "https://www.westpoint.edu/rss.xml",
+      "domain": "usma.edu",
+      "discovered_entries_count": 10
+    },
+    {
+      "id": 26,
+      "name": "FAS Secrecy Project",
+      "category": "military",
+      "old_rss_url": "https://fas.org/blogs/secrecy/feed",
+      "new_rss_url": "https://fas.org/feed/",
+      "domain": "fas.org",
+      "discovered_entries_count": 1
+    },
+    {
+      "id": 55,
+      "name": "Just Security - Military",
+      "category": "military",
+      "old_rss_url": "https://www.justsecurity.org/category/military/feed",
+      "new_rss_url": "https://www.justsecurity.org/feed/",
+      "domain": "justsecurity.org",
+      "discovered_entries_count": 10
+    },
+    {
+      "id": 60,
+      "name": "Military Benefits",
+      "category": "military",
+      "old_rss_url": "https://militarybenefits.info/news/feed",
+      "new_rss_url": "https://veteran.com/feed/",
+      "domain": "militarybenefits.info",
+      "discovered_entries_count": 10
+    },
+    {
+      "id": 61,
+      "name": "Veterans Jobs",
+      "category": "military",
+      "old_rss_url": "https://www.military.com/veterans-jobs/rss",
+      "new_rss_url": "https://www.military.com/rss.xml",
+      "domain": "military.com",
+      "discovered_entries_count": 10
+    },
+    {
+      "id": 62,
+      "name": "Hire Heroes USA",
+      "category": "military",
+      "old_rss_url": "https://hireheroesusa.org/news/feed",
+      "new_rss_url": "https://www.hireheroesusa.org/feed/",
+      "domain": "hireheroesusa.org",
+      "discovered_entries_count": 10
+    },
+    {
+      "id": 63,
+      "name": "Still Serving Veterans",
+      "category": "military",
+      "old_rss_url": "https://ssv.org/blog?format=rss",
+      "new_rss_url": "https://ssv.org/feed/",
+      "domain": "ssv.org",
+      "discovered_entries_count": 10
+    },
+    {
+      "id": 64,
+      "name": "Military Family",
+      "category": "military",
+      "old_rss_url": "https://militaryfamily.org/news/feed",
+      "new_rss_url": "https://www.militaryfamily.org/feed/",
+      "domain": "militaryfamily.org",
+      "discovered_entries_count": 10
+    },
+    {
+      "id": 65,
+      "name": "National Military Family Association",
+      "category": "military",
+      "old_rss_url": "https://www.militaryfamily.org/news/feed",
+      "new_rss_url": "https://www.militaryfamily.org/feed/",
+      "domain": "militaryfamily.org",
+      "discovered_entries_count": 10
+    },
+    {
+      "id": 67,
+      "name": "Military Spouse Magazine",
+      "category": "military",
+      "old_rss_url": "https://militaryspouse.com/news/feed",
+      "new_rss_url": "https://www.militaryspouse.com/feed/",
+      "domain": "militaryspouse.com",
+      "discovered_entries_count": 3
+    },
+    {
+      "id": 72,
+      "name": "Atlantic Council - Defense",
+      "category": "military",
+      "old_rss_url": "https://www.atlanticcouncil.org/feed",
+      "new_rss_url": "https://www.atlanticcouncil.org/feed/",
+      "domain": "atlanticcouncil.org",
+      "discovered_entries_count": 100
+    },
+    {
+      "id": 103,
+      "name": "Business Insider Personal Finance",
+      "category": "economy",
+      "old_rss_url": "https://feeds.businessinsider.com/personal-finance",
+      "new_rss_url": "https://feeds.businessinsider.com/custom/all",
+      "domain": "businessinsider.com",
+      "discovered_entries_count": 20
+    },
+    {
+      "id": 117,
+      "name": "ValueWalk",
+      "category": "economy",
+      "old_rss_url": "https://www.valuewalk.com/feed",
+      "new_rss_url": "https://www.valuewalk.com/feed/",
+      "domain": "valuewalk.com",
+      "discovered_entries_count": 10
+    },
+    {
+      "id": 141,
+      "name": "US Trade Representative",
+      "category": "economy",
+      "old_rss_url": "https://ustr.gov/rss",
+      "new_rss_url": "https://ustr.gov/rss.xml",
+      "domain": "ustr.gov",
+      "discovered_entries_count": 10
+    },
+    {
+      "id": 147,
+      "name": "Cato Institute",
+      "category": "economy",
+      "old_rss_url": "https://www.cato.org/rss",
+      "new_rss_url": "https://www.cato.org/rss.xml",
+      "domain": "cato.org",
+      "discovered_entries_count": 1
+    },
+    {
+      "id": 148,
+      "name": "Cato Institute Blog",
+      "category": "economy",
+      "old_rss_url": "https://www.cato.org/blog/rss",
+      "new_rss_url": "https://www.cato.org/rss.xml",
+      "domain": "cato.org",
+      "discovered_entries_count": 1
+    },
+    {
+      "id": 153,
+      "name": "Pew Research Center Economy",
+      "category": "economy",
+      "old_rss_url": "https://www.pewresearch.org/topics/national-economy/rss",
+      "new_rss_url": "https://www.pewresearch.org/feed/",
+      "domain": "pewresearch.org",
+      "discovered_entries_count": 50
+    },
+    {
+      "id": 154,
+      "name": "Pew Research World Economies",
+      "category": "economy",
+      "old_rss_url": "https://www.pewresearch.org/topics/world-economies/rss",
+      "new_rss_url": "https://www.pewresearch.org/feed/",
+      "domain": "pewresearch.org",
+      "discovered_entries_count": 50
+    },
+    {
+      "id": 166,
+      "name": "Entrepreneur Money & Finance",
+      "category": "economy",
+      "old_rss_url": "https://www.entrepreneur.com/money-finance/rss",
+      "new_rss_url": "https://www.entrepreneur.com/?feed=rss2",
+      "domain": "entrepreneur.com",
+      "discovered_entries_count": 15
+    },
+    {
+      "id": 167,
+      "name": "Entrepreneur Business News",
+      "category": "economy",
+      "old_rss_url": "https://www.entrepreneur.com/business-news/rss",
+      "new_rss_url": "https://www.entrepreneur.com/?feed=rss2",
+      "domain": "entrepreneur.com",
+      "discovered_entries_count": 15
+    },
+    {
+      "id": 173,
+      "name": "The Defiant",
+      "category": "economy",
+      "old_rss_url": "https://thedefiant.io/news/defi/rss",
+      "new_rss_url": "https://thedefiant.io/api/feed",
+      "domain": "thedefiant.io",
+      "discovered_entries_count": 100
+    },
+    {
+      "id": 174,
+      "name": "DeFi Prime",
+      "category": "economy",
+      "old_rss_url": "https://defiprime.com/blog/rss",
+      "new_rss_url": "https://defiprime.com/feed.xml",
+      "domain": "defiprime.com",
+      "discovered_entries_count": 5
+    },
+    {
+      "id": 184,
+      "name": "Multi-Housing News",
+      "category": "economy",
+      "old_rss_url": "https://www.multihousingnews.com/feed",
+      "new_rss_url": "https://www.multihousingnews.com/feed/",
+      "domain": "multihousingnews.com",
+      "discovered_entries_count": 100
+    },
+    {
+      "id": 190,
+      "name": "Noobpreneur",
+      "category": "economy",
+      "old_rss_url": "https://www.noobpreneur.com/feed",
+      "new_rss_url": "https://www.noobpreneur.com/blog/feed/",
+      "domain": "noobpreneur.com",
+      "discovered_entries_count": 10
+    },
+    {
+      "id": 194,
+      "name": "Women on Business",
+      "category": "economy",
+      "old_rss_url": "https://feeds.feedblitz.com/WomenonBusiness",
+      "new_rss_url": "https://www.feedblitz.com/feed/",
+      "domain": "feedblitz.com",
+      "discovered_entries_count": 25
+    },
+    {
+      "id": 196,
+      "name": "FinTech Futures",
+      "category": "economy",
+      "old_rss_url": "https://www.fintechfutures.com/feed",
+      "new_rss_url": "https://www.fintechfutures.com/rss.xml",
+      "domain": "fintechfutures.com",
+      "discovered_entries_count": 50
+    },
+    {
+      "id": 220,
+      "name": "NBC News Economy",
+      "category": "economy",
+      "old_rss_url": "https://www.nbcnews.com/business/economy/rss",
+      "new_rss_url": "https://feeds.nbcnews.com/nbcnews/public/news",
+      "domain": "nbcnews.com",
+      "discovered_entries_count": 25
+    },
+    {
+      "id": 245,
+      "name": "Newsweek Politics",
+      "category": "politics",
+      "old_rss_url": "https://www.newsweek.com/rss",
+      "new_rss_url": "https://www.newsweek.com/rss",
+      "domain": "newsweek.com",
+      "discovered_entries_count": 20
+    },
+    {
+      "id": 247,
+      "name": "The Seattle Times Politics",
+      "category": "politics",
+      "old_rss_url": "https://www.seattletimes.com/nation-world/nation-politics/feed/",
+      "new_rss_url": "https://www.seattletimes.com/feed/",
+      "domain": "seattletimes.com",
+      "discovered_entries_count": 34
+    },
+    {
+      "id": 249,
+      "name": "Chicago Tribune Politics",
+      "category": "politics",
+      "old_rss_url": "https://www.chicagotribune.com/politics/rss2.0.xml",
+      "new_rss_url": "https://www.chicagotribune.com/feed/",
+      "domain": "chicagotribune.com",
+      "discovered_entries_count": 10
+    },
+    {
+      "id": 251,
+      "name": "Denver Post Politics",
+      "category": "politics",
+      "old_rss_url": "https://www.denverpost.com/politics/feed/",
+      "new_rss_url": "https://www.denverpost.com/feed/",
+      "domain": "denverpost.com",
+      "discovered_entries_count": 10
+    },
+    {
+      "id": 255,
+      "name": "Star Tribune Politics",
+      "category": "politics",
+      "old_rss_url": "https://www.startribune.com/politics/feed/",
+      "new_rss_url": "https://www.startribune.com/rss",
+      "domain": "startribune.com",
+      "discovered_entries_count": 8
+    },
+    {
+      "id": 295,
+      "name": "Crooks and Liars",
+      "category": "politics",
+      "old_rss_url": "https://feeds.crooksandliars.com/crooksandliars",
+      "new_rss_url": "https://crooksandliars.com/feeds/latest",
+      "domain": "crooksandliars.com",
+      "discovered_entries_count": 25
+    },
+    {
+      "id": 297,
+      "name": "GovTrack",
+      "category": "politics",
+      "old_rss_url": "https://www.govtrack.us/rss",
+      "new_rss_url": "https://govtracknews.wordpress.com/feed/",
+      "domain": "govtrack.us",
+      "discovered_entries_count": 10
+    },
+    {
+      "id": 301,
+      "name": "Cook Political Report",
+      "category": "politics",
+      "old_rss_url": "https://cookpolitical.com/feed",
+      "new_rss_url": "https://www.cookpolitical.com/rss.xml",
+      "domain": "cookpolitical.com",
+      "discovered_entries_count": 10
+    },
+    {
+      "id": 311,
+      "name": "White House",
+      "category": "politics",
+      "old_rss_url": "https://www.whitehouse.gov/feed/",
+      "new_rss_url": "https://www.whitehouse.gov/news/feed/",
+      "domain": "whitehouse.gov",
+      "discovered_entries_count": 10
+    },
+    {
+      "id": 318,
+      "name": "BBC Reality Check",
+      "category": "politics",
+      "old_rss_url": "https://www.bbc.com/news/reality_check/feed",
+      "new_rss_url": "https://feeds.bbci.co.uk/news/rss.xml",
+      "domain": "bbc.com",
+      "discovered_entries_count": 33
+    },
+    {
+      "id": 320,
+      "name": "Cato Institute",
+      "category": "politics",
+      "old_rss_url": "https://www.cato.org/blog/feed",
+      "new_rss_url": "https://www.cato.org/rss.xml",
+      "domain": "cato.org",
+      "discovered_entries_count": 1
+    }
+  ]
+}

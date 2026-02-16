@@ -44,3 +44,4 @@ workers/content-extractor/dist/
 # Worker ignores
 workers/content-extractor/node_modules/
 workers/content-extractor/dist/
+worldmonitor/
