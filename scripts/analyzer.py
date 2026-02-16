@@ -1,0 +1,399 @@
+#!/usr/bin/env python3
+"""
+US-Monitor 热点分析器主流水线
+协调聚类、LLM摘要、信号检测和数据库操作
+"""
+
+import asyncio
+import argparse
+import json
+import logging
+import os
+import sys
+from datetime import datetime, timedelta
+from typing import List, Dict, Optional
+
+# 添加项目根目录到路径
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from supabase import create_client
+
+from config.analysis_config import (
+    MAX_ARTICLES_PER_RUN,
+    MAX_LLM_CALLS,
+    LLM_PROMPTS,
+    SIGNAL_TYPES,
+)
+from scripts.llm_client import LLMClient
+from scripts.clustering import cluster_news
+from scripts.signal_detector import detect_all_signals, generate_dedupe_key
+
+# 配置日志
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
+
+
+class HotspotAnalyzer:
+    """热点分析器主类"""
+
+    def __init__(self):
+        """初始化分析器"""
+        # Supabase 客户端
+        supabase_url = os.getenv("SUPABASE_URL")
+        supabase_key = os.getenv("SUPABASE_KEY")
+
+        if not supabase_url or not supabase_key:
+            raise ValueError(
+                "缺少 Supabase 配置。请设置 SUPABASE_URL 和 SUPABASE_KEY 环境变量"
+            )
+
+        self.supabase = create_client(supabase_url, supabase_key)
+
+        # LLM 客户端
+        try:
+            self.llm_client = LLMClient()
+            logger.info("LLM 客户端初始化成功")
+        except ValueError as e:
+            logger.warning(f"LLM 客户端初始化失败: {e}")
+            self.llm_client = None
+
+        self.stats = {
+            "articles_loaded": 0,
+            "clusters_created": 0,
+            "signals_detected": 0,
+            "llm_calls": 0,
+            "errors": 0,
+        }
+
+    def load_unanalyzed_articles(
+        self, limit: int = None, hours: int = 24
+    ) -> List[Dict]:
+        """
+        加载未分析的文章
+
+        Args:
+            limit: 最大加载数量
+            hours: 时间窗口（小时）
+
+        Returns:
+            文章列表
+        """
+        if limit is None:
+            limit = MAX_ARTICLES_PER_RUN
+
+        # 计算时间窗口
+        cutoff_time = (datetime.now() - timedelta(hours=hours)).isoformat()
+
+        logger.info(f"加载未分析的文章 (限制: {limit}, 时间窗口: {hours}小时)")
+
+        try:
+            # 查询未分析的文章
+            result = (
+                self.supabase.table("articles")
+                .select(
+                    "id, title, content, url, category, source_id, published_at, fetched_at"
+                )
+                .is_("analyzed_at", "null")
+                .gte("fetched_at", cutoff_time)
+                .limit(limit)
+                .execute()
+            )
+
+            articles = result.data
+            self.stats["articles_loaded"] = len(articles)
+
+            logger.info(f"加载了 {len(articles)} 篇未分析的文章")
+            return articles
+
+        except Exception as e:
+            logger.error(f"加载文章失败: {e}")
+            self.stats["errors"] += 1
+            return []
+
+    async def generate_cluster_summary(self, cluster: Dict) -> Dict:
+        """
+        为聚类生成中文摘要
+
+        Args:
+            cluster: 聚类数据
+
+        Returns:
+            摘要结果字典
+        """
+        if not self.llm_client:
+            logger.warning("LLM 客户端不可用，跳过摘要生成")
+            return {
+                "summary": cluster["primary_title"],
+                "key_entities": [],
+                "impact": "",
+                "trend": "",
+            }
+
+        # 检查是否超过LLM调用限制
+        if self.stats["llm_calls"] >= MAX_LLM_CALLS:
+            logger.warning(f"已达到LLM调用限制 ({MAX_LLM_CALLS})，跳过摘要生成")
+            return {
+                "summary": cluster["primary_title"],
+                "key_entities": [],
+                "impact": "",
+                "trend": "",
+            }
+
+        try:
+            # 准备提示词
+            content_samples = "\n".join(cluster["titles"][:3])  # 最多取3个标题作为样本
+
+            prompt = LLM_PROMPTS["cluster_summary"].format(
+                article_count=cluster["article_count"],
+                sources=", ".join([t[:30] for t in cluster["titles"][:5]]),
+                primary_title=cluster["primary_title"],
+                content_samples=content_samples[:500],
+            )
+
+            # 调用LLM
+            logger.info(f"为聚类 {cluster['cluster_id'][:8]}... 生成摘要")
+            result = await self.llm_client.summarize(prompt)
+
+            self.stats["llm_calls"] += 1
+
+            return result
+
+        except Exception as e:
+            logger.error(f"生成摘要失败: {e}")
+            self.stats["errors"] += 1
+            return {
+                "summary": cluster["primary_title"],
+                "key_entities": [],
+                "impact": "",
+                "trend": "",
+            }
+
+    async def save_analysis_results(self, clusters: List[Dict], signals: List[Dict]):
+        """
+        保存分析结果到数据库
+
+        Args:
+            clusters: 聚类列表
+            signals: 信号列表
+        """
+        logger.info(f"保存分析结果: {len(clusters)} 个聚类, {len(signals)} 个信号")
+
+        try:
+            # 保存聚类
+            for cluster in clusters:
+                cluster_data = {
+                    "cluster_key": cluster["cluster_id"],
+                    "category": cluster["category"],
+                    "primary_title": cluster["primary_title"],
+                    "primary_link": "",  # 可以添加主文章链接
+                    "summary": cluster.get("summary", {}).get(
+                        "summary", cluster["primary_title"]
+                    ),
+                    "summary_en": cluster["primary_title"],
+                    "article_count": cluster["article_count"],
+                    "key_entities": json.dumps(
+                        cluster.get("summary", {}).get("key_entities", [])
+                    ),
+                    "impact": cluster.get("summary", {}).get("impact", ""),
+                    "trend": cluster.get("summary", {}).get("trend", ""),
+                    "confidence": cluster.get("summary", {}).get("confidence", 0.8),
+                }
+
+                # 检查是否已存在
+                existing = (
+                    self.supabase.table("analysis_clusters")
+                    .select("id")
+                    .eq("cluster_key", cluster["cluster_id"])
+                    .execute()
+                )
+
+                if existing.data:
+                    # 更新
+                    cluster_id = existing.data[0]["id"]
+                    self.supabase.table("analysis_clusters").update(cluster_data).eq(
+                        "id", cluster_id
+                    ).execute()
+                    logger.debug(f"更新聚类: {cluster['cluster_id'][:8]}...")
+                else:
+                    # 插入
+                    result = (
+                        self.supabase.table("analysis_clusters")
+                        .insert(cluster_data)
+                        .execute()
+                    )
+                    cluster_id = result.data[0]["id"]
+                    logger.debug(f"插入聚类: {cluster['cluster_id'][:8]}...")
+
+                    # 保存 article_analyses 关联
+                    for article_id in cluster["article_ids"]:
+                        try:
+                            self.supabase.table("article_analyses").insert(
+                                {"article_id": article_id, "cluster_id": cluster_id}
+                            ).execute()
+                        except Exception as e:
+                            # 可能已存在，忽略错误
+                            pass
+
+            # 保存信号
+            for signal in signals:
+                signal_data = {
+                    "signal_type": signal["signal_type"],
+                    "signal_key": signal["signal_id"],
+                    "category": signal.get("category", "unknown"),
+                    "confidence": signal["confidence"],
+                    "description": signal["description"],
+                    "description_en": signal.get("description_en", ""),
+                    "rationale": json.dumps(signal.get("details", {})),
+                    "data_source": "llm_analysis",
+                    "expires_at": signal.get("expires_at"),
+                    "created_at": signal.get("created_at"),
+                }
+
+                # 检查是否已存在
+                existing = (
+                    self.supabase.table("analysis_signals")
+                    .select("id")
+                    .eq("signal_key", signal["signal_id"])
+                    .execute()
+                )
+
+                if not existing.data:
+                    self.supabase.table("analysis_signals").insert(
+                        signal_data
+                    ).execute()
+                    logger.debug(f"插入信号: {signal['signal_type']}")
+
+            logger.info("分析结果保存成功")
+
+        except Exception as e:
+            logger.error(f"保存分析结果失败: {e}")
+            self.stats["errors"] += 1
+            raise
+
+    async def mark_articles_analyzed(self, article_ids: List[int]):
+        """
+        标记文章为已分析
+
+        Args:
+            article_ids: 文章ID列表
+        """
+        if not article_ids:
+            return
+
+        logger.info(f"标记 {len(article_ids)} 篇文章为已分析")
+
+        try:
+            now = datetime.now().isoformat()
+
+            # 批量更新
+            for article_id in article_ids:
+                self.supabase.table("articles").update({"analyzed_at": now}).eq(
+                    "id", article_id
+                ).execute()
+
+            logger.info("文章标记完成")
+
+        except Exception as e:
+            logger.error(f"标记文章失败: {e}")
+            self.stats["errors"] += 1
+
+    async def run_analysis(self, limit: int = None, dry_run: bool = False):
+        """
+        运行完整的分析流程
+
+        Args:
+            limit: 最大处理文章数
+            dry_run: 试运行模式（不保存到数据库）
+        """
+        logger.info("=" * 60)
+        logger.info("开始热点分析")
+        logger.info("=" * 60)
+
+        start_time = datetime.now()
+
+        # 1. 加载文章
+        articles = self.load_unanalyzed_articles(limit)
+
+        if not articles:
+            logger.info("没有未分析的文章，跳过")
+            return
+
+        # 2. 聚类
+        logger.info(f"开始聚类 {len(articles)} 篇文章...")
+        clusters = cluster_news(articles)
+        self.stats["clusters_created"] = len(clusters)
+        logger.info(f"创建了 {len(clusters)} 个聚类")
+
+        # 3. 生成摘要
+        logger.info("生成聚类摘要...")
+        for i, cluster in enumerate(clusters):
+            logger.info(
+                f"  处理聚类 {i + 1}/{len(clusters)}: {cluster['primary_title'][:50]}..."
+            )
+            summary = await self.generate_cluster_summary(cluster)
+            cluster["summary"] = summary
+
+        # 4. 信号检测
+        logger.info("检测信号...")
+        signals = detect_all_signals(clusters)
+        self.stats["signals_detected"] = len(signals)
+
+        if signals:
+            logger.info(f"检测到 {len(signals)} 个信号:")
+            for signal in signals[:5]:  # 只显示前5个
+                icon = SIGNAL_TYPES.get(signal["signal_type"], {}).get("icon", "⚡")
+                logger.info(
+                    f"  {icon} {signal['name']}: 置信度 {signal['confidence']:.2f}"
+                )
+
+        # 5. 保存结果
+        if not dry_run:
+            logger.info("保存分析结果...")
+            await self.save_analysis_results(clusters, signals)
+
+            # 6. 标记文章
+            article_ids = [a["id"] for a in articles]
+            await self.mark_articles_analyzed(article_ids)
+        else:
+            logger.info("试运行模式: 跳过保存")
+
+        # 统计
+        end_time = datetime.now()
+        duration = (end_time - start_time).total_seconds()
+
+        logger.info("=" * 60)
+        logger.info("分析完成!")
+        logger.info(f"耗时: {duration:.1f} 秒")
+        logger.info(f"处理文章: {self.stats['articles_loaded']}")
+        logger.info(f"创建聚类: {self.stats['clusters_created']}")
+        logger.info(f"检测信号: {self.stats['signals_detected']}")
+        logger.info(f"LLM调用: {self.stats['llm_calls']}")
+        if self.llm_client:
+            llm_stats = self.llm_client.get_stats()
+            logger.info(f"预估成本: ${llm_stats['estimated_cost']:.4f}")
+        logger.info("=" * 60)
+
+
+async def main():
+    """主函数"""
+    parser = argparse.ArgumentParser(description="US-Monitor 热点分析器")
+    parser.add_argument("--limit", type=int, default=None, help="最大处理文章数")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="试运行模式（不保存到数据库）"
+    )
+    parser.add_argument("--hours", type=int, default=24, help="时间窗口（小时）")
+
+    args = parser.parse_args()
+
+    try:
+        analyzer = HotspotAnalyzer()
+        await analyzer.run_analysis(limit=args.limit, dry_run=args.dry_run)
+    except Exception as e:
+        logger.error(f"分析器运行失败: {e}")
+        raise
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
