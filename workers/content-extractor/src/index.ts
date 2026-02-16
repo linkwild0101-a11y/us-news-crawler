@@ -34,6 +34,7 @@ async function handleExtract(request) {
   try {
     const body = await request.json();
     const targetUrl = body.url;
+    const rawMode = body.raw === true; // 如果为 true，返回原始内容而不进行提取
     
     if (!targetUrl) {
       return new Response(JSON.stringify({
@@ -60,7 +61,7 @@ async function handleExtract(request) {
     const response = await fetch(targetUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,*/*',
+        'Accept': 'text/html,application/xhtml+xml,application/xml,*/*',
         'Accept-Encoding': 'gzip',
       },
     });
@@ -76,6 +77,26 @@ async function handleExtract(request) {
     }
     
     const html = await response.text();
+    
+    // 如果是 raw 模式（用于 RSS 验证），直接返回原始内容
+    if (rawMode) {
+      // 尝试提取标题
+      let title = '';
+      const titleMatch = html.match(/<title[^>]*>([^<]*)<\/title>/i);
+      if (titleMatch) {
+        title = titleMatch[1].trim();
+      }
+      
+      return new Response(JSON.stringify({
+        success: true,
+        title: title,
+        content: html, // 返回原始 HTML/XML
+        is_raw: true
+      }), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
     const extracted = extractContent(html);
     
     return new Response(JSON.stringify({
