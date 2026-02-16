@@ -18,9 +18,11 @@ from supabase import create_client
 # 配置
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://lwigqxyfxevldfjdeokp.supabase.co")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+WORKER_URL = os.getenv("WORKER_URL")  # Cloudflare Worker URL
 
 # 测试配置
 TEST_TIMEOUT = 20  # 请求超时时间
+WORKER_TIMEOUT = 30  # Worker 请求超时时间（更长，因为需要代理访问）
 MAX_SOURCES = None  # None=测试全部，设置为数字限制测试数量
 VALIDATE_ALL = (
     os.getenv("VALIDATE_ALL", "false").lower() == "true"
@@ -38,7 +40,7 @@ class RSSValidator:
         self.stats = {"total": 0, "working": 0, "failed": 0, "by_category": {}}
 
     async def test_source(self, source: Dict, session: aiohttp.ClientSession) -> Dict:
-        """测试单个RSS源"""
+        """测试单个RSS源，支持直接访问和通过Worker访问"""
         result = {
             "id": source["id"],
             "name": source["name"],
@@ -49,10 +51,12 @@ class RSSValidator:
             "articles_count": 0,
             "error": None,
             "response_time": 0,
+            "access_method": "direct",  # direct 或 worker
         }
 
         start_time = datetime.now()
 
+        # 1. 首先尝试直接访问
         try:
             async with session.get(
                 source["rss_url"],
@@ -69,10 +73,10 @@ class RSSValidator:
                     if feed.entries:
                         result["status"] = "working"
                         result["articles_count"] = len(feed.entries)
-                        # 记录最新文章标题
                         result["latest_article"] = feed.entries[0].get("title", "N/A")[
                             :60
                         ]
+                        return result
                     else:
                         result["status"] = "empty"
                         result["error"] = "RSS parsed but no entries found"
@@ -87,6 +91,98 @@ class RSSValidator:
             result["status"] = "error"
             result["error"] = str(e)[:100]
 
+        # 2. 直接访问失败，检查是否标记为反爬源，尝试通过 Worker 访问
+        anti_scraping = source.get("anti_scraping", "None")
+        if anti_scraping in ["Cloudflare", "Paywall"] and WORKER_URL:
+            print(f"  🔄 {source['name'][:40]:<40} | 直接访问失败，尝试 Worker...")
+            worker_result = await self._test_via_worker(source)
+            if worker_result["status"] == "working":
+                return worker_result
+            else:
+                # Worker 也失败，保留原始错误信息但记录 Worker 尝试
+                result["worker_error"] = worker_result.get("error", "Worker failed")
+
+        return result
+
+    async def _test_via_worker(self, source: Dict) -> Dict:
+        """通过 Cloudflare Worker 测试 RSS 源"""
+        result = {
+            "id": source["id"],
+            "name": source["name"],
+            "category": source["category"],
+            "rss_url": source["rss_url"],
+            "status": "unknown",
+            "http_status": None,
+            "articles_count": 0,
+            "error": None,
+            "response_time": 0,
+            "access_method": "worker",
+        }
+
+        start_time = datetime.now()
+
+        try:
+            # 使用 aiohttp 直接请求 Worker
+            timeout = aiohttp.ClientTimeout(total=WORKER_TIMEOUT)
+            async with aiohttp.ClientSession(timeout=timeout) as worker_session:
+                async with worker_session.post(
+                    f"{WORKER_URL}/extract",
+                    json={"url": source["rss_url"]},
+                    headers={"Content-Type": "application/json"},
+                ) as resp:
+                    result["http_status"] = resp.status
+                    result["response_time"] = (
+                        datetime.now() - start_time
+                    ).total_seconds()
+
+                    if resp.status == 200:
+                        data = await resp.json()
+                        if data.get("success"):
+                            # Worker 返回了 HTML 内容，需要检查是否包含 RSS 特征
+                            content = data.get("content", "")
+                            # 简单检查是否包含 RSS/Feed 特征
+                            if (
+                                "<rss" in content.lower()
+                                or "<feed" in content.lower()
+                                or "<?xml" in content
+                            ):
+                                # 解析 RSS 内容
+                                feed = feedparser.parse(content)
+                                if feed.entries:
+                                    result["status"] = "working"
+                                    result["articles_count"] = len(feed.entries)
+                                    result["latest_article"] = feed.entries[0].get(
+                                        "title", "N/A"
+                                    )[:60]
+                                else:
+                                    result["status"] = "empty"
+                                    result["error"] = (
+                                        "RSS parsed but no entries found via Worker"
+                                    )
+                            else:
+                                # 可能返回的是文章页面而非 RSS feed
+                                result["status"] = "working"
+                                result["articles_count"] = 1
+                                result["latest_article"] = data.get(
+                                    "title", "Via Worker"
+                                )[:60]
+                                result["note"] = "Via Worker (HTML page)"
+                        else:
+                            result["status"] = "error"
+                            result["error"] = (
+                                f"Worker error: {data.get('error', 'Unknown')}"
+                            )
+                    else:
+                        result["status"] = "error"
+                        result["error"] = f"Worker HTTP {resp.status}"
+
+        except asyncio.TimeoutError:
+            result["status"] = "timeout"
+            result["error"] = f"Worker timeout after {WORKER_TIMEOUT}s"
+        except Exception as e:
+            result["status"] = "error"
+            result["error"] = f"Worker error: {str(e)[:100]}"
+
         return result
 
     async def validate_all(self):
@@ -94,8 +190,12 @@ class RSSValidator:
         print("=" * 70)
         print("🧪 RSS源可用性验证")
         print("=" * 70)
-        print(f"⏱️  超时设置: {TEST_TIMEOUT}秒")
+        print(f"⏱️  超时设置: {TEST_TIMEOUT}秒 (直接) / {WORKER_TIMEOUT}秒 (Worker)")
         print(f"🗄️  数据库: {SUPABASE_URL}")
+        if WORKER_URL:
+            print(f"🌐 Worker: {WORKER_URL}")
+        else:
+            print("⚠️  Worker URL 未设置，反爬源可能无法验证")
         print()
 
         # 获取源
@@ -135,8 +235,10 @@ class RSSValidator:
                     result = await self.test_source(source, session)
                     # 实时打印结果
                     status_icon = "✅" if result["status"] == "working" else "⚠️ "
+                    access_method = result.get("access_method", "direct")
+                    method_icon = "🌐" if access_method == "worker" else ""
                     print(
-                        f"{status_icon} {result['name'][:40]:<40} | {result['status']:<10} | {result.get('articles_count', 0):>3} articles"
+                        f"{status_icon} {method_icon} {result['name'][:40]:<38} | {result['status']:<10} | {result.get('articles_count', 0):>3} articles"
                     )
                     return result
 
@@ -204,10 +306,26 @@ class RSSValidator:
 
         # 可用的源示例
         working_sources = [r for r in self.results if r["status"] == "working"]
+        worker_sources = [
+            r for r in working_sources if r.get("access_method") == "worker"
+        ]
+
+        if worker_sources:
+            print(f"\n🌐 通过 Worker 访问的源 ({len(worker_sources)}个):")
+            for r in worker_sources[:5]:
+                print(f"  - {r['name'][:40]:<40} | {r['articles_count']:>3} articles")
+                if len(worker_sources) > 5:
+                    print(f"    ... 还有 {len(worker_sources) - 5} 个")
+
         if working_sources:
             print(f"\n✅ 可用的源示例 ({len(working_sources)}个中的前5个):")
             for r in working_sources[:5]:
-                print(f"  - {r['name'][:40]:<40} | {r['articles_count']:>3} articles")
+                access_info = (
+                    "[Worker]" if r.get("access_method") == "worker" else "[Direct]"
+                )
+                print(
+                    f"  - {r['name'][:40]:<40} | {access_info:<10} | {r['articles_count']:>3} articles"
+                )
                 print(f"    Latest: {r.get('latest_article', 'N/A')}")
 
         print("\n" + "=" * 70)

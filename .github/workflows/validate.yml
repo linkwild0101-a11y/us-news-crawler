@@ -27,6 +27,7 @@ jobs:
       env:
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        WORKER_URL: ${{ secrets.WORKER_URL }}
         VALIDATE_ALL: "true"
       run: |
         python scripts/validate_rss.py
