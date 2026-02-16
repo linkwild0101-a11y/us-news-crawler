@@ -22,6 +22,9 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 # 测试配置
 TEST_TIMEOUT = 20  # 请求超时时间
 MAX_SOURCES = None  # None=测试全部，设置为数字限制测试数量
+VALIDATE_ALL = (
+    os.getenv("VALIDATE_ALL", "false").lower() == "true"
+)  # true=验证所有源，false=只验证active
 
 
 class RSSValidator:
@@ -95,15 +98,23 @@ class RSSValidator:
         print(f"🗄️  数据库: {SUPABASE_URL}")
         print()
 
-        # 获取所有源
+        # 获取源
         print("📊 正在获取RSS源列表...")
-        sources = (
-            self.supabase.table("rss_sources")
-            .select("*")
-            .eq("status", "active")
-            .execute()
-            .data
-        )
+
+        if VALIDATE_ALL:
+            # 验证所有源（包括之前标记为error的）
+            print("🔄 模式: 验证所有源（包括之前标记为error的）")
+            sources = self.supabase.table("rss_sources").select("*").execute().data
+        else:
+            # 只验证active的源
+            print("🔄 模式: 只验证active状态的源")
+            sources = (
+                self.supabase.table("rss_sources")
+                .select("*")
+                .eq("status", "active")
+                .execute()
+                .data
+            )
 
         if MAX_SOURCES:
             sources = sources[:MAX_SOURCES]
