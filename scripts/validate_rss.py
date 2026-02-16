@@ -19,10 +19,12 @@ from supabase import create_client
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://lwigqxyfxevldfjdeokp.supabase.co")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 WORKER_URL = os.getenv("WORKER_URL")  # Cloudflare Worker URL
+RAILWAY_URL = os.getenv("RAILWAY_URL")  # Railway Proxy URL
 
 # 测试配置
 TEST_TIMEOUT = 20  # 请求超时时间
 WORKER_TIMEOUT = 30  # Worker 请求超时时间（更长，因为需要代理访问）
+RAILWAY_TIMEOUT = 30  # Railway 请求超时时间
 MAX_SOURCES = None  # None=测试全部，设置为数字限制测试数量
 VALIDATE_ALL = (
     os.getenv("VALIDATE_ALL", "false").lower() == "true"
@@ -99,8 +101,23 @@ class RSSValidator:
             if worker_result["status"] == "working":
                 return worker_result
             else:
-                # Worker 也失败，保留原始错误信息但记录 Worker 尝试
-                result["worker_error"] = worker_result.get("error", "Worker failed")
+                # Worker 也失败，尝试 Railway
+                if RAILWAY_URL:
+                    print(
+                        f"  🚂 {source['name'][:40]:<40} | Worker 失败，尝试 Railway..."
+                    )
+                    railway_result = await self._test_via_railway(source)
+                    if railway_result["status"] == "working":
+                        return railway_result
+                    else:
+                        result["worker_error"] = worker_result.get(
+                            "error", "Worker failed"
+                        )
+                        result["railway_error"] = railway_result.get(
+                            "error", "Railway failed"
+                        )
+                else:
+                    result["worker_error"] = worker_result.get("error", "Worker failed")
 
         return result
 
@@ -188,17 +205,82 @@ class RSSValidator:
 
         return result
 
+    async def _test_via_railway(self, source: Dict) -> Dict:
+        """通过 Railway 代理测试 RSS 源"""
+        result = {
+            "id": source["id"],
+            "name": source["name"],
+            "category": source["category"],
+            "rss_url": source["rss_url"],
+            "status": "unknown",
+            "http_status": None,
+            "articles_count": 0,
+            "error": None,
+            "response_time": 0,
+            "access_method": "railway",
+        }
+
+        start_time = datetime.now()
+
+        try:
+            timeout = aiohttp.ClientTimeout(total=RAILWAY_TIMEOUT)
+            async with aiohttp.ClientSession(timeout=timeout) as railway_session:
+                async with railway_session.get(
+                    f"{RAILWAY_URL}/rss",
+                    params={"url": source["rss_url"]},
+                    headers={"Accept": "application/xml"},
+                ) as resp:
+                    result["http_status"] = resp.status
+                    result["response_time"] = (
+                        datetime.now() - start_time
+                    ).total_seconds()
+
+                    if resp.status == 200:
+                        content = await resp.text()
+                        # 解析 RSS
+                        feed = feedparser.parse(content)
+
+                        if feed.entries:
+                            result["status"] = "working"
+                            result["articles_count"] = len(feed.entries)
+                            result["latest_article"] = feed.entries[0].get(
+                                "title", "N/A"
+                            )[:60]
+                        else:
+                            result["status"] = "empty"
+                            result["error"] = (
+                                "RSS parsed but no entries found via Railway"
+                            )
+                    else:
+                        result["status"] = "error"
+                        result["error"] = f"Railway HTTP {resp.status}"
+
+        except asyncio.TimeoutError:
+            result["status"] = "timeout"
+            result["error"] = f"Railway timeout after {RAILWAY_TIMEOUT}s"
+        except Exception as e:
+            result["status"] = "error"
+            result["error"] = f"Railway error: {str(e)[:100]}"
+
+        return result
+
     async def validate_all(self):
         """验证所有RSS源"""
         print("=" * 70)
         print("🧪 RSS源可用性验证")
         print("=" * 70)
-        print(f"⏱️  超时设置: {TEST_TIMEOUT}秒 (直接) / {WORKER_TIMEOUT}秒 (Worker)")
+        print(
+            f"⏱️  超时设置: {TEST_TIMEOUT}秒 (直接) / {WORKER_TIMEOUT}秒 (Worker) / {RAILWAY_TIMEOUT}秒 (Railway)"
+        )
         print(f"🗄️  数据库: {SUPABASE_URL}")
         if WORKER_URL:
             print(f"🌐 Worker: {WORKER_URL}")
         else:
-            print("⚠️  Worker URL 未设置，反爬源可能无法验证")
+            print("⚠️  Worker URL 未设置")
+        if RAILWAY_URL:
+            print(f"🚂 Railway: {RAILWAY_URL}")
+        else:
+            print("⚠️  Railway URL 未设置")
         print()
 
         # 获取源
