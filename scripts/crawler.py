@@ -228,12 +228,24 @@ class RSSCrawler:
         title = entry.get("title", extracted.get("title", "Untitled"))
         content = extracted.get("content", entry.get("summary", ""))
 
+        # 处理 published_parsed (time.struct_time -> ISO format)
+        published_at = None
+        if entry.get("published_parsed"):
+            try:
+                from time import mktime
+
+                published_at = datetime.fromtimestamp(
+                    mktime(entry["published_parsed"])
+                ).isoformat()
+            except:
+                published_at = None
+
         article = {
             "title": title,
             "content": content,
             "url": url,
             "source_id": source_info["source_id"],
-            "published_at": entry.get("published_parsed"),
+            "published_at": published_at,
             "category": source_info["category"],
             "author": entry.get("author", extracted.get("author", "")),
             "extraction_method": extracted.get("extraction_method", "local"),
