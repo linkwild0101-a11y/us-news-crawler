@@ -68,6 +68,11 @@ class RSSCrawler:
 
     async def extract_content(self, url: str, anti_scraping: str) -> Optional[Dict]:
         """混合内容提取"""
+        # 跳过 Twitter/X 链接（已知会有 header 过长问题）
+        if "twitter.com" in url or "x.com" in url:
+            print(f"  ⏭️  跳过 Twitter/X 链接")
+            return None
+
         try:
             if anti_scraping in ["Cloudflare", "Paywall"] and WORKER_URL:
                 # 使用Cloudflare Worker
