@@ -93,9 +93,22 @@ class RSSValidator:
             result["status"] = "error"
             result["error"] = str(e)[:100]
 
-        # 2. 直接访问失败，检查是否标记为反爬源，尝试通过 Worker 访问
+        # 2. 直接访问失败，检查是否标记为反爬源，尝试通过 Worker/Railway 访问
         anti_scraping = source.get("anti_scraping", "None")
-        if anti_scraping in ["Cloudflare", "Paywall"] and WORKER_URL:
+
+        # 对于标记为 railway 的源，跳过直接访问和 Worker，直接使用 Railway
+        if anti_scraping == "railway" and RAILWAY_URL:
+            print(
+                f"  🚂 {source['name'][:40]:<40} | 标记为 railway，直接使用 Railway..."
+            )
+            railway_result = await self._test_via_railway(source)
+            if railway_result["status"] == "working":
+                return railway_result
+            else:
+                result["railway_error"] = railway_result.get("error", "Railway failed")
+
+        # 对于 Cloudflare/Paywall，先尝试 Worker，再尝试 Railway
+        elif anti_scraping in ["Cloudflare", "Paywall"] and WORKER_URL:
             print(f"  🔄 {source['name'][:40]:<40} | 直接访问失败，尝试 Worker...")
             worker_result = await self._test_via_worker(source)
             if worker_result["status"] == "working":
@@ -321,7 +334,12 @@ class RSSValidator:
                     # 实时打印结果
                     status_icon = "✅" if result["status"] == "working" else "⚠️ "
                     access_method = result.get("access_method", "direct")
-                    method_icon = "🌐" if access_method == "worker" else ""
+                    if access_method == "worker":
+                        method_icon = "🌐"
+                    elif access_method == "railway":
+                        method_icon = "🚂"
+                    else:
+                        method_icon = ""
                     print(
                         f"{status_icon} {method_icon} {result['name'][:40]:<38} | {result['status']:<10} | {result.get('articles_count', 0):>3} articles"
                     )
