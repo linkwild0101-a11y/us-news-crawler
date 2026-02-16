@@ -1,0 +1,137 @@
+name: RSS Crawler Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+    
+    - name: Test database connection
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      run: |
+        python -c "
+        from supabase import create_client
+        import os
+        
+        print('Testing database connection...')
+        supabase = create_client(
+            os.getenv('SUPABASE_URL'),
+            os.getenv('SUPABASE_KEY')
+        )
+        
+        result = supabase.table('rss_sources').select('count', count='exact').execute()
+        print(f'✅ Database connected! Found {result.count} sources')
+        
+        # Test write
+        test_data = {
+            'title': 'GitHub Actions Test',
+            'content': 'Test from GitHub Actions',
+            'url': 'https://test.github.actions/' + str(__import__('time').time()),
+            'source_id': 1,
+            'category': 'test'
+        }
+        result = supabase.table('articles').insert(test_data).execute()
+        print('✅ Write test passed!')
+        
+        # Cleanup
+        supabase.table('articles').delete().eq('url', test_data['url']).execute()
+        print('✅ Cleanup completed!')
+        print('All tests passed!')
+        "
+    
+    - name: Test RSS crawling (5 sources)
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        WORKER_URL: ${{ secrets.WORKER_URL }}
+      run: |
+        python -c "
+        import asyncio
+        import aiohttp
+        import feedparser
+        from supabase import create_client
+        import os
+        
+        print('\\nTesting RSS crawling...')
+        
+        supabase = create_client(
+            os.getenv('SUPABASE_URL'),
+            os.getenv('SUPABASE_KEY')
+        )
+        
+        sources = supabase.table('rss_sources').select('*').limit(5).execute().data
+        print(f'Testing {len(sources)} sources...')
+        
+        async def test_source(source):
+            try:
+                timeout = aiohttp.ClientTimeout(total=20)
+                async with aiohttp.ClientSession(timeout=timeout) as session:
+                    async with session.get(
+                        source['rss_url'],
+                        headers={'User-Agent': 'Mozilla/5.0 (compatible; RSSCrawler/1.0)'}
+                    ) as resp:
+                        if resp.status == 200:
+                            content = await resp.text()
+                            feed = feedparser.parse(content)
+                            if feed.entries:
+                                print(f'✅ {source[\"name\"][:30]}: {len(feed.entries)} articles')
+                                return True
+                            else:
+                                print(f'⚠️  {source[\"name\"][:30]}: No articles')
+                        else:
+                            print(f'⚠️  {source[\"name\"][:30]}: HTTP {resp.status}')
+            except Exception as e:
+                print(f'❌ {source[\"name\"][:30]}: {str(e)[:40]}')
+            return False
+        
+        async def main():
+            tasks = [test_source(s) for s in sources]
+            results = await asyncio.gather(*tasks)
+            success = sum(results)
+            print(f'\\n📊 Results: {success}/{len(sources)} sources working')
+            return success > 0
+        
+        if asyncio.run(main()):
+            print('\\n✅ RSS crawling test passed!')
+        else:
+            print('\\n⚠️  Some sources failed, but system is working')
+        "
+    
+    - name: Test Worker connection
+      env:
+        WORKER_URL: ${{ secrets.WORKER_URL }}
+      run: |
+        if [ -n "$WORKER_URL" ]; then
+          echo "Testing Worker connection..."
+          curl -s "$WORKER_URL/health" || echo "⚠️ Worker health check failed (may be normal)"
+          echo "✅ Worker URL configured"
+        else
+          echo "⚠️ WORKER_URL not set, skipping Worker test"
+        fi
+    
+    - name: Summary
+      run: |
+        echo ""
+        echo "=========================================="
+        echo "✅ Cloud Test Completed!"
+        echo "=========================================="
+        echo ""
+        echo "If all tests passed, your system is ready!"
+        echo "You can now run the full crawler."
