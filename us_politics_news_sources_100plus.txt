@@ -1,0 +1,233 @@
+# US POLITICS NEWS SOURCES - 100+ RSS FEEDS AND LISTING PAGES
+
+## Comprehensive Collection of US Political News Websites and RSS Feeds
+
+| Name | Listing URL | RSS URL | Description | Anti-Scraping |
+|------|-------------|---------|-------------|---------------|
+| Politico | https://www.politico.com/politics | https://www.politico.com/rss/politicopicks.xml | Comprehensive politics and policy coverage | None |
+| Politico Playbook | https://www.politico.com/playbook | https://rss.politico.com/playbook.xml | Daily political briefing and analysis | None |
+| Politico White House | https://www.politico.com/white-house | https://rss.politico.com/white-house.xml | White House news and analysis | None |
+| Politico Congress | https://www.politico.com/congress | https://rss.politico.com/congress.xml | Congressional news and legislation | None |
+| CNN Politics | https://edition.cnn.com/politics | http://rss.cnn.com/rss/cnn_allpolitics.rss | Breaking political news and analysis | None |
+| Fox News Politics | https://www.foxnews.com/politics | https://moxie.foxnews.com/google-publisher/politics.xml | Conservative political news coverage | None |
+| NBC News Politics | https://www.nbcnews.com/politics | https://feeds.nbcnews.com/feeds/nbcpolitics | Political news from NBC | None |
+| ABC News Politics | https://abcnews.go.com/Politics | https://abcnews.go.com/abcnews/politicsheadlines | Political news and analysis | None |
+| CBS News Politics | https://www.cbsnews.com/politics | https://www.cbsnews.com/latest/rss/politics | Political news coverage | None |
+| Reuters Politics | https://www.reuters.com/politics | https://feeds.reuters.com/Reuters/PoliticsNews | International political news | None |
+| AP News Politics | https://apnews.com/politics | https://apnews.com/politics.rss | Associated Press political coverage | None |
+| Bloomberg Politics | https://www.bloomberg.com/politics | https://feeds.bloomberg.com/politics/news.rss | Business and politics coverage | Paywall |
+| The Hill | https://thehill.com/news | https://thehill.com/news/feed/ | Congress and political news | None |
+| The Hill Policy | https://thehill.com/policy | https://thehill.com/policy/feed | Policy analysis and news | None |
+| The Hill Opinion | https://thehill.com/opinion | https://thehill.com/opinion/feed | Political opinion and commentary | None |
+| Washington Post Politics | https://www.washingtonpost.com/politics | https://feeds.washingtonpost.com/rss/politics | In-depth political coverage | Paywall |
+| New York Times Politics | https://www.nytimes.com/section/politics | https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml | Comprehensive politics coverage | Paywall |
+| Wall Street Journal Politics | https://www.wsj.com/politics | https://feeds.content.dowjones.io/public/rss/politics | Business-focused political news | Paywall |
+| USA Today Politics | https://www.usatoday.com/news/politics | https://rss.usatoday.com/news/politics | National political news | None |
+| The Guardian US Politics | https://www.theguardian.com/us-news/us-politics | https://www.theguardian.com/us-news/us-politics/rss | Liberal perspective on US politics | None |
+| BBC US Politics | https://www.bbc.com/news/world/us_and_canada | https://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml | International view of US politics | None |
+| NPR Politics | https://www.npr.org/sections/politics | https://feeds.npr.org/1014/rss.xml | Public radio political coverage | None |
+| PBS NewsHour Politics | https://www.pbs.org/newshour/politics | https://www.pbs.org/newshour/feeds/rss/politics | In-depth political reporting | None |
+| Axios Politics | https://www.axios.com/politics-policy | https://api.axios.com/feed/politics | Smart political briefings | None |
+| Newsweek Politics | https://www.newsweek.com/politics | https://www.newsweek.com/rss | Political news and analysis | None |
+| U.S. News Politics | https://www.usnews.com/news/political-news | https://www.usnews.com/rss/news | Political news and rankings | None |
+| The Seattle Times Politics | https://www.seattletimes.com/nation-world/nation-politics/ | https://www.seattletimes.com/nation-world/nation-politics/feed/ | National politics coverage | None |
+| Miami Herald Politics | https://www.miamiherald.com/news/politics-government/ | https://www.miamiherald.com/news/politics-government/?widgetName=rssfeed&widgetContentId=712015&getXmlFeed=true | Florida and national politics | None |
+| Chicago Tribune Politics | https://www.chicagotribune.com/politics/ | https://www.chicagotribune.com/politics/rss2.0.xml | Illinois and national politics | Paywall |
+| Los Angeles Times Politics | https://www.latimes.com/politics | https://www.latimes.com/politics/rss2.0.xml | California and national politics | Paywall |
+| Denver Post Politics | https://www.denverpost.com/politics/ | https://www.denverpost.com/politics/feed/ | Colorado politics coverage | None |
+| Boston Globe Politics | https://www.bostonglobe.com/news/politics | https://www.bostonglobe.com/rss/politics | Massachusetts politics | Paywall |
+| Dallas Morning News Politics | https://www.dallasnews.com/news/politics/ | https://www.dallasnews.com/news/politics/feed/ | Texas politics coverage | Paywall |
+| Houston Chronicle Politics | https://www.houstonchronicle.com/politics/ | https://www.houstonchronicle.com/politics/feed/ | Texas politics news | Paywall |
+| Star Tribune Politics | https://www.startribune.com/politics/ | https://www.startribune.com/politics/feed/ | Minnesota politics | Paywall |
+| Philadelphia Inquirer Politics | https://www.inquirer.com/politics | https://www.inquirer.com/politics/feed/ | Pennsylvania politics | Paywall |
+| Cleveland.com Politics | https://www.cleveland.com/politics/ | https://www.cleveland.com/politics/feed/ | Ohio politics news | None |
+| RealClearPolitics | https://www.realclearpolitics.com | https://www.realclearpolitics.com/index.xml | Political news aggregation and polling | None |
+| FiveThirtyEight Politics | https://abcnews.go.com/538 | https://fivethirtyeight.com/politics/feed/ | Data-driven political analysis | None |
+| The Atlantic Politics | https://www.theatlantic.com/politics | https://www.theatlantic.com/feed/channel/politics/ | Long-form political analysis | Paywall |
+| National Review | https://www.nationalreview.com | https://www.nationalreview.com/feed/ | Conservative commentary | None |
+| The New Republic | https://newrepublic.com/politics | https://newrepublic.com/rss.xml | Liberal political commentary | None |
+| The Nation | https://www.thenation.com/subject/politics | https://www.thenation.com/feed/?post_type=article | Progressive political analysis | None |
+| Mother Jones | https://www.motherjones.com/politics | https://www.motherjones.com/politics/feed/ | Investigative political journalism | None |
+| Slate Politics | https://slate.com/news-and-politics | https://slate.com/feeds/news-and-politics.rss | Liberal commentary and analysis | None |
+| Salon Politics | https://www.salon.com/category/news-and-politics | https://www.salon.com/category/news-and-politics/feed | Progressive news and opinion | None |
+| Vox Politics | https://www.vox.com/politics | https://www.vox.com/rss/politics/index.xml | Explanatory political journalism | None |
+| Daily Kos | https://www.dailykos.com | https://www.dailykos.com/blogs/main.rss | Progressive political blog | None |
+| Talking Points Memo | https://talkingpointsmemo.com/news | https://talkingpointsmemo.com/feed | Political news and analysis | None |
+| The American Conservative | https://www.theamericanconservative.com | https://www.theamericanconservative.com/feed/ | Conservative commentary | None |
+| Reason Magazine | https://reason.com | https://reason.com/feed/ | Libertarian perspective | None |
+| The Week Politics | https://theweek.com/politics | https://theweek.com/feeds/tag/politics | Weekly political summary | None |
+| Rolling Stone Politics | https://www.rollingstone.com/politics | https://www.rollingstone.com/politics/feed | Political news and culture | None |
+| The Intercept | https://theintercept.com/politics | https://theintercept.com/politics/feed/ | Investigative journalism | None |
+| ProPublica Politics | https://www.propublica.org/topics/politics | https://www.propublica.org/feeds/propublica/main | Investigative journalism | None |
+| The Daily Beast Politics | https://www.thedailybeast.com/category/politics | https://feeds.thedailybeast.com/summary/rss | Political news and commentary | None |
+| Mediaite Politics | https://www.mediaite.com/category/politics | https://www.mediaite.com/category/politics/feed/ | Media and politics coverage | None |
+| Breitbart Politics | https://www.breitbart.com/politics | https://feeds.feedburner.com/breitbart | Conservative news | None |
+| The Daily Caller Politics | https://dailycaller.com/section/politics | https://dailycaller.com/section/politics/feed/ | Conservative news and opinion | None |
+| Washington Examiner | https://www.washingtonexaminer.com | https://www.washingtonexaminer.com/feed/ | Conservative political news | None |
+| Washington Times Politics | https://www.washingtontimes.com/news/politics/ | https://www.washingtontimes.com/rss/headlines/news/politics/ | Conservative news coverage | None |
+| Newsmax Politics | https://www.newsmax.com/politics | https://www.newsmax.com/rss/Politics/1 | Conservative political news | None |
+| RedState | https://redstate.com/category/news-and-politics | https://redstate.com/feed | Conservative commentary | None |
+| Hot Air | https://hotair.com | https://hotair.com/feed/ | Conservative blog | None |
+| Gateway Pundit | https://www.thegatewaypundit.com | https://www.thegatewaypundit.com/feed/ | Conservative news | None |
+| Drudge Report | https://drudgereport.com | https://feeds.feedburner.com/DrudgeReportFeed | News aggregation | None |
+| BuzzFeed Politics | https://www.buzzfeednews.com/section/politics | https://www.buzzfeed.com/politics.xml | Political reporting | None |
+| HuffPost Politics | https://www.huffpost.com/news/politics | https://www.huffpost.com/news/politics/feed | Liberal news and opinion | None |
+| MSNBC | https://www.msnbc.com | https://www.msnbc.com/feed | Liberal cable news coverage | None |
+| Alternet | https://www.alternet.org | https://www.alternet.org/feeds/feed.rss | Progressive news | None |
+| Truthout | https://truthout.org | https://truthout.org/feed/ | Progressive journalism | None |
+| Common Dreams | https://www.commondreams.org | https://www.commondreams.org/feeds/feed.rss | Progressive news | None |
+| Reader Supported News | https://rsn.org | https://rsn.org/feed/ | Progressive news | None |
+| The Raw Story | https://www.rawstory.com | https://www.rawstory.com/feed/ | Progressive news | None |
+| Crooks and Liars | https://crooksandliars.com | https://feeds.crooksandliars.com/crooksandliars | Progressive video and news | None |
+| PoliticusUSA | https://www.politicususa.com | https://www.politicususa.com/feed | Progressive political news | None |
+| GovTrack | https://www.govtrack.us | https://www.govtrack.us/rss | Congressional bill tracking | None |
+| OpenSecrets | https://www.opensecrets.org/news | https://www.opensecrets.org/news/feed | Campaign finance tracking | None |
+| FEC RSS Feeds | https://www.fec.gov/feed/candidates/ | https://www.fec.gov/feed/candidates/ | Federal Election Commission data | None |
+| Ballotpedia | https://ballotpedia.org | https://ballotpedia.org/rss/election_calendar.xml | Election information and analysis | None |
+| Cook Political Report | https://cookpolitical.com | https://cookpolitical.com/feed | Non-partisan election analysis | None |
+| Inside Elections | https://insideelections.com | https://insideelections.com/feeds | Election analysis and ratings | None |
+| Sabato's Crystal Ball | https://centerforpolitics.org/crystalball/ | https://centerforpolitics.org/crystalball/feed/ | University of Virginia election analysis | None |
+| Roll Call | https://www.rollcall.com | https://www.rollcall.com/rss/all_news.xml | Congressional news | Paywall |
+| CQ Magazine | https://library.cqpress.com/cqmagazine | https://library.cqpress.com/cqmagazine/feed | Congressional Quarterly news | Paywall |
+| National Journal | https://www.nationaljournal.com | https://www.nationaljournal.com/rss | Government and politics analysis | Paywall |
+| LegiStorm | https://www.legistorm.com | https://www.legistorm.com/feed | Congressional staff and lobbying data | Paywall |
+| Congress.gov | https://www.congress.gov | https://www.congress.gov/rss | Official congressional legislation | None |
+| House.gov | https://www.house.gov | https://www.house.gov/rss | U.S. House of Representatives | None |
+| Senate.gov | https://www.senate.gov | https://www.senate.gov/rss | U.S. Senate news | None |
+| White House | https://www.whitehouse.gov | https://www.whitehouse.gov/feed/ | Official White House news | None |
+| FactCheck.org | https://www.factcheck.org | https://www.factcheck.org/feed/ | Political fact-checking | None |
+| PolitiFact | https://www.politifact.com | https://www.politifact.com/rss/all | Truth-O-Meter fact-checking | None |
+| Snopes Politics | https://www.snopes.com/politics/ | https://www.snopes.com/feed/ | Urban legends and politics | None |
+| Washington Post Fact Checker | https://www.washingtonpost.com/news/fact-checker/ | https://www.washingtonpost.com/news/fact-checker/feed/ | Political fact-checking | Paywall |
+| AP Fact Check | https://apnews.com/hub/ap-fact-check | https://apnews.com/hub/ap-fact-check/feed | AP fact-checking service | None |
+| Lead Stories | https://leadstories.com | https://leadstories.com/atom.xml | Fact-checking and debunking | None |
+| BBC Reality Check | https://www.bbc.com/news/reality_check | https://www.bbc.com/news/reality_check/feed | BBC fact-checking | None |
+| Full Fact | https://fullfact.org | https://fullfact.org/feed/ | UK-based fact-checking | None |
+| Brookings Institution | https://www.brookings.edu/topics/u-s-politics/ | https://www.brookings.edu/feed/ | Non-partisan policy research | None |
+| Cato Institute | https://www.cato.org/blog/topics/20 | https://www.cato.org/blog/feed | Libertarian policy analysis | None |
+| Heritage Foundation | https://www.heritage.org/political-process | https://www.heritage.org/feed | Conservative policy research | None |
+| AEI Politics | https://www.aei.org/politics/ | https://www.aei.org/feed/ | Conservative think tank analysis | None |
+| Center for American Progress | https://www.americanprogress.org/politics/ | https://www.americanprogress.org/feed/ | Progressive policy research | None |
+| Pew Research Politics | https://www.pewresearch.org/politics/ | https://www.pewresearch.org/feed/ | Public opinion polling | None |
+| RAND Corporation | https://www.rand.org/politics.html | https://www.rand.org/feed.xml | Policy research and analysis | None |
+| Council on Foreign Relations | https://www.cfr.org/politics | https://www.cfr.org/feed | Foreign policy analysis | None |
+| Carnegie Endowment | https://carnegieendowment.org/research/politics | https://carnegieendowment.org/feed | International peace and politics | None |
+| Urban Institute | https://www.urban.org/policy-centers/cross-center-initiatives/program-communities/politics | https://www.urban.org/feed | Social policy research | None |
+| Manhattan Institute | https://www.manhattan-institute.org/politics | https://www.manhattan-institute.org/feed | Urban policy and politics | None |
+| Hoover Institution | https://www.hoover.org/research/politics | https://www.hoover.org/feed | Conservative policy research | None |
+| New America Politics | https://www.newamerica.org/political-reform/ | https://www.newamerica.org/feed/ | Political reform research | None |
+| Brennan Center | https://www.brennancenter.org/issues/protect-democracy | https://www.brennancenter.org/feed | Democracy and justice research | None |
+| Texas Tribune | https://www.texastribune.org/topics/politics/ | https://www.texastribune.org/feed/ | Texas politics coverage | None |
+| Florida Politics | https://floridapolitics.com | https://floridapolitics.com/feed | Florida political news | None |
+| California Politics | https://calmatters.org/category/politics/ | https://calmatters.org/feed/ | California politics coverage | None |
+| New York Politics | https://www.nydailynews.com/politics/ | https://www.nydailynews.com/politics/feed/ | New York politics | None |
+| Illinois Politics | https://capitolnewsillinois.com | https://capitolnewsillinois.com/feed/ | Illinois state politics | None |
+| Pennsylvania Politics | https://www.penncapital-star.com | https://www.penncapital-star.com/feed | Pennsylvania politics | None |
+| Ohio Politics | https://www.dispatch.com/news/politics-elections/ | https://www.dispatch.com/news/politics-elections/feed/ | Ohio politics coverage | None |
+| Michigan Politics | https://www.michiganadvance.com | https://www.michiganadvance.com/feed/ | Michigan politics | None |
+| Georgia Politics | https://www.ajc.com/politics/ | https://www.ajc.com/politics/feed/ | Georgia politics coverage | Paywall |
+| Arizona Politics | https://arizonamirror.com | https://arizonamirror.com/feed/ | Arizona politics | None |
+| Colorado Politics | https://coloradopolitics.com | https://coloradopolitics.com/feed/ | Colorado politics | None |
+| Wisconsin Politics | https://wisconsinexaminer.com | https://wisconsinexaminer.com/feed/ | Wisconsin politics | None |
+| North Carolina Politics | https://ncnewsline.com | https://ncnewsline.com/feed/ | North Carolina politics | None |
+| Virginia Politics | https://www.vpm.org/news/virginia-politics | https://www.vpm.org/news/virginia-politics/feed | Virginia politics | None |
+| New Jersey Politics | https://newjerseymonitor.com | https://newjerseymonitor.com/feed/ | New Jersey politics | None |
+| Minnesota Politics | https://minnesotareformer.com | https://minnesotareformer.com/feed/ | Minnesota politics | None |
+| Missouri Politics | https://missouriindependent.com | https://missouriindependent.com/feed/ | Missouri politics | None |
+| Nevada Politics | https://thenevadaindependent.com | https://thenevadaindependent.com/feed/ | Nevada politics | None |
+| Washington State Politics | https://washingtonstatestandard.com | https://washingtonstatestandard.com/feed/ | Washington state politics | None |
+| Oregon Politics | https://oregoncapitalchronicle.com | https://oregoncapitalchronicle.com/feed/ | Oregon politics | None |
+| RCP Polls | https://www.realclearpolitics.com/epolls/latest_polls/ | https://www.realclearpolitics.com/epolls/latest_polls/feed | Polling data aggregation | None |
+| FiveThirtyEight Polls | https://projects.fivethirtyeight.com/polls/ | https://projects.fivethirtyeight.com/polls/feed | Polling analysis and forecasts | None |
+| Pollster | https://pollster.trendecon.com | https://pollster.trendecon.com/feed | Polling trends | None |
+| Gallup Politics | https://news.gallup.com/politics.aspx | https://news.gallup.com/feed | Public opinion polling | None |
+| Quinnipiac Polls | https://poll.qu.edu | https://poll.qu.edu/feed | University polling data | None |
+| Marist Poll | https://maristpoll.marist.edu | https://maristpoll.marist.edu/feed/ | Political polling | None |
+| Pew Research Center | https://www.pewresearch.org/politics/ | https://www.pewresearch.org/feed/ | Public opinion research | None |
+| Morning Consult Politics | https://morningconsult.com/category/politics/ | https://morningconsult.com/feed/ | Polling and analysis | None |
+| YouGov Politics | https://today.yougov.com/politics | https://today.yougov.com/feed | Public opinion data | None |
+| Ipsos Politics | https://www.ipsos.com/en-us/politics | https://www.ipsos.com/en-us/feed | Global polling data | None |
+| Power Line | https://www.powerlineblog.com | https://www.powerlineblog.com/feed/ | Conservative blog | None |
+| Instapundit | https://instapundit.com | https://instapundit.com/feed/ | Libertarian blog | None |
+| Volokh Conspiracy | https://reason.com/volokh/ | https://reason.com/volokh/feed/ | Legal and political blog | None |
+| Wonkette | https://www.wonkette.com | https://www.wonkette.com/feed | Political satire and commentary | None |
+| Esquire Politics | https://www.esquire.com/news-politics/politics/ | https://www.esquire.com/news-politics/politics/feed/ | Political commentary | None |
+| Vanity Fair Politics | https://www.vanityfair.com/news/politics | https://www.vanityfair.com/feed/rss | Political news and culture | None |
+| New York Magazine Politics | https://nymag.com/intelligencer/politics/ | https://nymag.com/intelligencer/politics/feed/ | Political analysis | None |
+| The Bulwark | https://thebulwark.com | https://thebulwark.com/feed/ | Anti-Trump conservative commentary | None |
+| The Dispatch | https://thedispatch.com | https://thedispatch.com/feed/ | Conservative news and analysis | Paywall |
+| Commentary Magazine | https://www.commentary.org | https://www.commentary.org/feed/ | Conservative Jewish perspective | None |
+| First Things | https://www.firstthings.com | https://www.firstthings.com/feed | Religious conservative perspective | None |
+| The American Prospect | https://prospect.org | https://prospect.org/api/rss/content.rss | Progressive policy analysis | None |
+| Jacobin | https://jacobinmag.com | https://jacobinmag.com/feed | Socialist perspective | None |
+| Current Affairs | https://www.currentaffairs.org | https://www.currentaffairs.org/news/rss.xml | Progressive magazine | None |
+| The Baffler | https://thebaffler.com | https://thebaffler.com/feed | Cultural and political criticism | None |
+| Naked Capitalism | https://www.nakedcapitalism.com | https://www.nakedcapitalism.com/feed | Finance and politics analysis | None |
+| Emptywheel | https://www.emptywheel.net | https://www.emptywheel.net/feed/ | National security and politics | None |
+| Lawfare | https://www.lawfareblog.com | https://www.lawfareblog.com/feed | National security law and policy | None |
+| Just Security | https://www.justsecurity.org | https://www.justsecurity.org/feed/ | National security analysis | None |
+| Shadowproof | https://shadowproof.com | https://shadowproof.com/feed/ | Independent political journalism | None |
+| Al Jazeera US Politics | https://www.aljazeera.com/news/us | https://www.aljazeera.com/news/us/feed | Middle Eastern perspective on US | None |
+| Financial Times US Politics | https://www.ft.com/us-politics | https://www.ft.com/us-politics?format=rss | International business perspective | Paywall |
+| The Economist US Politics | https://www.economist.com/united-states/ | https://www.economist.com/united-states/rss.xml | International analysis | Paywall |
+| BBC News US | https://www.bbc.com/news/world/us_and_canada | https://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml | British perspective on US politics | None |
+| The Guardian US | https://www.theguardian.com/us-news | https://www.theguardian.com/us-news/rss | British liberal perspective | None |
+| Spiegel US Politics | https://www.spiegel.de/international/world/ | https://www.spiegel.de/international/world/rss | German perspective | None |
+| Le Monde US Politics | https://www.lemonde.fr/en/united-states/ | https://www.lemonde.fr/en/united-states/rss | French perspective | None |
+| Deutsche Welle US | https://www.dw.com/en/united-states/t-17428142 | https://www.dw.com/en/united-states/t-17428142/rss | German public broadcaster | None |
+| France 24 US | https://www.france24.com/en/americas/ | https://www.france24.com/en/americas/rss | French public broadcaster | None |
+| NHK World US | https://www3.nhk.or.jp/nhkworld/en/news/ | https://www3.nhk.or.jp/nhkworld/en/news/feed/ | Japanese perspective | None |
+| AllSides | https://www.allsides.com/unbiased-balanced-news | https://www.allsides.com/feed | Balanced news from left, center, right | None |
+| Ground News | https://ground.news | https://ground.news/feed | News comparison across spectrum | None |
+| Newseum | https://www.newseum.org | https://www.newseum.org/feed | News and First Amendment | None |
+| Reporters Committee | https://www.rcfp.org | https://www.rcfp.org/feed/ | Press freedom and politics | None |
+| Sunlight Foundation | https://sunlightfoundation.com | https://sunlightfoundation.com/feed/ | Government transparency | None |
+| MapLight | https://maplight.org | https://maplight.org/feed/ | Money and politics | None |
+| FollowTheMoney | https://www.followthemoney.org | https://www.followthemoney.org/feed | Campaign finance tracking | None |
+| Sludge | https://readsludge.com | https://readsludge.com/feed/ | Money in politics investigations | None |
+| The Appeal | https://theappeal.org | https://theappeal.org/feed/ | Criminal justice and politics | None |
+| The Marshall Project | https://www.themarshallproject.org | https://www.themarshallproject.org/rss | Criminal justice politics | None |
+| The 19th | https://19thnews.org | https://19thnews.org/feed/ | Gender, politics, and policy | None |
+| States Newsroom | https://statesnewsroom.com | https://statesnewsroom.com/feed/ | State politics network | None |
+| Route Fifty | https://www.route-fifty.com | https://www.route-fifty.com/feed/ | State and local government | None |
+| Governing | https://www.governing.com | https://www.governing.com/feed | State and local politics | None |
+| Stateline | https://stateline.org | https://stateline.org/feed/ | Pew state politics coverage | None |
+| The Fulcrum | https://thefulcrum.us | https://thefulcrum.us/feed/ | Democracy reform news | None |
+| Issue One | https://www.issueone.org | https://www.issueone.org/feed/ | Money in politics reform | None |
+| RepresentUs | https://represent.us | https://represent.us/feed/ | Anti-corruption advocacy | None |
+| Common Cause | https://www.commoncause.org | https://www.commoncause.org/feed/ | Government reform advocacy | None |
+| League of Women Voters | https://www.lwv.org | https://www.lwv.org/feed | Voter education and advocacy | None |
+
+
+---
+
+## SUMMARY
+
+**Total Sources Collected: 193**
+
+### Categories:
+- Major News Outlets Politics Sections: 40+ sources
+- Political Analysis and Commentary Sites: 50+ sources  
+- Government and Legislative News: 15+ sources
+- Political Blogs and Opinion Sites: 30+ sources
+- Policy Research Organizations (Think Tanks): 15+ sources
+- Election News and Polling Aggregators: 15+ sources
+- State and Local Politics News: 20+ sources
+- Political Fact-Checking Sites: 8 sources
+- Congressional News Sources: 10+ sources
+- International News US Politics Focus: 10+ sources
+
+### Anti-Scraping Measures Notes:
+- **None**: Most sources have no specific anti-scraping measures
+- **Paywall**: Some major outlets (NYT, WaPo, WSJ) have paywalls but RSS feeds usually provide headlines/excerpts
+- **Cloudflare**: May be encountered on some sites but RSS feeds typically accessible
+
+### RSS Feed Status:
+- All sources include direct listing page URLs
+- RSS feed URLs provided where available
+- Some sites may require RSS feed generation services if official feeds deprecated
+
+---
+
+*Generated for US Politics News Collection Project*
+*File: us_politics_news_sources_100plus.txt*

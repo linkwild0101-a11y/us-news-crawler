@@ -1,0 +1,5392 @@
+[
+  {
+    "name": "Defense News",
+    "listing_url": "https://www.defensenews.com/news/military/",
+    "rss_url": "https://www.defensenews.com/m/rss/",
+    "description": "Leading defense industry and military news publication covering Pentagon, Congress, and global defense",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 1
+  },
+  {
+    "name": "Breaking Defense",
+    "listing_url": "https://breakingdefense.com/category/military/",
+    "rss_url": "https://breakingdefense.com/feed",
+    "description": "Digital magazine on defense strategy, politics, and technology",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 2
+  },
+  {
+    "name": "Defense One",
+    "listing_url": "https://www.defenseone.com/news/military/",
+    "rss_url": "https://defenseone.com/rss/all",
+    "description": "News and analysis for defense and industry leaders",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 3
+  },
+  {
+    "name": "Military.com",
+    "listing_url": "https://www.military.com/daily-news/military",
+    "rss_url": "https://www.military.com/daily-news/military-rss-feeds.html",
+    "description": "Comprehensive military news, benefits, and resources",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 4
+  },
+  {
+    "name": "Military Times",
+    "listing_url": "https://www.militarytimes.com/news/",
+    "rss_url": "https://www.militarytimes.com/m/rss/",
+    "description": "Independent news for service members and families",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 5
+  },
+  {
+    "name": "Stars and Stripes",
+    "listing_url": "https://www.stripes.com/news/military/",
+    "rss_url": "https://www.stripes.com/rss",
+    "description": "Independent news for U.S. military community since WWII",
+    "category": "military",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 6
+  },
+  {
+    "name": "Army Times",
+    "listing_url": "https://www.armytimes.com/news/",
+    "rss_url": "https://www.armytimes.com/m/rss/",
+    "description": "Independent news for soldiers",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 7
+  },
+  {
+    "name": "Navy Times",
+    "listing_url": "https://www.navytimes.com/news/",
+    "rss_url": "https://www.navytimes.com/m/rss/",
+    "description": "Independent news for sailors",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 8
+  },
+  {
+    "name": "Air Force Times",
+    "listing_url": "https://www.airforcetimes.com/news/",
+    "rss_url": "https://www.airforcetimes.com/m/rss/",
+    "description": "Independent news for airmen",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 9
+  },
+  {
+    "name": "Marine Corps Times",
+    "listing_url": "https://www.marinecorpstimes.com/news/",
+    "rss_url": "https://www.marinecorpstimes.com/m/rss/",
+    "description": "Independent news for Marines",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 10
+  },
+  {
+    "name": "U.S. Department of Defense",
+    "listing_url": "https://www.defense.gov/News/News-Stories/",
+    "rss_url": "https://www.defense.gov/News/RSS/",
+    "description": "Official DoD news releases and stories",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 11
+  },
+  {
+    "name": "DVIDS Hub",
+    "listing_url": "https://www.dvidshub.net/news/",
+    "rss_url": "https://www.dvidshub.net/news/rss",
+    "description": "Defense Visual Information Distribution Service",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 12
+  },
+  {
+    "name": "War on the Rocks",
+    "listing_url": "https://warontherocks.com/",
+    "rss_url": "https://warontherocks.com/feed",
+    "description": "Analysis and commentary on foreign policy and national security",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 13
+  },
+  {
+    "name": "CSIS (Center for Strategic & International Studies)",
+    "listing_url": "https://www.csis.org/analysis/defense",
+    "rss_url": "https://www.csis.org/rss.xml",
+    "description": "Bipartisan foreign policy think tank",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 14
+  },
+  {
+    "name": "RAND Corporation",
+    "listing_url": "https://www.rand.org/topics/defense.html",
+    "rss_url": "https://www.rand.org/rss.xml",
+    "description": "Research on defense and national security",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 15
+  },
+  {
+    "name": "Heritage Foundation - Defense",
+    "listing_url": "https://www.heritage.org/defense",
+    "rss_url": "https://www.heritage.org/feed",
+    "description": "Conservative think tank defense analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 16
+  },
+  {
+    "name": "Brookings - Defense",
+    "listing_url": "https://www.brookings.edu/topic/defense/",
+    "rss_url": "https://www.brookings.edu/feed/",
+    "description": "Nonpartisan think tank defense research",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 17
+  },
+  {
+    "name": "Cato - Defense",
+    "listing_url": "https://www.cato.org/research/defense",
+    "rss_url": "https://www.cato.org/rss.xml",
+    "description": "Libertarian think tank defense policy",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 18
+  },
+  {
+    "name": "AEI - Defense",
+    "listing_url": "https://www.aei.org/topic/defense/",
+    "rss_url": "https://www.aei.org/feed/",
+    "description": "Conservative think tank defense analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 19
+  },
+  {
+    "name": "CNAS (Center for New American Security)",
+    "listing_url": "https://www.cnas.org/research/defense",
+    "rss_url": "https://www.cnas.org/rss.xml",
+    "description": "National security and defense policy think tank",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 20
+  },
+  {
+    "name": "IISS (International Institute for Strategic Studies)",
+    "listing_url": "https://www.iiss.org/online-analysis/military-balance",
+    "rss_url": "https://www.iiss.org/feed",
+    "description": "Global security and defense analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 21
+  },
+  {
+    "name": "Modern War Institute",
+    "listing_url": "https://mwi.westpoint.edu/",
+    "rss_url": "https://mwi.westpoint.edu/feed/",
+    "description": "West Point-based contemporary warfare research",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 22
+  },
+  {
+    "name": "Small Wars Journal",
+    "listing_url": "https://smallwarsjournal.com/",
+    "rss_url": "https://smallwarsjournal.com/rss.xml",
+    "description": "Irregular warfare and small wars analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 23
+  },
+  {
+    "name": "Institute for the Study of War",
+    "listing_url": "https://iswresearch.org/",
+    "rss_url": "https://iswresearch.org/feeds/posts/default",
+    "description": "Military operations and threat analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 24
+  },
+  {
+    "name": "Defense Daily",
+    "listing_url": "https://www.defensedaily.com/",
+    "rss_url": "https://www.defensedaily.com/feed",
+    "description": "Daily defense industry business intelligence",
+    "category": "military",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 25
+  },
+  {
+    "name": "National Defense Magazine",
+    "listing_url": "https://www.nationaldefensemagazine.org/",
+    "rss_url": "https://nationaldefense.libsyn.com/rss",
+    "description": "NDIA publication on defense technology and policy",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 26
+  },
+  {
+    "name": "C4ISRNET",
+    "listing_url": "https://www.c4isrnet.com/",
+    "rss_url": "https://www.c4isrnet.com/arc/outboundfeeds/rss/category/cyber/?outputType=xml",
+    "description": "Command, control, communications, computers, intelligence, surveillance and reconnaissance",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 27
+  },
+  {
+    "name": "Defense News - Air",
+    "listing_url": "https://www.defensenews.com/air/",
+    "rss_url": "https://www.defensenews.com/m/rss/air",
+    "description": "Air force and aviation defense news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 28
+  },
+  {
+    "name": "Defense News - Land",
+    "listing_url": "https://www.defensenews.com/land/",
+    "rss_url": "https://www.defensenews.com/m/rss/land",
+    "description": "Army and ground forces defense news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 29
+  },
+  {
+    "name": "Defense News - Naval",
+    "listing_url": "https://www.defensenews.com/naval/",
+    "rss_url": "https://www.defensenews.com/m/rss/naval",
+    "description": "Navy and maritime defense news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 30
+  },
+  {
+    "name": "Defense News - Space",
+    "listing_url": "https://www.defensenews.com/space/",
+    "rss_url": "https://www.defensenews.com/m/rss/space",
+    "description": "Space defense and military space news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 31
+  },
+  {
+    "name": "Shephard Media",
+    "listing_url": "https://www.shephardmedia.com/news/",
+    "rss_url": "https://www.shephardmedia.com/news/feed",
+    "description": "Defense equipment and technology coverage",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 32
+  },
+  {
+    "name": "Army Technology",
+    "listing_url": "https://www.army-technology.com/news/",
+    "rss_url": "https://www.army-technology.com/feed",
+    "description": "Army technology and equipment news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 33
+  },
+  {
+    "name": "Naval Technology",
+    "listing_url": "https://www.naval-technology.com/news/",
+    "rss_url": "https://www.naval-technology.com/news/feed",
+    "description": "Naval technology and warship news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 34
+  },
+  {
+    "name": "Airforce Technology",
+    "listing_url": "https://www.airforce-technology.com/news/",
+    "rss_url": "https://www.airforce-technology.com/feed",
+    "description": "Air force technology and aircraft news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 35
+  },
+  {
+    "name": "Defense Update",
+    "listing_url": "https://defense-update.com/",
+    "rss_url": "https://defense-update.com/feed",
+    "description": "Israel-based defense technology magazine",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 36
+  },
+  {
+    "name": "Defence Blog",
+    "listing_url": "https://defence-blog.com/category/news/",
+    "rss_url": "https://defence-blog.com/feed",
+    "description": "Independent defense and security news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 37
+  },
+  {
+    "name": "Military Embedded Systems",
+    "listing_url": "https://militaryembedded.com/blogs",
+    "rss_url": "https://militaryembedded.com/blogs/feed",
+    "description": "Military COTS and embedded systems",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 38
+  },
+  {
+    "name": "COTS Journal",
+    "listing_url": "https://cotsjournalonline.com/",
+    "rss_url": "https://cotsjournalonline.com/index.php?format=feed&type=rss",
+    "description": "Commercial off-the-shelf military technology",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 39
+  },
+  {
+    "name": "Military Aerospace Technology",
+    "listing_url": "https://military-aerospace-technology.com/",
+    "rss_url": "https://military-aerospace-technology.com/feed-info.cfm",
+    "description": "Military aerospace and avionics news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 40
+  },
+  {
+    "name": "Defense Industry Daily",
+    "listing_url": "https://www.defenseindustrydaily.com/",
+    "rss_url": "https://www.defenseindustrydaily.com/feed",
+    "description": "Defense contracts and procurement news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 41
+  },
+  {
+    "name": "Real Clear Defense",
+    "listing_url": "https://www.realcleardefense.com/",
+    "rss_url": "https://www.realcleardefense.com/index.xml",
+    "description": "Defense news aggregation and analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 42
+  },
+  {
+    "name": "Defense World",
+    "listing_url": "https://www.defenseworld.net/",
+    "rss_url": "https://www.defenseworld.net/feed",
+    "description": "Global defense industry news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 43
+  },
+  {
+    "name": "Army Recognition",
+    "listing_url": "https://www.armyrecognition.com/news/",
+    "rss_url": "https://www.armyrecognition.com/news/feed",
+    "description": "Land forces defense news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 44
+  },
+  {
+    "name": "Navy Recognition",
+    "listing_url": "https://www.navyrecognition.com/news/",
+    "rss_url": "https://www.navyrecognition.com/news/feed",
+    "description": "Naval forces defense news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 45
+  },
+  {
+    "name": "ASDNews",
+    "listing_url": "https://www.asdnews.com/",
+    "rss_url": "https://www.asdnews.com/feed",
+    "description": "Aerospace and defense industry news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 46
+  },
+  {
+    "name": "Aviation Week - Defense",
+    "listing_url": "https://aviationweek.com/defense-space",
+    "rss_url": "https://aviationweek.com/rss.xml",
+    "description": "Defense aviation and aerospace news",
+    "category": "military",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 47
+  },
+  {
+    "name": "Forecast International",
+    "listing_url": "https://dsm.forecastinternational.com/",
+    "rss_url": "https://dsm.forecastinternational.com/feed",
+    "description": "Defense market analysis and forecasts",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 48
+  },
+  {
+    "name": "The Defense Post",
+    "listing_url": "https://www.thedefensepost.com/",
+    "rss_url": "https://www.thedefensepost.com/feed",
+    "description": "Global defense and security news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 49
+  },
+  {
+    "name": "Defense Aerospace",
+    "listing_url": "https://www.defense-aerospace.com/",
+    "rss_url": "https://www.defense-aerospace.com/feed",
+    "description": "European defense and aerospace news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 50
+  },
+  {
+    "name": "BulgarianMilitary.com",
+    "listing_url": "https://bulgarianmilitary.com/",
+    "rss_url": "https://bulgarianmilitary.com/feed",
+    "description": "International defense industry news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 51
+  },
+  {
+    "name": "Quwa Defence News",
+    "listing_url": "https://quwa.org/",
+    "rss_url": "https://quwa.org/feed",
+    "description": "Defense analysis focused on Asia, Africa, Middle East",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 52
+  },
+  {
+    "name": "Reuters - Aerospace & Defense",
+    "listing_url": "https://www.reuters.com/business/aerospace-defense/",
+    "rss_url": "https://www.reuters.com/business/aerospace-defense/rss.xml",
+    "description": "Reuters defense industry coverage",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 53
+  },
+  {
+    "name": "Politico - Defense",
+    "listing_url": "https://www.politico.com/tag/defense",
+    "rss_url": "https://rss.politico.com/defense.xml",
+    "description": "Defense politics and policy news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 54
+  },
+  {
+    "name": "Politico - Military",
+    "listing_url": "https://www.politico.com/news/military",
+    "rss_url": "https://rss.politico.com/military.xml",
+    "description": "Military-focused political news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 55
+  },
+  {
+    "name": "NBC News - Military",
+    "listing_url": "https://www.nbcnews.com/news/military",
+    "rss_url": "https://feeds.nbcnews.com/nbcnews/public/news/military",
+    "description": "NBC military news coverage",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 56
+  },
+  {
+    "name": "BBC News - Military",
+    "listing_url": "https://www.bbc.com/news/topics/cn89208qmzxlt",
+    "rss_url": "https://feeds.bbci.co.uk/news/topics/cn89208qmzxlt/rss.xml",
+    "description": "BBC military coverage",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 57
+  },
+  {
+    "name": "AP News - Military & Defense",
+    "listing_url": "https://apnews.com/hub/military-and-defense",
+    "rss_url": "https://apnews.com/hub/military-and-defense/rss",
+    "description": "Associated Press military coverage",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 58
+  },
+  {
+    "name": "Fox News - Military",
+    "listing_url": "https://www.foxnews.com/category/us/military",
+    "rss_url": "https://feeds.foxnews.com/foxnews/military",
+    "description": "Fox News military coverage",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 59
+  },
+  {
+    "name": "CNN - Military",
+    "listing_url": "https://www.cnn.com/us/military",
+    "rss_url": "https://rss.cnn.com/rss/cnn_military.rss",
+    "description": "CNN military news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 60
+  },
+  {
+    "name": "The Hill - Defense",
+    "listing_url": "https://thehill.com/policy/defense/",
+    "rss_url": "https://thehill.com/rss/feed/defense",
+    "description": "Congressional defense policy news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 61
+  },
+  {
+    "name": "UPI - Defense",
+    "listing_url": "https://www.upi.com/Defense-News/",
+    "rss_url": "https://rss.upi.com/news/dfn.rss",
+    "description": "United Press International defense news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 62
+  },
+  {
+    "name": "ZeroHedge - Military",
+    "listing_url": "https://www.zerohedge.com/military",
+    "rss_url": "https://www.zerohedge.com/military/rss.xml",
+    "description": "Alternative military news and analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 63
+  },
+  {
+    "name": "Popular Mechanics - Military",
+    "listing_url": "https://www.popularmechanics.com/military/",
+    "rss_url": "https://www.popularmechanics.com/military/rss",
+    "description": "Military technology and science",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 64
+  },
+  {
+    "name": "Live Science - Military Weapons",
+    "listing_url": "https://www.livescience.com/technology/military-weapons",
+    "rss_url": "https://www.livescience.com/technology/military-weapons/rss.xml",
+    "description": "Military weapons science",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 65
+  },
+  {
+    "name": "USNI News",
+    "listing_url": "https://news.usni.org/",
+    "rss_url": "https://news.usni.org/feed",
+    "description": "U.S. Naval Institute news and analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 66
+  },
+  {
+    "name": "Naval News",
+    "listing_url": "https://www.navalnews.com/",
+    "rss_url": "https://www.navalnews.com/feed",
+    "description": "Global naval defense news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 67
+  },
+  {
+    "name": "Naval Today",
+    "listing_url": "https://www.navaltoday.com/",
+    "rss_url": "https://www.navaltoday.com/feed",
+    "description": "Naval industry daily news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 68
+  },
+  {
+    "name": "Seapower Magazine",
+    "listing_url": "https://seapowermagazine.org/",
+    "rss_url": "https://seapowermagazine.org/feed",
+    "description": "Navy League official publication",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 69
+  },
+  {
+    "name": "The Maritime Executive",
+    "listing_url": "https://maritime-executive.com/",
+    "rss_url": "https://maritime-executive.com/articles/rss",
+    "description": "Maritime and naval news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 70
+  },
+  {
+    "name": "Naval Analyses",
+    "listing_url": "https://navalanalyses.com/",
+    "rss_url": "https://navalanalyses.com/feeds/posts/default",
+    "description": "Naval fleet and vessel analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 71
+  },
+  {
+    "name": "Navy Matters",
+    "listing_url": "https://navy-matters.blogspot.com/",
+    "rss_url": "https://navy-matters.blogspot.com/feeds/posts/default",
+    "description": "Naval analysis and commentary",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 72
+  },
+  {
+    "name": "Naval Historical Foundation",
+    "listing_url": "https://navyhistory.org/",
+    "rss_url": "https://navyhistory.org/feed",
+    "description": "U.S. naval history blog",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 73
+  },
+  {
+    "name": "NOSI - Naval Open Source Intelligence",
+    "listing_url": "https://nosi.org/",
+    "rss_url": "https://nosi.org/feed",
+    "description": "Naval intelligence aggregation",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 74
+  },
+  {
+    "name": "Veterans Affairs News",
+    "listing_url": "https://news.va.gov/",
+    "rss_url": "https://news.va.gov/feed",
+    "description": "Official VA news and updates",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 75
+  },
+  {
+    "name": "Vietnam Veterans of America",
+    "listing_url": "https://vva.org/category/press-releases/",
+    "rss_url": "https://vva.org/category/press-releases/feed",
+    "description": "VVA news and advocacy",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 76
+  },
+  {
+    "name": "Disabled American Veterans",
+    "listing_url": "https://dav.org/news/",
+    "rss_url": "https://dav.org/news/feed",
+    "description": "DAV news and benefits information",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 77
+  },
+  {
+    "name": "American Legion",
+    "listing_url": "https://www.legion.org/news/",
+    "rss_url": "https://www.legion.org/news/rss.xml",
+    "description": "American Legion news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 78
+  },
+  {
+    "name": "VFW (Veterans of Foreign Wars)",
+    "listing_url": "https://www.vfw.org/news-and-events",
+    "rss_url": "https://www.vfw.org/news-and-events/rss",
+    "description": "VFW news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 79
+  },
+  {
+    "name": "IAVA (Iraq & Afghanistan Vets)",
+    "listing_url": "https://iava.org/news/",
+    "rss_url": "https://iava.org/news/feed",
+    "description": "Iraq and Afghanistan veterans news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 80
+  },
+  {
+    "name": "Military Officers Association",
+    "listing_url": "https://www.moaa.org/news/",
+    "rss_url": "https://www.moaa.org/news/rss",
+    "description": "Military officers association news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 81
+  },
+  {
+    "name": "National Veterans Foundation",
+    "listing_url": "https://nvf.org/blog/",
+    "rss_url": "https://nvf.org/blog/feed",
+    "description": "Veteran crisis and support news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 82
+  },
+  {
+    "name": "Cohen Veterans Network",
+    "listing_url": "https://cohenveteransnetwork.org/blog/",
+    "rss_url": "https://cohenveteransnetwork.org/blog/feed",
+    "description": "Veteran mental health news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 83
+  },
+  {
+    "name": "Veterans Education Success",
+    "listing_url": "https://vetsedsuccess.org/",
+    "rss_url": "https://vetsedsuccess.org/feed",
+    "description": "Veteran education policy news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 84
+  },
+  {
+    "name": "Disabled Veterans National Foundation",
+    "listing_url": "https://dvnf.org/news-impact/",
+    "rss_url": "https://dvnf.org/feed",
+    "description": "Disabled veterans support news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 85
+  },
+  {
+    "name": "National Coalition for Homeless Veterans",
+    "listing_url": "https://nchv.org/blog/",
+    "rss_url": "https://nchv.org/feed",
+    "description": "Homeless veterans advocacy news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 86
+  },
+  {
+    "name": "Connecting Vets",
+    "listing_url": "https://connectingvets.radio.com/",
+    "rss_url": "https://connectingvets.radio.com/rss",
+    "description": "Veteran-focused news radio",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 87
+  },
+  {
+    "name": "Veterans Today",
+    "listing_url": "https://veteranstoday.blog.gov.uk/",
+    "rss_url": "https://veteranstoday.blog.gov.uk/feed",
+    "description": "UK veterans news (relevant to U.S.)",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 88
+  },
+  {
+    "name": "DARPA News",
+    "listing_url": "https://www.darpa.mil/news/",
+    "rss_url": "https://www.darpa.mil/news/rss",
+    "description": "Defense Advanced Research Projects Agency news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 89
+  },
+  {
+    "name": "Defense Tech",
+    "listing_url": "https://defensetech.org/",
+    "rss_url": "https://defensetech.org/feed",
+    "description": "Military technology news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 90
+  },
+  {
+    "name": "The War Zone",
+    "listing_url": "https://www.thedrive.com/the-war-zone",
+    "rss_url": "https://www.thedrive.com/the-war-zone/rss.xml",
+    "description": "Military aviation and technology",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 91
+  },
+  {
+    "name": "Task & Purpose",
+    "listing_url": "https://taskandpurpose.com/",
+    "rss_url": "https://taskandpurpose.com/feed",
+    "description": "Military news and culture",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 92
+  },
+  {
+    "name": "We Are The Mighty",
+    "listing_url": "https://www.wearethemighty.com/",
+    "rss_url": "https://www.wearethemighty.com/feed",
+    "description": "Military entertainment and news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 93
+  },
+  {
+    "name": "Coffee or Die Magazine",
+    "listing_url": "https://coffeeordie.com/",
+    "rss_url": "https://coffeeordie.com/feed",
+    "description": "Military and veteran lifestyle magazine",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 94
+  },
+  {
+    "name": "Sandboxx",
+    "listing_url": "https://sandboxx.us/news/",
+    "rss_url": "https://sandboxx.us/news/feed",
+    "description": "Military family connection platform news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 95
+  },
+  {
+    "name": "Military Families Magazine",
+    "listing_url": "https://militaryfamiliesmagazine.com/",
+    "rss_url": "https://militaryfamiliesmagazine.com/feed",
+    "description": "Military family-focused news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 96
+  },
+  {
+    "name": "MilitaryLeak",
+    "listing_url": "https://militaryleak.com/",
+    "rss_url": "https://militaryleak.com/feed",
+    "description": "Military operations and equipment news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 97
+  },
+  {
+    "name": "DefenceTalk",
+    "listing_url": "https://www.defencetalk.com/news/",
+    "rss_url": "https://feeds.feedburner.com/defencetalk",
+    "description": "Defense discussion forum and news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 98
+  },
+  {
+    "name": "The Diplomat - Asia Defense",
+    "listing_url": "https://thediplomat.com/category/asia-defense/",
+    "rss_url": "https://thediplomat.com/category/asia-defense/feed",
+    "description": "Asia-Pacific defense analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 99
+  },
+  {
+    "name": "NATO News",
+    "listing_url": "https://www.nato.int/cps/en/natohq/news.htm",
+    "rss_url": "https://www.nato.int/cps/en/natohq/news.rss",
+    "description": "NATO official news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 100
+  },
+  {
+    "name": "European Security & Defence",
+    "listing_url": "https://esd.eu/",
+    "rss_url": "https://esd.eu/feed",
+    "description": "European defense industry news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 101
+  },
+  {
+    "name": "Geostrategy-Direct",
+    "listing_url": "https://geostrategy-direct.com/",
+    "rss_url": "https://geostrategy-direct.com/feed",
+    "description": "Exclusive geopolitical intelligence",
+    "category": "military",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 102
+  },
+  {
+    "name": "Global Issues - Security",
+    "listing_url": "https://www.globalissues.org/news/security",
+    "rss_url": "https://www.globalissues.org/news/security/feed",
+    "description": "Global security news aggregation",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 103
+  },
+  {
+    "name": "PolGeoNow - Military",
+    "listing_url": "https://polgeonow.com/search/label/Military",
+    "rss_url": "https://polgeonow.com/feeds/posts/default/-/Military",
+    "description": "Geopolitical changes and military control",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 104
+  },
+  {
+    "name": "HistoryNet - Military History",
+    "listing_url": "https://www.historynet.com/military-history/",
+    "rss_url": "https://www.historynet.com/feed",
+    "description": "Military history articles",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 105
+  },
+  {
+    "name": "War History Online",
+    "listing_url": "https://warhistoryonline.com/",
+    "rss_url": "https://warhistoryonline.com/feed",
+    "description": "Military history stories",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 106
+  },
+  {
+    "name": "Military History Now",
+    "listing_url": "https://militaryhistorynow.com/",
+    "rss_url": "https://militaryhistorynow.com/feed",
+    "description": "Military history blog",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 107
+  },
+  {
+    "name": "The National WWII Museum",
+    "listing_url": "https://www.nationalww2museum.org/news/",
+    "rss_url": "https://www.nationalww2museum.org/news/feed",
+    "description": "WWII history and news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 108
+  },
+  {
+    "name": "Together We Served Blog",
+    "listing_url": "https://blog.togetherweserved.com/",
+    "rss_url": "https://blog.togetherweserved.com/feed",
+    "description": "Veteran community and history",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 109
+  },
+  {
+    "name": "Legion Magazine",
+    "listing_url": "https://legionmagazine.com/",
+    "rss_url": "https://legionmagazine.com/feed",
+    "description": "Canadian military history (relevant context)",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 110
+  },
+  {
+    "name": "Joint Force Quarterly",
+    "listing_url": "https://ndupress.ndu.edu/joint-force-quarterly/",
+    "rss_url": "https://digitalcommons.ndu.edu/joint-force-quarterly/announcements.html",
+    "description": "NDU professional military journal",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 111
+  },
+  {
+    "name": "Parameters (Army War College)",
+    "listing_url": "https://press.armywarcollege.edu/parameters/",
+    "rss_url": "https://press.armywarcollege.edu/parameters/feed",
+    "description": "Army strategic studies quarterly",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 112
+  },
+  {
+    "name": "Strategic Studies Quarterly",
+    "listing_url": "https://www.airuniversity.af.edu/SSQ/",
+    "rss_url": "https://www.airuniversity.af.edu/SSQ/feed",
+    "description": "Air Force strategic studies",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 113
+  },
+  {
+    "name": "Military Review",
+    "listing_url": "https://www.armyupress.army.mil/Military-Review/",
+    "rss_url": "https://www.armyupress.army.mil/Military-Review/feed",
+    "description": "Army professional journal",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 114
+  },
+  {
+    "name": "Air & Space Power Journal",
+    "listing_url": "https://www.airuniversity.af.edu/ASPJ/",
+    "rss_url": "https://www.airuniversity.af.edu/ASPJ/feed",
+    "description": "Air power theory and practice",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 115
+  },
+  {
+    "name": "Naval War College Review",
+    "listing_url": "https://digital-commons.usnwc.edu/nwc-review/",
+    "rss_url": "https://digital-commons.usnwc.edu/nwc-review/feed",
+    "description": "Naval strategy and policy",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 116
+  },
+  {
+    "name": "Marine Corps Gazette",
+    "listing_url": "https://mca-marines.org/gazette/",
+    "rss_url": "https://mca-marines.org/gazette/feed",
+    "description": "Marine Corps professional journal",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 117
+  },
+  {
+    "name": "Proceedings (USNI)",
+    "listing_url": "https://www.usni.org/magazines/proceedings",
+    "rss_url": "https://www.usni.org/magazines/proceedings/feed",
+    "description": "Naval Institute professional journal",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 118
+  },
+  {
+    "name": "Homeland Security Today",
+    "listing_url": "https://www.hstoday.us/",
+    "rss_url": "https://www.hstoday.us/feed",
+    "description": "Homeland security news and analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 119
+  },
+  {
+    "name": "Homeland Security News Wire",
+    "listing_url": "https://homelandsecuritynewswire.com/",
+    "rss_url": "https://homelandsecuritynewswire.com/feed",
+    "description": "Homeland security daily news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 120
+  },
+  {
+    "name": "Homeland Preparedness News",
+    "listing_url": "https://homelandprepnews.com/",
+    "rss_url": "https://homelandprepnews.com/feed",
+    "description": "Homeland preparedness and response",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 121
+  },
+  {
+    "name": "Just Security",
+    "listing_url": "https://www.justsecurity.org/",
+    "rss_url": "https://www.justsecurity.org/feed",
+    "description": "National security law and policy",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 122
+  },
+  {
+    "name": "Lawfare",
+    "listing_url": "https://www.lawfareblog.com/",
+    "rss_url": "https://www.lawfareblog.com/feed",
+    "description": "National security legal analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 123
+  },
+  {
+    "name": "Schneier on Security",
+    "listing_url": "https://www.schneier.com/",
+    "rss_url": "https://www.schneier.com/feed",
+    "description": "Security technology expert blog",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 124
+  },
+  {
+    "name": "Air Force Association",
+    "listing_url": "https://www.afa.org/news/",
+    "rss_url": "https://www.afa.org/news/feed",
+    "description": "Air Force advocacy and news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 125
+  },
+  {
+    "name": "Navy League",
+    "listing_url": "https://navyleague.org/news/",
+    "rss_url": "https://navyleague.org/news/feed",
+    "description": "Navy advocacy organization news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 126
+  },
+  {
+    "name": "Association of the U.S. Army",
+    "listing_url": "https://www.ausa.org/news/",
+    "rss_url": "https://www.ausa.org/news/feed",
+    "description": "Army advocacy and news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 127
+  },
+  {
+    "name": "Marine Corps Association",
+    "listing_url": "https://mca-marines.org/",
+    "rss_url": "https://mca-marines.org/feed",
+    "description": "Marine Corps professional association",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 128
+  },
+  {
+    "name": "Coast Guard News",
+    "listing_url": "https://coastguardnews.com/",
+    "rss_url": "https://coastguardnews.com/feed",
+    "description": "Coast Guard news aggregator",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 129
+  },
+  {
+    "name": "Military Report",
+    "listing_url": "https://www.military.com/military-report",
+    "rss_url": "https://www.military.com/military-report/rss",
+    "description": "Military benefits and policy updates",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 130
+  },
+  {
+    "name": "Military Spouse",
+    "listing_url": "https://www.militaryspouse.com/news/",
+    "rss_url": "https://www.militaryspouse.com/news/feed",
+    "description": "Military family news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 131
+  },
+  {
+    "name": "Military Child Education Coalition",
+    "listing_url": "https://militarychild.org/news/",
+    "rss_url": "https://militarychild.org/news/feed",
+    "description": "Military children education news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 132
+  },
+  {
+    "name": "Blue Star Families",
+    "listing_url": "https://bluestarfam.org/news/",
+    "rss_url": "https://bluestarfam.org/news/feed",
+    "description": "Military family support news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 133
+  },
+  {
+    "name": "Tragedy Assistance Program (TAPS)",
+    "listing_url": "https://www.taps.org/news/",
+    "rss_url": "https://www.taps.org/news/feed",
+    "description": "Military survivor support news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 134
+  },
+  {
+    "name": "Wounded Warrior Project",
+    "listing_url": "https://www.woundedwarriorproject.org/news/",
+    "rss_url": "https://www.woundedwarriorproject.org/news/feed",
+    "description": "Wounded veteran support news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 135
+  },
+  {
+    "name": "Fisher House Foundation",
+    "listing_url": "https://fisherhouse.org/news/",
+    "rss_url": "https://fisherhouse.org/news/feed",
+    "description": "Military family housing support",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 136
+  },
+  {
+    "name": "Operation Homefront",
+    "listing_url": "https://operationhomefront.org/news/",
+    "rss_url": "https://operationhomefront.org/news/feed",
+    "description": "Military family assistance news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 137
+  },
+  {
+    "name": "Semper Fi & America's Fund",
+    "listing_url": "https://semperfifund.org/news/",
+    "rss_url": "https://semperfifund.org/news/feed",
+    "description": "Injured veteran support news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 138
+  },
+  {
+    "name": "Patriot Guard Riders",
+    "listing_url": "https://patriotguard.org/news/",
+    "rss_url": "https://patriotguard.org/news/feed",
+    "description": "Veteran memorial support news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 139
+  },
+  {
+    "name": "Rolling Thunder",
+    "listing_url": "https://rollingthunder.org/news/",
+    "rss_url": "https://rollingthunder.org/news/feed",
+    "description": "POW/MIA advocacy news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 140
+  },
+  {
+    "name": "CyberScoop - Defense",
+    "listing_url": "https://cyberscoop.com/category/defense/",
+    "rss_url": "https://cyberscoop.com/category/defense/feed",
+    "description": "Defense cybersecurity news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 141
+  },
+  {
+    "name": "FedScoop - Defense",
+    "listing_url": "https://fedscoop.com/category/defense/",
+    "rss_url": "https://fedscoop.com/category/defense/feed",
+    "description": "Defense IT news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 142
+  },
+  {
+    "name": "DefenseScoop",
+    "listing_url": "https://defensescoop.com/",
+    "rss_url": "https://defensescoop.com/feed",
+    "description": "Defense technology and innovation",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 143
+  },
+  {
+    "name": "Breaking Defense - Cyber",
+    "listing_url": "https://breakingdefense.com/category/cyber/",
+    "rss_url": "https://breakingdefense.com/category/cyber/feed",
+    "description": "Defense cyber policy and technology",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 144
+  },
+  {
+    "name": "Fifth Domain",
+    "listing_url": "https://www.fifthdomain.com/",
+    "rss_url": "https://www.fifthdomain.com/feed",
+    "description": "Cyber and electronic warfare news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 145
+  },
+  {
+    "name": "Cyberspace Solarium Commission",
+    "listing_url": "https://www.solarium.gov/",
+    "rss_url": "https://www.solarium.gov/feed",
+    "description": "Cyber strategy recommendations",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 146
+  },
+  {
+    "name": "SpaceNews - Military",
+    "listing_url": "https://spacenews.com/category/military/",
+    "rss_url": "https://spacenews.com/category/military/feed",
+    "description": "Military space news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 147
+  },
+  {
+    "name": "Space Force Times",
+    "listing_url": "https://www.spaceforcetimes.com/",
+    "rss_url": "https://www.spaceforcetimes.com/feed",
+    "description": "U.S. Space Force news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 148
+  },
+  {
+    "name": "Missile Defense Advocacy",
+    "listing_url": "https://missiledefenseadvocacy.org/",
+    "rss_url": "https://missiledefenseadvocacy.org/feed",
+    "description": "Missile defense policy news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 149
+  },
+  {
+    "name": "Missile Threat (CSIS)",
+    "listing_url": "https://missilethreat.csis.org/",
+    "rss_url": "https://missilethreat.csis.org/feed",
+    "description": "Missile proliferation analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 150
+  },
+  {
+    "name": "38 North",
+    "listing_url": "https://www.38north.org/",
+    "rss_url": "https://www.38north.org/feed",
+    "description": "North Korea analysis (Johns Hopkins)",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 151
+  },
+  {
+    "name": "Combating Terrorism Center",
+    "listing_url": "https://ctc.usma.edu/",
+    "rss_url": "https://ctc.usma.edu/feed",
+    "description": "West Point terrorism analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 152
+  },
+  {
+    "name": "Long War Journal",
+    "listing_url": "https://www.longwarjournal.org/",
+    "rss_url": "https://www.longwarjournal.org/feed",
+    "description": "Terrorism and insurgency tracking",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 153
+  },
+  {
+    "name": "Terrorism Monitor (Jamestown)",
+    "listing_url": "https://jamestown.org/programs/terrorism-monitor/",
+    "rss_url": "https://jamestown.org/feed",
+    "description": "Terrorism analysis and monitoring",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 154
+  },
+  {
+    "name": "SITE Intelligence Group",
+    "listing_url": "https://ent.siteintelgroup.com/",
+    "rss_url": "https://ent.siteintelgroup.com/feed",
+    "description": "Terrorist propaganda monitoring",
+    "category": "military",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 155
+  },
+  {
+    "name": "Intelligence Online",
+    "listing_url": "https://www.intelligenceonline.com/",
+    "rss_url": "https://www.intelligenceonline.com/feed",
+    "description": "Global intelligence community news",
+    "category": "military",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 156
+  },
+  {
+    "name": "Cipher Brief",
+    "listing_url": "https://www.thecipherbrief.com/",
+    "rss_url": "https://www.thecipherbrief.com/feed",
+    "description": "Intelligence community analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 157
+  },
+  {
+    "name": "FAS Secrecy Project",
+    "listing_url": "https://fas.org/blogs/secrecy/",
+    "rss_url": "https://fas.org/blogs/secrecy/feed",
+    "description": "Government secrecy and intelligence",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 158
+  },
+  {
+    "name": "Defense Acquisition University",
+    "listing_url": "https://www.dau.edu/news/",
+    "rss_url": "https://www.dau.edu/news/feed",
+    "description": "Defense acquisition training news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 159
+  },
+  {
+    "name": "Government Executive - Defense",
+    "listing_url": "https://www.govexec.com/defense/",
+    "rss_url": "https://www.govexec.com/defense/feed",
+    "description": "Defense management news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 160
+  },
+  {
+    "name": "Federal News Network - Defense",
+    "listing_url": "https://federalnewsnetwork.com/category/defense/",
+    "rss_url": "https://federalnewsnetwork.com/category/defense/feed",
+    "description": "Defense federal workforce news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 161
+  },
+  {
+    "name": "Defense Finance & Accounting",
+    "listing_url": "https://www.dfas.mil/news/",
+    "rss_url": "https://www.dfas.mil/news/feed",
+    "description": "Defense financial management",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 162
+  },
+  {
+    "name": "Military Health System",
+    "listing_url": "https://health.mil/news/",
+    "rss_url": "https://health.mil/news/feed",
+    "description": "DoD health system news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 163
+  },
+  {
+    "name": "Defense Health Agency",
+    "listing_url": "https://www.dha.mil/news/",
+    "rss_url": "https://www.dha.mil/news/feed",
+    "description": "Defense health agency updates",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 164
+  },
+  {
+    "name": "VA Research",
+    "listing_url": "https://www.research.va.gov/news/",
+    "rss_url": "https://www.research.va.gov/news/feed",
+    "description": "Veterans health research",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 165
+  },
+  {
+    "name": "Wounded Times",
+    "listing_url": "https://woundedtimes.blogspot.com/",
+    "rss_url": "https://woundedtimes.blogspot.com/feeds/posts/default",
+    "description": "Veteran PTSD and mental health",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 166
+  },
+  {
+    "name": "Air University",
+    "listing_url": "https://www.airuniversity.af.edu/news/",
+    "rss_url": "https://www.airuniversity.af.edu/news/feed",
+    "description": "Air Force education and training",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 167
+  },
+  {
+    "name": "Army University",
+    "listing_url": "https://armyuniversity.edu/news/",
+    "rss_url": "https://armyuniversity.edu/news/feed",
+    "description": "Army education and training",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 168
+  },
+  {
+    "name": "Naval War College",
+    "listing_url": "https://usnwc.edu/news/",
+    "rss_url": "https://usnwc.edu/news/feed",
+    "description": "Naval education and strategy",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 169
+  },
+  {
+    "name": "National Defense University",
+    "listing_url": "https://ndupress.ndu.edu/",
+    "rss_url": "https://ndupress.ndu.edu/Publications-RSS/",
+    "description": "Senior military education",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 170
+  },
+  {
+    "name": "Army War College",
+    "listing_url": "https://warcollege.army.mil/",
+    "rss_url": "https://warcollege.army.mil/feed",
+    "description": "Army strategic leadership education",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 171
+  },
+  {
+    "name": "UK Ministry of Defence",
+    "listing_url": "https://www.gov.uk/government/organisations/ministry-of-defence",
+    "rss_url": "https://www.gov.uk/government/organisations/ministry-of-defence.atom",
+    "description": "British defense news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 172
+  },
+  {
+    "name": "Australian Defence Magazine",
+    "listing_url": "https://www.australiandefence.com.au/",
+    "rss_url": "https://www.australiandefence.com.au/feed",
+    "description": "Australian defense industry",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 173
+  },
+  {
+    "name": "Canadian Defence Review",
+    "listing_url": "https://www.canadiandefencereview.ca/",
+    "rss_url": "https://www.canadiandefencereview.ca/feed",
+    "description": "Canadian defense news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 174
+  },
+  {
+    "name": "Israel Defense",
+    "listing_url": "https://www.israeldefense.co.il/",
+    "rss_url": "https://www.israeldefense.co.il/feed",
+    "description": "Israeli defense news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 175
+  },
+  {
+    "name": "Information Dissemination",
+    "listing_url": "https://informationdissemination.net/",
+    "rss_url": "https://informationdissemination.net/feeds/posts/default",
+    "description": "Naval strategy and policy blog",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 176
+  },
+  {
+    "name": "NextWar (CSBA)",
+    "listing_url": "https://csbaonline.org/research/nextwar",
+    "rss_url": "https://csbaonline.org/feed",
+    "description": "Future warfare analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 177
+  },
+  {
+    "name": "War Is Boring",
+    "listing_url": "https://warisboring.com/",
+    "rss_url": "https://warisboring.com/feed",
+    "description": "Defense commentary and analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 178
+  },
+  {
+    "name": "The Strategy Bridge",
+    "listing_url": "https://thestrategybridge.org/",
+    "rss_url": "https://thestrategybridge.org/feed",
+    "description": "Military strategy discussion",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 179
+  },
+  {
+    "name": "Balloons and Drones",
+    "listing_url": "https://balloonsanddrones.com/",
+    "rss_url": "https://balloonsanddrones.com/feed",
+    "description": "Emerging warfare technology",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 180
+  },
+  {
+    "name": "Drones and Robotics",
+    "listing_url": "https://dronesandrobotics.com/",
+    "rss_url": "https://dronesandrobotics.com/feed",
+    "description": "Unmanned systems news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 181
+  },
+  {
+    "name": "Unmanned Aerial",
+    "listing_url": "https://unmanned-aerial.com/",
+    "rss_url": "https://unmanned-aerial.com/feed",
+    "description": "UAV/UAS military applications",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 182
+  },
+  {
+    "name": "Electronic Warfare",
+    "listing_url": "https://electronicwarfare.com/",
+    "rss_url": "https://electronicwarfare.com/feed",
+    "description": "Electronic warfare technology",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 183
+  },
+  {
+    "name": "Directed Energy",
+    "listing_url": "https://directedenergy.org/",
+    "rss_url": "https://directedenergy.org/feed",
+    "description": "Directed energy weapons news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 184
+  },
+  {
+    "name": "Hypersonic Weapons",
+    "listing_url": "https://hypersonicweapons.com/",
+    "rss_url": "https://hypersonicweapons.com/feed",
+    "description": "Hypersonic technology news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 185
+  },
+  {
+    "name": "Lieber Institute (West Point)",
+    "listing_url": "https://lieber.westpoint.edu/articles/",
+    "rss_url": "https://lieber.westpoint.edu/feed",
+    "description": "Law of armed conflict analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 186
+  },
+  {
+    "name": "Just Security - Military",
+    "listing_url": "https://www.justsecurity.org/category/military/",
+    "rss_url": "https://www.justsecurity.org/category/military/feed",
+    "description": "Military legal analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 187
+  },
+  {
+    "name": "Defense Logistics Agency",
+    "listing_url": "https://www.dla.mil/news/",
+    "rss_url": "https://www.dla.mil/news/feed",
+    "description": "Defense logistics news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 188
+  },
+  {
+    "name": "Military Logistics",
+    "listing_url": "https://militarylogistics.com/",
+    "rss_url": "https://militarylogistics.com/feed",
+    "description": "Military logistics and supply chain",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 189
+  },
+  {
+    "name": "Sustainment Times",
+    "listing_url": "https://sustainmenttimes.com/",
+    "rss_url": "https://sustainmenttimes.com/feed",
+    "description": "Military sustainment news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 190
+  },
+  {
+    "name": "Military Pay",
+    "listing_url": "https://militarypay.com/news/",
+    "rss_url": "https://militarypay.com/news/feed",
+    "description": "Military compensation news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 191
+  },
+  {
+    "name": "Military Benefits",
+    "listing_url": "https://militarybenefits.info/news/",
+    "rss_url": "https://militarybenefits.info/news/feed",
+    "description": "Military benefits information",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 192
+  },
+  {
+    "name": "Veterans Jobs",
+    "listing_url": "https://www.military.com/veterans-jobs",
+    "rss_url": "https://www.military.com/veterans-jobs/rss",
+    "description": "Veteran employment news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 193
+  },
+  {
+    "name": "Hire Heroes USA",
+    "listing_url": "https://hireheroesusa.org/news/",
+    "rss_url": "https://hireheroesusa.org/news/feed",
+    "description": "Veteran hiring initiative news",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 194
+  },
+  {
+    "name": "Still Serving Veterans",
+    "listing_url": "https://ssv.org/blog/",
+    "rss_url": "https://ssv.org/blog?format=rss",
+    "description": "Veteran career transition",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 195
+  },
+  {
+    "name": "Military Family",
+    "listing_url": "https://militaryfamily.org/news/",
+    "rss_url": "https://militaryfamily.org/news/feed",
+    "description": "Military family advocacy",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 196
+  },
+  {
+    "name": "National Military Family Association",
+    "listing_url": "https://www.militaryfamily.org/news/",
+    "rss_url": "https://www.militaryfamily.org/news/feed",
+    "description": "Military family support",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 197
+  },
+  {
+    "name": "Military OneSource",
+    "listing_url": "https://www.militaryonesource.mil/news/",
+    "rss_url": "https://www.militaryonesource.mil/news/feed",
+    "description": "DoD family support program",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 198
+  },
+  {
+    "name": "Military Spouse Magazine",
+    "listing_url": "https://militaryspouse.com/news/",
+    "rss_url": "https://militaryspouse.com/news/feed",
+    "description": "Military spouse lifestyle",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 199
+  },
+  {
+    "name": "National Security Archive",
+    "listing_url": "https://nsarchive.gwu.edu/",
+    "rss_url": "https://nsarchive.gwu.edu/feed",
+    "description": "Declassified documents and analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 200
+  },
+  {
+    "name": "Council on Foreign Relations",
+    "listing_url": "https://www.cfr.org/topics/defense",
+    "rss_url": "https://www.cfr.org/rss.xml",
+    "description": "Foreign policy and defense analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 201
+  },
+  {
+    "name": "Brookings - Security & Strategy",
+    "listing_url": "https://www.brookings.edu/topic/security-strategy/",
+    "rss_url": "https://www.brookings.edu/feed",
+    "description": "Security strategy research",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 202
+  },
+  {
+    "name": "Carnegie Endowment - Security",
+    "listing_url": "https://carnegieendowment.org/research/security",
+    "rss_url": "https://carnegieendowment.org/rss.xml",
+    "description": "International security analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 203
+  },
+  {
+    "name": "Atlantic Council - Defense",
+    "listing_url": "https://www.atlanticcouncil.org/topic/defense/",
+    "rss_url": "https://www.atlanticcouncil.org/feed",
+    "description": "Transatlantic defense analysis",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 204
+  },
+  {
+    "name": "Stimson Center - Security",
+    "listing_url": "https://www.stimson.org/topic/security/",
+    "rss_url": "https://www.stimson.org/feed",
+    "description": "Security policy research",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 205
+  },
+  {
+    "name": "Bloomberg Markets",
+    "listing_url": "https://www.bloomberg.com/markets",
+    "rss_url": "https://feeds.bloomberg.com/markets/news.rss",
+    "description": "Financial markets news, stocks, bonds, commodities, currencies",
+    "category": "economy",
+    "anti_scraping": "Cloudflare",
+    "status": "active",
+    "id": 206
+  },
+  {
+    "name": "Bloomberg Business",
+    "listing_url": "https://www.bloomberg.com/business",
+    "rss_url": "https://feeds.bloomberg.com/business/news.rss",
+    "description": "Business news, company analysis, industry trends",
+    "category": "economy",
+    "anti_scraping": "Cloudflare",
+    "status": "active",
+    "id": 207
+  },
+  {
+    "name": "Bloomberg Wealth",
+    "listing_url": "https://www.bloomberg.com/wealth",
+    "rss_url": "https://feeds.bloomberg.com/wealth/news.rss",
+    "description": "Personal finance, investing, wealth management",
+    "category": "economy",
+    "anti_scraping": "Cloudflare",
+    "status": "active",
+    "id": 208
+  },
+  {
+    "name": "Reuters Business",
+    "listing_url": "https://www.reuters.com/business",
+    "rss_url": "https://www.reuters.com/business/rss",
+    "description": "Global business and financial news, markets analysis",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 209
+  },
+  {
+    "name": "Reuters Finance & Banking",
+    "listing_url": "https://www.reuters.com/legal/finance-banking",
+    "rss_url": "https://www.reuters.com/legal/finance-banking/rss",
+    "description": "Banking industry news, financial regulation",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 210
+  },
+  {
+    "name": "Wall Street Journal Economy",
+    "listing_url": "https://www.wsj.com/economy",
+    "rss_url": "https://feeds.content.dowjones.io/public/rss/economy",
+    "description": "US economy, economic policy, Fed coverage",
+    "category": "economy",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 211
+  },
+  {
+    "name": "Wall Street Journal Markets",
+    "listing_url": "https://www.wsj.com/markets",
+    "rss_url": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+    "description": "Stock market, bonds, commodities, currencies",
+    "category": "economy",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 212
+  },
+  {
+    "name": "WSJ Personal Finance",
+    "listing_url": "https://www.wsj.com/personal-finance",
+    "rss_url": "https://feeds.content.dowjones.io/public/rss/personal-finance",
+    "description": "Retirement, savings, tax guidance, investing",
+    "category": "economy",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 213
+  },
+  {
+    "name": "WSJ Real Estate",
+    "listing_url": "https://www.wsj.com/real-estate",
+    "rss_url": "https://feeds.content.dowjones.io/public/rss/real-estate",
+    "description": "Housing market, property trends, mortgages",
+    "category": "economy",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 214
+  },
+  {
+    "name": "CNBC Economy",
+    "listing_url": "https://www.cnbc.com/economy",
+    "rss_url": "https://www.cnbc.com/id/20910258/device/rss/rss.html",
+    "description": "Economic news, current events, policy analysis",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 215
+  },
+  {
+    "name": "CNBC Business",
+    "listing_url": "https://www.cnbc.com/business",
+    "rss_url": "https://www.cnbc.com/id/10001147/device/rss/rss.html",
+    "description": "Business headlines, corporate news",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 216
+  },
+  {
+    "name": "CNBC Finance",
+    "listing_url": "https://www.cnbc.com/finance",
+    "rss_url": "https://www.cnbc.com/id/10000664/device/rss/rss.html",
+    "description": "Investing news, finance headlines from Wall Street",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 217
+  },
+  {
+    "name": "CNBC Markets",
+    "listing_url": "https://www.cnbc.com/markets",
+    "rss_url": "https://www.cnbc.com/id/15839069/device/rss/rss.html",
+    "description": "Stock market news, trading analysis",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 218
+  },
+  {
+    "name": "CNBC Small Business",
+    "listing_url": "https://www.cnbc.com/small-business",
+    "rss_url": "https://www.cnbc.com/id/44877279/device/rss/rss.html",
+    "description": "Entrepreneurship, startups, small business trends",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 219
+  },
+  {
+    "name": "CNBC Earnings",
+    "listing_url": "https://www.cnbc.com/earnings",
+    "rss_url": "https://www.cnbc.com/id/15839135/device/rss/rss.html",
+    "description": "Corporate earnings reports and analysis",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 220
+  },
+  {
+    "name": "MarketWatch Economy",
+    "listing_url": "https://www.marketwatch.com/economy-politics",
+    "rss_url": "https://feeds.marketwatch.com/marketwatch/economy",
+    "description": "Economic policy, market impact of current events",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 221
+  },
+  {
+    "name": "MarketWatch Top Stories",
+    "listing_url": "https://www.marketwatch.com/latest-news",
+    "rss_url": "https://feeds.marketwatch.com/marketwatch/topstories",
+    "description": "Latest stock market, financial and business news",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 222
+  },
+  {
+    "name": "MarketWatch Stock Market",
+    "listing_url": "https://www.marketwatch.com/markets",
+    "rss_url": "https://feeds.marketwatch.com/marketwatch/markets",
+    "description": "Stock market news and currencies",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 223
+  },
+  {
+    "name": "Financial Times",
+    "listing_url": "https://www.ft.com",
+    "rss_url": "https://www.ft.com/rss/home",
+    "description": "Global markets, business news, economic analysis",
+    "category": "economy",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 224
+  },
+  {
+    "name": "Fox Business Economy",
+    "listing_url": "https://www.foxbusiness.com/economy",
+    "rss_url": "https://moxie.foxbusiness.com/google-publisher/economy.xml",
+    "description": "Economic trends, market developments, government policy",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 225
+  },
+  {
+    "name": "Fox Business Markets",
+    "listing_url": "https://www.foxbusiness.com/markets",
+    "rss_url": "https://moxie.foxbusiness.com/google-publisher/markets.xml",
+    "description": "World market analysis, stock market news",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 226
+  },
+  {
+    "name": "Fox Business Personal Finance",
+    "listing_url": "https://www.foxbusiness.com/personal-finance",
+    "rss_url": "https://moxie.foxbusiness.com/google-publisher/personal-finance.xml",
+    "description": "Personal finance, investing, retirement",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 227
+  },
+  {
+    "name": "Fox Business Real Estate",
+    "listing_url": "https://www.foxbusiness.com/real-estate",
+    "rss_url": "https://moxie.foxbusiness.com/google-publisher/real-estate.xml",
+    "description": "Property trends, housing market updates",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 228
+  },
+  {
+    "name": "Fox Business Small Business",
+    "listing_url": "https://www.foxbusiness.com/category/small-business",
+    "rss_url": "https://moxie.foxbusiness.com/google-publisher/small-business.xml",
+    "description": "Small business news and trends",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 229
+  },
+  {
+    "name": "Yahoo Finance",
+    "listing_url": "https://finance.yahoo.com",
+    "rss_url": "https://feeds.finance.yahoo.com/rss/2.0/headline",
+    "description": "Stock quotes, financial news, portfolio management",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 230
+  },
+  {
+    "name": "Yahoo Finance Crypto",
+    "listing_url": "https://finance.yahoo.com/topic/crypto",
+    "rss_url": "https://finance.yahoo.com/topic/crypto/rss",
+    "description": "Cryptocurrency news, Bitcoin, Ethereum updates",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 231
+  },
+  {
+    "name": "Yahoo Finance Housing",
+    "listing_url": "https://finance.yahoo.com/topic/housing-market",
+    "rss_url": "https://finance.yahoo.com/topic/housing-market/rss",
+    "description": "Housing market news, mortgage rates",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 232
+  },
+  {
+    "name": "CNN Business",
+    "listing_url": "https://www.cnn.com/business",
+    "rss_url": "https://www.cnn.com/business/rss",
+    "description": "Business, markets, technology, media news",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 233
+  },
+  {
+    "name": "Business Insider",
+    "listing_url": "https://www.businessinsider.com",
+    "rss_url": "https://feeds.businessinsider.com/custom/all",
+    "description": "Business news, finance, economy, tech",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 234
+  },
+  {
+    "name": "Business Insider Personal Finance",
+    "listing_url": "https://www.businessinsider.com/personal-finance",
+    "rss_url": "https://feeds.businessinsider.com/personal-finance",
+    "description": "Personal finance, savings, credit cards, insurance",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 235
+  },
+  {
+    "name": "Investing.com News",
+    "listing_url": "https://www.investing.com/news",
+    "rss_url": "https://www.investing.com/rss/news.rss",
+    "description": "Real-time financial news, market analysis",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 236
+  },
+  {
+    "name": "Investing.com Economy",
+    "listing_url": "https://www.investing.com/news/economy",
+    "rss_url": "https://www.investing.com/rss/news_14.rss",
+    "description": "Economic news, global stock markets",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 237
+  },
+  {
+    "name": "Investing.com Forex",
+    "listing_url": "https://www.investing.com/news/forex-news",
+    "rss_url": "https://www.investing.com/rss/news_1.rss",
+    "description": "Forex news, currency market updates",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 238
+  },
+  {
+    "name": "Investing.com Crypto",
+    "listing_url": "https://www.investing.com/news/cryptocurrency",
+    "rss_url": "https://www.investing.com/rss/news_301.rss",
+    "description": "Cryptocurrency news, Bitcoin, altcoins",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 239
+  },
+  {
+    "name": "Investing.com Stocks",
+    "listing_url": "https://www.investing.com/news/stock-market",
+    "rss_url": "https://www.investing.com/rss/news_25.rss",
+    "description": "Stock market news, trading updates",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 240
+  },
+  {
+    "name": "Investing.com Commodities",
+    "listing_url": "https://www.investing.com/news/commodities",
+    "rss_url": "https://www.investing.com/rss/news_11.rss",
+    "description": "Commodity market news, gold, oil prices",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 241
+  },
+  {
+    "name": "Seeking Alpha",
+    "listing_url": "https://seekingalpha.com",
+    "rss_url": "https://seekingalpha.com/feed.xml",
+    "description": "Investment analysis, stock research, market insights",
+    "category": "economy",
+    "anti_scraping": "Partial Paywall",
+    "status": "active",
+    "id": 242
+  },
+  {
+    "name": "Seeking Alpha Market Currents",
+    "listing_url": "https://seekingalpha.com/market-currents",
+    "rss_url": "https://seekingalpha.com/market_currents.xml",
+    "description": "Breaking market news and analysis",
+    "category": "economy",
+    "anti_scraping": "Partial Paywall",
+    "status": "active",
+    "id": 243
+  },
+  {
+    "name": "The Motley Fool",
+    "listing_url": "https://www.fool.com",
+    "rss_url": "https://www.fool.com/rss",
+    "description": "Investing insights, stock recommendations",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 244
+  },
+  {
+    "name": "The Motley Fool Stock News",
+    "listing_url": "https://www.fool.com/investing-news",
+    "rss_url": "https://www.fool.com/a/feeds/partner/google/headlines.rss",
+    "description": "Stock news and investment analysis",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 245
+  },
+  {
+    "name": "Morningstar",
+    "listing_url": "https://www.morningstar.com",
+    "rss_url": "https://www.morningstar.com/rss",
+    "description": "Investment research, mutual funds, ETFs",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 246
+  },
+  {
+    "name": "Morningstar Economy",
+    "listing_url": "https://www.morningstar.com/economy",
+    "rss_url": "https://www.morningstar.com/rss/economy",
+    "description": "Economic policy analysis, Fed coverage",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 247
+  },
+  {
+    "name": "Zacks Investment",
+    "listing_url": "https://www.zacks.com",
+    "rss_url": "https://www.zacks.com/rss",
+    "description": "Stock research, investment analysis, earnings",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 248
+  },
+  {
+    "name": "ValueWalk",
+    "listing_url": "https://www.valuewalk.com",
+    "rss_url": "https://www.valuewalk.com/feed",
+    "description": "Value investing, hedge funds, asset management",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 249
+  },
+  {
+    "name": "TheStreet",
+    "listing_url": "https://www.thestreet.com",
+    "rss_url": "https://thestreet.com/.rss/feed/a386",
+    "description": "Financial news, investing analysis",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 250
+  },
+  {
+    "name": "TheStreet Economy",
+    "listing_url": "https://www.thestreet.com/economy",
+    "rss_url": "https://thestreet.com/.rss/feed/34ba",
+    "description": "Economy news for investing decisions",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 251
+  },
+  {
+    "name": "Kiplinger",
+    "listing_url": "https://www.kiplinger.com",
+    "rss_url": "https://www.kiplinger.com/rss",
+    "description": "Personal finance, investing, retirement, taxes",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 252
+  },
+  {
+    "name": "Investopedia",
+    "listing_url": "https://www.investopedia.com",
+    "rss_url": "https://www.investopedia.com/feedbuilder/feed/getfeed/?feedName=rss_headlines",
+    "description": "Financial education, investing news",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 253
+  },
+  {
+    "name": "Investopedia Markets",
+    "listing_url": "https://www.investopedia.com/markets-news",
+    "rss_url": "https://www.investopedia.com/feedbuilder/feed/getfeed/?feedName=rss_markets",
+    "description": "Markets moving news and company updates",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 254
+  },
+  {
+    "name": "Investopedia Crypto",
+    "listing_url": "https://www.investopedia.com/cryptocurrency",
+    "rss_url": "https://www.investopedia.com/feedbuilder/feed/getfeed/?feedName=rss_crypto",
+    "description": "Cryptocurrency developments, Bitcoin, Ethereum",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 255
+  },
+  {
+    "name": "Newsmax Finance",
+    "listing_url": "https://www.newsmax.com/finance",
+    "rss_url": "https://www.newsmax.com/rss/finance",
+    "description": "Business news, investing, personal finance",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 256
+  },
+  {
+    "name": "Newsmax Investing",
+    "listing_url": "https://www.newsmax.com/finance/investing",
+    "rss_url": "https://www.newsmax.com/rss/InvestingAnalysis",
+    "description": "Investing news and market analysis",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 257
+  },
+  {
+    "name": "Newsmax Street Talk",
+    "listing_url": "https://www.newsmax.com/finance/streettalk",
+    "rss_url": "https://www.newsmax.com/rss/StreetTalk",
+    "description": "Market and business news headlines",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 258
+  },
+  {
+    "name": "Bankrate News",
+    "listing_url": "https://www.bankrate.com/news",
+    "rss_url": "https://www.bankrate.com/news/rss",
+    "description": "Mortgages, savings, CDs, credit cards news",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 259
+  },
+  {
+    "name": "Federal Reserve News",
+    "listing_url": "https://www.federalreserve.gov/feeds/feeds.htm",
+    "rss_url": "https://www.federalreserve.gov/feeds/press_all.xml",
+    "description": "Fed press releases, monetary policy news",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 260
+  },
+  {
+    "name": "Federal Reserve Speeches",
+    "listing_url": "https://www.federalreserve.gov/feeds/feeds.htm",
+    "rss_url": "https://www.federalreserve.gov/feeds/speeches.xml",
+    "description": "Fed officials speeches and testimony",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 261
+  },
+  {
+    "name": "Federal Reserve Data",
+    "listing_url": "https://www.federalreserve.gov/data.htm",
+    "rss_url": "https://www.federalreserve.gov/feeds/data.xml",
+    "description": "Economic data releases, statistics",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 262
+  },
+  {
+    "name": "Atlanta Fed Macroblog",
+    "listing_url": "https://www.atlantafed.org/blogs/macroblog",
+    "rss_url": "https://www.atlantafed.org/RSS/macroblog",
+    "description": "Economic commentary, monetary policy analysis",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 263
+  },
+  {
+    "name": "Atlanta Fed GDPNow",
+    "listing_url": "https://www.atlantafed.org/cqer/research/gdpnow",
+    "rss_url": "https://www.atlantafed.org/RSS/gdpnow",
+    "description": "GDP forecasting, economic indicators",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 264
+  },
+  {
+    "name": "Dallas Fed",
+    "listing_url": "https://www.dallasfed.org",
+    "rss_url": "https://www.dallasfed.org/rss",
+    "description": "Economic analysis, regional economic trends",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 265
+  },
+  {
+    "name": "Bureau of Economic Analysis",
+    "listing_url": "https://www.bea.gov",
+    "rss_url": "https://www.bea.gov/rss",
+    "description": "GDP, personal income, economic accounts data",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 266
+  },
+  {
+    "name": "Bureau of Labor Statistics",
+    "listing_url": "https://www.bls.gov",
+    "rss_url": "https://www.bls.gov/rss",
+    "description": "Employment, inflation, wage data releases",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 267
+  },
+  {
+    "name": "SEC News",
+    "listing_url": "https://www.sec.gov",
+    "rss_url": "https://www.sec.gov/rss",
+    "description": "SEC announcements, regulatory filings",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 268
+  },
+  {
+    "name": "SEC Press Releases",
+    "listing_url": "https://www.sec.gov/news/press-releases",
+    "rss_url": "https://www.sec.gov/rss/news/press.xml",
+    "description": "SEC enforcement actions, regulatory news",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 269
+  },
+  {
+    "name": "Treasury Department",
+    "listing_url": "https://home.treasury.gov",
+    "rss_url": "https://home.treasury.gov/rss",
+    "description": "Treasury news, fiscal policy, debt management",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 270
+  },
+  {
+    "name": "TreasuryDirect",
+    "listing_url": "https://www.treasurydirect.gov",
+    "rss_url": "https://www.treasurydirect.gov/rss",
+    "description": "Treasury securities, savings bonds news",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 271
+  },
+  {
+    "name": "CBO Blog",
+    "listing_url": "https://www.cbo.gov/publications",
+    "rss_url": "https://www.cbo.gov/rss",
+    "description": "Congressional Budget Office analysis, fiscal policy",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 272
+  },
+  {
+    "name": "US Trade Representative",
+    "listing_url": "https://ustr.gov",
+    "rss_url": "https://ustr.gov/rss",
+    "description": "Trade policy, agreements, negotiations",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 273
+  },
+  {
+    "name": "Commerce Department",
+    "listing_url": "https://www.commerce.gov",
+    "rss_url": "https://www.commerce.gov/rss",
+    "description": "Economic development, trade, business news",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 274
+  },
+  {
+    "name": "Census Bureau",
+    "listing_url": "https://www.census.gov",
+    "rss_url": "https://www.census.gov/rss",
+    "description": "Economic indicators, demographic data",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 275
+  },
+  {
+    "name": "Brookings Institution",
+    "listing_url": "https://www.brookings.edu",
+    "rss_url": "https://www.brookings.edu/rss",
+    "description": "Economic policy research, analysis",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 276
+  },
+  {
+    "name": "Brookings Economy",
+    "listing_url": "https://www.brookings.edu/economy",
+    "rss_url": "https://www.brookings.edu/topic/economy/rss",
+    "description": "Economic research, policy analysis",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 277
+  },
+  {
+    "name": "Peterson Institute",
+    "listing_url": "https://www.piie.com",
+    "rss_url": "https://www.piie.com/rss",
+    "description": "International economics, trade, finance research",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 278
+  },
+  {
+    "name": "Cato Institute",
+    "listing_url": "https://www.cato.org",
+    "rss_url": "https://www.cato.org/rss",
+    "description": "Economic policy, free market research",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 279
+  },
+  {
+    "name": "Cato Institute Blog",
+    "listing_url": "https://www.cato.org/blog",
+    "rss_url": "https://www.cato.org/blog/rss",
+    "description": "Policy analysis, economic commentary",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 280
+  },
+  {
+    "name": "Heritage Foundation",
+    "listing_url": "https://www.heritage.org",
+    "rss_url": "https://www.heritage.org/rss",
+    "description": "Economic policy, fiscal research",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 281
+  },
+  {
+    "name": "American Enterprise Institute",
+    "listing_url": "https://www.aei.org",
+    "rss_url": "https://www.aei.org/rss",
+    "description": "Economic research, policy analysis",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 282
+  },
+  {
+    "name": "NBER",
+    "listing_url": "https://www.nber.org",
+    "rss_url": "https://www.nber.org/rss",
+    "description": "Economic research, working papers",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 283
+  },
+  {
+    "name": "NBER Working Papers",
+    "listing_url": "https://www.nber.org/working-papers",
+    "rss_url": "https://back.nber.org/rss/new.xml",
+    "description": "Latest economic research papers",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 284
+  },
+  {
+    "name": "Pew Research Center Economy",
+    "listing_url": "https://www.pewresearch.org/topics/national-economy",
+    "rss_url": "https://www.pewresearch.org/topics/national-economy/rss",
+    "description": "National economy research, public opinion",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 285
+  },
+  {
+    "name": "Pew Research World Economies",
+    "listing_url": "https://www.pewresearch.org/topics/world-economies",
+    "rss_url": "https://www.pewresearch.org/topics/world-economies/rss",
+    "description": "Global economy research, international economics",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 286
+  },
+  {
+    "name": "American Institute for Economic Research",
+    "listing_url": "https://www.aier.org",
+    "rss_url": "https://www.aier.org/feed",
+    "description": "Economic research, business conditions, markets",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 287
+  },
+  {
+    "name": "FocusEconomics",
+    "listing_url": "https://www.focus-economics.com",
+    "rss_url": "https://www.focus-economics.com/news-search/rss",
+    "description": "Economic forecasts, indicators for 131 countries",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 288
+  },
+  {
+    "name": "Freakonomics",
+    "listing_url": "https://freakonomics.com",
+    "rss_url": "https://freakonomics.com/feed",
+    "description": "Economic analysis, behavioral economics",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 289
+  },
+  {
+    "name": "Forbes",
+    "listing_url": "https://www.forbes.com",
+    "rss_url": "https://www.forbes.com/innovation/feed2",
+    "description": "Business, investing, technology, entrepreneurship",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 290
+  },
+  {
+    "name": "Forbes Business",
+    "listing_url": "https://www.forbes.com/business",
+    "rss_url": "https://www.forbes.com/business/feed",
+    "description": "Business news and analysis",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 291
+  },
+  {
+    "name": "Forbes Crypto & Blockchain",
+    "listing_url": "https://www.forbes.com/digital-assets",
+    "rss_url": "https://www.forbes.com/digital-assets/rss",
+    "description": "Cryptocurrency, blockchain technology news",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 292
+  },
+  {
+    "name": "Fortune",
+    "listing_url": "https://fortune.com",
+    "rss_url": "https://fortune.com/feed",
+    "description": "Business news, finance, leadership",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 293
+  },
+  {
+    "name": "Harvard Business Review",
+    "listing_url": "https://hbr.org",
+    "rss_url": "https://feeds.hbr.org/harvardbusiness",
+    "description": "Business management, leadership, strategy",
+    "category": "economy",
+    "anti_scraping": "Partial Paywall",
+    "status": "active",
+    "id": 294
+  },
+  {
+    "name": "Fast Company",
+    "listing_url": "https://www.fastcompany.com",
+    "rss_url": "https://www.fastcompany.com/rss",
+    "description": "Business innovation, technology, leadership",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 295
+  },
+  {
+    "name": "Inc.",
+    "listing_url": "https://www.inc.com",
+    "rss_url": "https://www.inc.com/rss",
+    "description": "Startups, entrepreneurship, small business",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 296
+  },
+  {
+    "name": "Entrepreneur.com",
+    "listing_url": "https://www.entrepreneur.com",
+    "rss_url": "https://www.entrepreneur.com/latest.rss",
+    "description": "Entrepreneurship, small business, startups",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 297
+  },
+  {
+    "name": "Entrepreneur Money & Finance",
+    "listing_url": "https://www.entrepreneur.com/money-finance",
+    "rss_url": "https://www.entrepreneur.com/money-finance/rss",
+    "description": "Business finance, funding, investment",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 298
+  },
+  {
+    "name": "Entrepreneur Business News",
+    "listing_url": "https://www.entrepreneur.com/business-news",
+    "rss_url": "https://www.entrepreneur.com/business-news/rss",
+    "description": "Latest business news and updates",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 299
+  },
+  {
+    "name": "CoinTelegraph",
+    "listing_url": "https://cointelegraph.com",
+    "rss_url": "https://cointelegraph.com/rss",
+    "description": "Bitcoin, Ethereum, blockchain, crypto news",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 300
+  },
+  {
+    "name": "CoinTelegraph Markets",
+    "listing_url": "https://cointelegraph.com/markets",
+    "rss_url": "https://cointelegraph.com/rss/tag/markets",
+    "description": "Crypto markets, trading analysis",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 301
+  },
+  {
+    "name": "CoinTelegraph DeFi",
+    "listing_url": "https://cointelegraph.com/tags/defi",
+    "rss_url": "https://cointelegraph.com/rss/tag/defi",
+    "description": "Decentralized finance news and updates",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 302
+  },
+  {
+    "name": "CoinTelegraph Bitcoin",
+    "listing_url": "https://cointelegraph.com/tags/bitcoin",
+    "rss_url": "https://cointelegraph.com/rss/tag/bitcoin",
+    "description": "Bitcoin news, price updates, analysis",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 303
+  },
+  {
+    "name": "CryptoSlate",
+    "listing_url": "https://cryptoslate.com",
+    "rss_url": "https://cryptoslate.com/feed",
+    "description": "Blockchain news, coin rankings, crypto directory",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 304
+  },
+  {
+    "name": "The Defiant",
+    "listing_url": "https://thedefiant.io",
+    "rss_url": "https://thedefiant.io/news/defi/rss",
+    "description": "DeFi news, analysis, developments",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 305
+  },
+  {
+    "name": "DeFi Prime",
+    "listing_url": "https://defiprime.com",
+    "rss_url": "https://defiprime.com/blog/rss",
+    "description": "DeFi products, ecosystem analysis",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 306
+  },
+  {
+    "name": "DeFi Rate",
+    "listing_url": "https://defirate.com",
+    "rss_url": "https://defirate.com/feed",
+    "description": "DeFi lending rates, yield farming",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 307
+  },
+  {
+    "name": "The Merkle",
+    "listing_url": "https://themerkle.com",
+    "rss_url": "https://themerkle.com/feed",
+    "description": "Crypto, finance, blockchain, tech news",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 308
+  },
+  {
+    "name": "Crypto-News.net",
+    "listing_url": "https://crypto-news.net",
+    "rss_url": "https://crypto-news.net/feed",
+    "description": "Bitcoin, Ethereum, altcoin news",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 309
+  },
+  {
+    "name": "Inman",
+    "listing_url": "https://www.inman.com",
+    "rss_url": "https://feeds.feedburner.com/inmannews",
+    "description": "Real estate news, realtor and broker trends",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 310
+  },
+  {
+    "name": "HousingWire",
+    "listing_url": "https://www.housingwire.com",
+    "rss_url": "https://www.housingwire.com/feed",
+    "description": "Housing market, mortgage trends, real estate",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 311
+  },
+  {
+    "name": "Redfin Blog",
+    "listing_url": "https://www.redfin.com/blog",
+    "rss_url": "https://www.redfin.com/blog/feed",
+    "description": "Real estate news, housing data, home buying/selling",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 312
+  },
+  {
+    "name": "NAR Realtors",
+    "listing_url": "https://nar.realtor/blogs",
+    "rss_url": "https://feeds.feedburner.com/nar/culture/scout",
+    "description": "REALTOR news, property ownership trends",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 313
+  },
+  {
+    "name": "Calculated Risk",
+    "listing_url": "https://www.calculatedriskblog.com",
+    "rss_url": "https://feeds.feedburner.com/CalculatedRisk",
+    "description": "Housing market analysis, economic indicators",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 314
+  },
+  {
+    "name": "NAREIT",
+    "listing_url": "https://www.reit.com",
+    "rss_url": "https://www.reit.com/news/rss.xml",
+    "description": "REIT news, real estate investment",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 315
+  },
+  {
+    "name": "Multi-Housing News",
+    "listing_url": "https://www.multihousingnews.com",
+    "rss_url": "https://www.multihousingnews.com/feed",
+    "description": "Multifamily real estate news",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 316
+  },
+  {
+    "name": "National Mortgage News",
+    "listing_url": "https://www.nationalmortgagenews.com",
+    "rss_url": "https://www.nationalmortgagenews.com/feed",
+    "description": "Mortgage industry news, lending trends",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 317
+  },
+  {
+    "name": "RISMedia",
+    "listing_url": "https://www.rismedia.com",
+    "rss_url": "https://blog.rismedia.com/feed",
+    "description": "Real estate news, agent resources",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 318
+  },
+  {
+    "name": "The Truth About Mortgage",
+    "listing_url": "https://www.thetruthaboutmortgage.com",
+    "rss_url": "https://www.thetruthaboutmortgage.com/feed",
+    "description": "Mortgage news, rates, lending",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 319
+  },
+  {
+    "name": "Keeping Current Matters",
+    "listing_url": "https://www.keepingcurrentmatters.com/blog",
+    "rss_url": "https://www.keepingcurrentmatters.com/blog/feed",
+    "description": "Real estate market insights, data",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 320
+  },
+  {
+    "name": "Small Business Trends",
+    "listing_url": "https://smallbiztrends.com",
+    "rss_url": "https://smallbiztrends.com/feed",
+    "description": "Small business news, trends, advice",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 321
+  },
+  {
+    "name": "Noobpreneur",
+    "listing_url": "https://www.noobpreneur.com",
+    "rss_url": "https://www.noobpreneur.com/feed",
+    "description": "Small business tips, resources, interviews",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 322
+  },
+  {
+    "name": "Under30CEO",
+    "listing_url": "https://www.under30ceo.com",
+    "rss_url": "https://www.under30ceo.com/feed",
+    "description": "Young entrepreneurs, business leadership",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 323
+  },
+  {
+    "name": "500 Startups",
+    "listing_url": "https://500.co",
+    "rss_url": "https://500.co/feed",
+    "description": "Startup news, venture capital, entrepreneurship",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 324
+  },
+  {
+    "name": "Foundr",
+    "listing_url": "https://foundr.com",
+    "rss_url": "https://foundr.com/feed",
+    "description": "Entrepreneurship, startup advice, business growth",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 325
+  },
+  {
+    "name": "Women on Business",
+    "listing_url": "https://www.womenonbusiness.com",
+    "rss_url": "https://feeds.feedblitz.com/WomenonBusiness",
+    "description": "Women entrepreneurs, business leadership",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 326
+  },
+  {
+    "name": "Sramana Mitra",
+    "listing_url": "https://www.sramanamitra.com",
+    "rss_url": "https://www.sramanamitra.com/feed",
+    "description": "Entrepreneurship, startup strategies",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 327
+  },
+  {
+    "name": "FinTech Futures",
+    "listing_url": "https://www.fintechfutures.com",
+    "rss_url": "https://www.fintechfutures.com/feed",
+    "description": "Fintech news, banking technology",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 328
+  },
+  {
+    "name": "Bank Automation News",
+    "listing_url": "https://www.bankautomationnews.com",
+    "rss_url": "https://www.bankautomationnews.com/feed",
+    "description": "Automation in financial services",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 329
+  },
+  {
+    "name": "The Financial Brand",
+    "listing_url": "https://thefinancialbrand.com",
+    "rss_url": "https://thefinancialbrand.com/feed",
+    "description": "Banking industry news, marketing, strategy",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 330
+  },
+  {
+    "name": "PaymentsSource",
+    "listing_url": "https://www.paymentsource.com",
+    "rss_url": "https://www.paymentsource.com/feed",
+    "description": "Payments industry news, digital wallets",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 331
+  },
+  {
+    "name": "American Banker",
+    "listing_url": "https://www.americanbanker.com",
+    "rss_url": "https://www.americanbanker.com/feed",
+    "description": "Banking industry news, regulation",
+    "category": "economy",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 332
+  },
+  {
+    "name": "Gonzobanker",
+    "listing_url": "https://www.gonzobanker.com",
+    "rss_url": "https://www.gonzobanker.com/feed",
+    "description": "Banking technology, vendor analysis",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 333
+  },
+  {
+    "name": "Central Banking",
+    "listing_url": "https://www.centralbanking.com",
+    "rss_url": "https://www.centralbanking.com/feed",
+    "description": "Central bank policy, regulation",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 334
+  },
+  {
+    "name": "Global Banking & Finance",
+    "listing_url": "https://www.globalbankingandfinance.com",
+    "rss_url": "https://www.globalbankingandfinance.com/feed",
+    "description": "Banking and finance industry news",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 335
+  },
+  {
+    "name": "MyBankTracker",
+    "listing_url": "https://www.mybanktracker.com/news",
+    "rss_url": "https://www.mybanktracker.com/news/feed",
+    "description": "Banking news, consumer finance",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 336
+  },
+  {
+    "name": "Chime Blog",
+    "listing_url": "https://www.chime.com/blog",
+    "rss_url": "https://www.chime.com/blog/feed",
+    "description": "Digital banking, personal finance",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 337
+  },
+  {
+    "name": "Supply Chain Dive",
+    "listing_url": "https://www.supplychaindive.com",
+    "rss_url": "https://www.supplychaindive.com/feeds/news",
+    "description": "Supply chain management, logistics news",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 338
+  },
+  {
+    "name": "Supply Chain Management Review",
+    "listing_url": "https://www.scmr.com",
+    "rss_url": "https://feeds.feedburner.com/scmr/rss",
+    "description": "Supply chain management, procurement",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 339
+  },
+  {
+    "name": "The Manufacturer",
+    "listing_url": "https://www.themanufacturer.com",
+    "rss_url": "https://www.themanufacturer.com/feed",
+    "description": "Manufacturing news, industry insights",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 340
+  },
+  {
+    "name": "Industry Today",
+    "listing_url": "https://www.industrytoday.com",
+    "rss_url": "https://www.industrytoday.com/feed",
+    "description": "Manufacturing, industrial sector news",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 341
+  },
+  {
+    "name": "Manufacturing Digital",
+    "listing_url": "https://www.manufacturingdigital.com",
+    "rss_url": "https://www.manufacturingdigital.com/feed",
+    "description": "Manufacturing technology, digital transformation",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 342
+  },
+  {
+    "name": "Supply Chain Now",
+    "listing_url": "https://www.supplychainnow.com",
+    "rss_url": "https://www.supplychainnow.com/feed",
+    "description": "Supply chain news, interviews, analysis",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 343
+  },
+  {
+    "name": "Blue Yonder Blog",
+    "listing_url": "https://blog.blueyonder.com",
+    "rss_url": "https://blog.blueyonder.com/feed",
+    "description": "Supply chain, logistics technology",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 344
+  },
+  {
+    "name": "MIT Supply Chain",
+    "listing_url": "https://medium.com/mitsupplychain",
+    "rss_url": "https://medium.com/feed/mitsupplychain",
+    "description": "Supply chain research, thought leadership",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 345
+  },
+  {
+    "name": "Economic Times",
+    "listing_url": "https://economictimes.indiatimes.com",
+    "rss_url": "https://economictimes.indiatimes.com/rssfeedsdefault.cms",
+    "description": "Global economic news, markets",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 346
+  },
+  {
+    "name": "Trading Economics",
+    "listing_url": "https://www.tradingeconomics.com",
+    "rss_url": "https://www.tradingeconomics.com/rss",
+    "description": "Economic indicators, forecasts for 196 countries",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 347
+  },
+  {
+    "name": "World Bank",
+    "listing_url": "https://www.worldbank.org",
+    "rss_url": "https://www.worldbank.org/rss",
+    "description": "Global economic development, research",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 348
+  },
+  {
+    "name": "IMF News",
+    "listing_url": "https://www.imf.org",
+    "rss_url": "https://www.imf.org/rss",
+    "description": "International monetary fund news, global economy",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 349
+  },
+  {
+    "name": "BIS",
+    "listing_url": "https://www.bis.org",
+    "rss_url": "https://www.bis.org/doclist/bis_fsi_publs.rss",
+    "description": "Bank for International Settlements research",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 350
+  },
+  {
+    "name": "AP News Economy",
+    "listing_url": "https://apnews.com/hub/economy",
+    "rss_url": "https://apnews.com/hub/economy/rss",
+    "description": "Associated Press economic news",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 351
+  },
+  {
+    "name": "NBC News Economy",
+    "listing_url": "https://www.nbcnews.com/business/economy",
+    "rss_url": "https://www.nbcnews.com/business/economy/rss",
+    "description": "Economic news and analysis",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 352
+  },
+  {
+    "name": "Politico",
+    "listing_url": "https://www.politico.com/politics",
+    "rss_url": "https://www.politico.com/rss/politicopicks.xml",
+    "description": "Comprehensive politics and policy coverage",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 353
+  },
+  {
+    "name": "Politico Playbook",
+    "listing_url": "https://www.politico.com/playbook",
+    "rss_url": "https://rss.politico.com/playbook.xml",
+    "description": "Daily political briefing and analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 354
+  },
+  {
+    "name": "Politico White House",
+    "listing_url": "https://www.politico.com/white-house",
+    "rss_url": "https://rss.politico.com/white-house.xml",
+    "description": "White House news and analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 355
+  },
+  {
+    "name": "Politico Congress",
+    "listing_url": "https://www.politico.com/congress",
+    "rss_url": "https://rss.politico.com/congress.xml",
+    "description": "Congressional news and legislation",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 356
+  },
+  {
+    "name": "CNN Politics",
+    "listing_url": "https://edition.cnn.com/politics",
+    "rss_url": "http://rss.cnn.com/rss/cnn_allpolitics.rss",
+    "description": "Breaking political news and analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 357
+  },
+  {
+    "name": "Fox News Politics",
+    "listing_url": "https://www.foxnews.com/politics",
+    "rss_url": "https://moxie.foxnews.com/google-publisher/politics.xml",
+    "description": "Conservative political news coverage",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 358
+  },
+  {
+    "name": "NBC News Politics",
+    "listing_url": "https://www.nbcnews.com/politics",
+    "rss_url": "https://feeds.nbcnews.com/feeds/nbcpolitics",
+    "description": "Political news from NBC",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 359
+  },
+  {
+    "name": "ABC News Politics",
+    "listing_url": "https://abcnews.go.com/Politics",
+    "rss_url": "https://abcnews.go.com/abcnews/politicsheadlines",
+    "description": "Political news and analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 360
+  },
+  {
+    "name": "CBS News Politics",
+    "listing_url": "https://www.cbsnews.com/politics",
+    "rss_url": "https://www.cbsnews.com/latest/rss/politics",
+    "description": "Political news coverage",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 361
+  },
+  {
+    "name": "Reuters Politics",
+    "listing_url": "https://www.reuters.com/politics",
+    "rss_url": "https://feeds.reuters.com/Reuters/PoliticsNews",
+    "description": "International political news",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 362
+  },
+  {
+    "name": "AP News Politics",
+    "listing_url": "https://apnews.com/politics",
+    "rss_url": "https://apnews.com/politics.rss",
+    "description": "Associated Press political coverage",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 363
+  },
+  {
+    "name": "Bloomberg Politics",
+    "listing_url": "https://www.bloomberg.com/politics",
+    "rss_url": "https://feeds.bloomberg.com/politics/news.rss",
+    "description": "Business and politics coverage",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 364
+  },
+  {
+    "name": "The Hill",
+    "listing_url": "https://thehill.com/news",
+    "rss_url": "https://thehill.com/news/feed/",
+    "description": "Congress and political news",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 365
+  },
+  {
+    "name": "The Hill Policy",
+    "listing_url": "https://thehill.com/policy",
+    "rss_url": "https://thehill.com/policy/feed",
+    "description": "Policy analysis and news",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 366
+  },
+  {
+    "name": "The Hill Opinion",
+    "listing_url": "https://thehill.com/opinion",
+    "rss_url": "https://thehill.com/opinion/feed",
+    "description": "Political opinion and commentary",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 367
+  },
+  {
+    "name": "Washington Post Politics",
+    "listing_url": "https://www.washingtonpost.com/politics",
+    "rss_url": "https://feeds.washingtonpost.com/rss/politics",
+    "description": "In-depth political coverage",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 368
+  },
+  {
+    "name": "New York Times Politics",
+    "listing_url": "https://www.nytimes.com/section/politics",
+    "rss_url": "https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml",
+    "description": "Comprehensive politics coverage",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 369
+  },
+  {
+    "name": "Wall Street Journal Politics",
+    "listing_url": "https://www.wsj.com/politics",
+    "rss_url": "https://feeds.content.dowjones.io/public/rss/politics",
+    "description": "Business-focused political news",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 370
+  },
+  {
+    "name": "USA Today Politics",
+    "listing_url": "https://www.usatoday.com/news/politics",
+    "rss_url": "https://rss.usatoday.com/news/politics",
+    "description": "National political news",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 371
+  },
+  {
+    "name": "The Guardian US Politics",
+    "listing_url": "https://www.theguardian.com/us-news/us-politics",
+    "rss_url": "https://www.theguardian.com/us-news/us-politics/rss",
+    "description": "Liberal perspective on US politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 372
+  },
+  {
+    "name": "BBC US Politics",
+    "listing_url": "https://www.bbc.com/news/world/us_and_canada",
+    "rss_url": "https://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml",
+    "description": "International view of US politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 373
+  },
+  {
+    "name": "NPR Politics",
+    "listing_url": "https://www.npr.org/sections/politics",
+    "rss_url": "https://feeds.npr.org/1014/rss.xml",
+    "description": "Public radio political coverage",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 374
+  },
+  {
+    "name": "PBS NewsHour Politics",
+    "listing_url": "https://www.pbs.org/newshour/politics",
+    "rss_url": "https://www.pbs.org/newshour/feeds/rss/politics",
+    "description": "In-depth political reporting",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 375
+  },
+  {
+    "name": "Axios Politics",
+    "listing_url": "https://www.axios.com/politics-policy",
+    "rss_url": "https://api.axios.com/feed/politics",
+    "description": "Smart political briefings",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 376
+  },
+  {
+    "name": "Newsweek Politics",
+    "listing_url": "https://www.newsweek.com/politics",
+    "rss_url": "https://www.newsweek.com/rss",
+    "description": "Political news and analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 377
+  },
+  {
+    "name": "U.S. News Politics",
+    "listing_url": "https://www.usnews.com/news/political-news",
+    "rss_url": "https://www.usnews.com/rss/news",
+    "description": "Political news and rankings",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 378
+  },
+  {
+    "name": "The Seattle Times Politics",
+    "listing_url": "https://www.seattletimes.com/nation-world/nation-politics/",
+    "rss_url": "https://www.seattletimes.com/nation-world/nation-politics/feed/",
+    "description": "National politics coverage",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 379
+  },
+  {
+    "name": "Miami Herald Politics",
+    "listing_url": "https://www.miamiherald.com/news/politics-government/",
+    "rss_url": "https://www.miamiherald.com/news/politics-government/?widgetName=rssfeed&widgetContentId=712015&getXmlFeed=true",
+    "description": "Florida and national politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 380
+  },
+  {
+    "name": "Chicago Tribune Politics",
+    "listing_url": "https://www.chicagotribune.com/politics/",
+    "rss_url": "https://www.chicagotribune.com/politics/rss2.0.xml",
+    "description": "Illinois and national politics",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 381
+  },
+  {
+    "name": "Los Angeles Times Politics",
+    "listing_url": "https://www.latimes.com/politics",
+    "rss_url": "https://www.latimes.com/politics/rss2.0.xml",
+    "description": "California and national politics",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 382
+  },
+  {
+    "name": "Denver Post Politics",
+    "listing_url": "https://www.denverpost.com/politics/",
+    "rss_url": "https://www.denverpost.com/politics/feed/",
+    "description": "Colorado politics coverage",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 383
+  },
+  {
+    "name": "Boston Globe Politics",
+    "listing_url": "https://www.bostonglobe.com/news/politics",
+    "rss_url": "https://www.bostonglobe.com/rss/politics",
+    "description": "Massachusetts politics",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 384
+  },
+  {
+    "name": "Dallas Morning News Politics",
+    "listing_url": "https://www.dallasnews.com/news/politics/",
+    "rss_url": "https://www.dallasnews.com/news/politics/feed/",
+    "description": "Texas politics coverage",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 385
+  },
+  {
+    "name": "Houston Chronicle Politics",
+    "listing_url": "https://www.houstonchronicle.com/politics/",
+    "rss_url": "https://www.houstonchronicle.com/politics/feed/",
+    "description": "Texas politics news",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 386
+  },
+  {
+    "name": "Star Tribune Politics",
+    "listing_url": "https://www.startribune.com/politics/",
+    "rss_url": "https://www.startribune.com/politics/feed/",
+    "description": "Minnesota politics",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 387
+  },
+  {
+    "name": "Philadelphia Inquirer Politics",
+    "listing_url": "https://www.inquirer.com/politics",
+    "rss_url": "https://www.inquirer.com/politics/feed/",
+    "description": "Pennsylvania politics",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 388
+  },
+  {
+    "name": "Cleveland.com Politics",
+    "listing_url": "https://www.cleveland.com/politics/",
+    "rss_url": "https://www.cleveland.com/politics/feed/",
+    "description": "Ohio politics news",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 389
+  },
+  {
+    "name": "RealClearPolitics",
+    "listing_url": "https://www.realclearpolitics.com",
+    "rss_url": "https://www.realclearpolitics.com/index.xml",
+    "description": "Political news aggregation and polling",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 390
+  },
+  {
+    "name": "FiveThirtyEight Politics",
+    "listing_url": "https://abcnews.go.com/538",
+    "rss_url": "https://fivethirtyeight.com/politics/feed/",
+    "description": "Data-driven political analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 391
+  },
+  {
+    "name": "The Atlantic Politics",
+    "listing_url": "https://www.theatlantic.com/politics",
+    "rss_url": "https://www.theatlantic.com/feed/channel/politics/",
+    "description": "Long-form political analysis",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 392
+  },
+  {
+    "name": "National Review",
+    "listing_url": "https://www.nationalreview.com",
+    "rss_url": "https://www.nationalreview.com/feed/",
+    "description": "Conservative commentary",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 393
+  },
+  {
+    "name": "The New Republic",
+    "listing_url": "https://newrepublic.com/politics",
+    "rss_url": "https://newrepublic.com/rss.xml",
+    "description": "Liberal political commentary",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 394
+  },
+  {
+    "name": "The Nation",
+    "listing_url": "https://www.thenation.com/subject/politics",
+    "rss_url": "https://www.thenation.com/feed/?post_type=article",
+    "description": "Progressive political analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 395
+  },
+  {
+    "name": "Mother Jones",
+    "listing_url": "https://www.motherjones.com/politics",
+    "rss_url": "https://www.motherjones.com/politics/feed/",
+    "description": "Investigative political journalism",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 396
+  },
+  {
+    "name": "Slate Politics",
+    "listing_url": "https://slate.com/news-and-politics",
+    "rss_url": "https://slate.com/feeds/news-and-politics.rss",
+    "description": "Liberal commentary and analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 397
+  },
+  {
+    "name": "Salon Politics",
+    "listing_url": "https://www.salon.com/category/news-and-politics",
+    "rss_url": "https://www.salon.com/category/news-and-politics/feed",
+    "description": "Progressive news and opinion",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 398
+  },
+  {
+    "name": "Vox Politics",
+    "listing_url": "https://www.vox.com/politics",
+    "rss_url": "https://www.vox.com/rss/politics/index.xml",
+    "description": "Explanatory political journalism",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 399
+  },
+  {
+    "name": "Daily Kos",
+    "listing_url": "https://www.dailykos.com",
+    "rss_url": "https://www.dailykos.com/blogs/main.rss",
+    "description": "Progressive political blog",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 400
+  },
+  {
+    "name": "Talking Points Memo",
+    "listing_url": "https://talkingpointsmemo.com/news",
+    "rss_url": "https://talkingpointsmemo.com/feed",
+    "description": "Political news and analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 401
+  },
+  {
+    "name": "The American Conservative",
+    "listing_url": "https://www.theamericanconservative.com",
+    "rss_url": "https://www.theamericanconservative.com/feed/",
+    "description": "Conservative commentary",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 402
+  },
+  {
+    "name": "Reason Magazine",
+    "listing_url": "https://reason.com",
+    "rss_url": "https://reason.com/feed/",
+    "description": "Libertarian perspective",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 403
+  },
+  {
+    "name": "The Week Politics",
+    "listing_url": "https://theweek.com/politics",
+    "rss_url": "https://theweek.com/feeds/tag/politics",
+    "description": "Weekly political summary",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 404
+  },
+  {
+    "name": "Rolling Stone Politics",
+    "listing_url": "https://www.rollingstone.com/politics",
+    "rss_url": "https://www.rollingstone.com/politics/feed",
+    "description": "Political news and culture",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 405
+  },
+  {
+    "name": "The Intercept",
+    "listing_url": "https://theintercept.com/politics",
+    "rss_url": "https://theintercept.com/politics/feed/",
+    "description": "Investigative journalism",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 406
+  },
+  {
+    "name": "ProPublica Politics",
+    "listing_url": "https://www.propublica.org/topics/politics",
+    "rss_url": "https://www.propublica.org/feeds/propublica/main",
+    "description": "Investigative journalism",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 407
+  },
+  {
+    "name": "The Daily Beast Politics",
+    "listing_url": "https://www.thedailybeast.com/category/politics",
+    "rss_url": "https://feeds.thedailybeast.com/summary/rss",
+    "description": "Political news and commentary",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 408
+  },
+  {
+    "name": "Mediaite Politics",
+    "listing_url": "https://www.mediaite.com/category/politics",
+    "rss_url": "https://www.mediaite.com/category/politics/feed/",
+    "description": "Media and politics coverage",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 409
+  },
+  {
+    "name": "Breitbart Politics",
+    "listing_url": "https://www.breitbart.com/politics",
+    "rss_url": "https://feeds.feedburner.com/breitbart",
+    "description": "Conservative news",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 410
+  },
+  {
+    "name": "The Daily Caller Politics",
+    "listing_url": "https://dailycaller.com/section/politics",
+    "rss_url": "https://dailycaller.com/section/politics/feed/",
+    "description": "Conservative news and opinion",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 411
+  },
+  {
+    "name": "Washington Examiner",
+    "listing_url": "https://www.washingtonexaminer.com",
+    "rss_url": "https://www.washingtonexaminer.com/feed/",
+    "description": "Conservative political news",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 412
+  },
+  {
+    "name": "Washington Times Politics",
+    "listing_url": "https://www.washingtontimes.com/news/politics/",
+    "rss_url": "https://www.washingtontimes.com/rss/headlines/news/politics/",
+    "description": "Conservative news coverage",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 413
+  },
+  {
+    "name": "Newsmax Politics",
+    "listing_url": "https://www.newsmax.com/politics",
+    "rss_url": "https://www.newsmax.com/rss/Politics/1",
+    "description": "Conservative political news",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 414
+  },
+  {
+    "name": "RedState",
+    "listing_url": "https://redstate.com/category/news-and-politics",
+    "rss_url": "https://redstate.com/feed",
+    "description": "Conservative commentary",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 415
+  },
+  {
+    "name": "Hot Air",
+    "listing_url": "https://hotair.com",
+    "rss_url": "https://hotair.com/feed/",
+    "description": "Conservative blog",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 416
+  },
+  {
+    "name": "Gateway Pundit",
+    "listing_url": "https://www.thegatewaypundit.com",
+    "rss_url": "https://www.thegatewaypundit.com/feed/",
+    "description": "Conservative news",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 417
+  },
+  {
+    "name": "Drudge Report",
+    "listing_url": "https://drudgereport.com",
+    "rss_url": "https://feeds.feedburner.com/DrudgeReportFeed",
+    "description": "News aggregation",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 418
+  },
+  {
+    "name": "BuzzFeed Politics",
+    "listing_url": "https://www.buzzfeednews.com/section/politics",
+    "rss_url": "https://www.buzzfeed.com/politics.xml",
+    "description": "Political reporting",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 419
+  },
+  {
+    "name": "HuffPost Politics",
+    "listing_url": "https://www.huffpost.com/news/politics",
+    "rss_url": "https://www.huffpost.com/news/politics/feed",
+    "description": "Liberal news and opinion",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 420
+  },
+  {
+    "name": "MSNBC",
+    "listing_url": "https://www.msnbc.com",
+    "rss_url": "https://www.msnbc.com/feed",
+    "description": "Liberal cable news coverage",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 421
+  },
+  {
+    "name": "Alternet",
+    "listing_url": "https://www.alternet.org",
+    "rss_url": "https://www.alternet.org/feeds/feed.rss",
+    "description": "Progressive news",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 422
+  },
+  {
+    "name": "Truthout",
+    "listing_url": "https://truthout.org",
+    "rss_url": "https://truthout.org/feed/",
+    "description": "Progressive journalism",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 423
+  },
+  {
+    "name": "Common Dreams",
+    "listing_url": "https://www.commondreams.org",
+    "rss_url": "https://www.commondreams.org/feeds/feed.rss",
+    "description": "Progressive news",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 424
+  },
+  {
+    "name": "Reader Supported News",
+    "listing_url": "https://rsn.org",
+    "rss_url": "https://rsn.org/feed/",
+    "description": "Progressive news",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 425
+  },
+  {
+    "name": "The Raw Story",
+    "listing_url": "https://www.rawstory.com",
+    "rss_url": "https://www.rawstory.com/feed/",
+    "description": "Progressive news",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 426
+  },
+  {
+    "name": "Crooks and Liars",
+    "listing_url": "https://crooksandliars.com",
+    "rss_url": "https://feeds.crooksandliars.com/crooksandliars",
+    "description": "Progressive video and news",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 427
+  },
+  {
+    "name": "PoliticusUSA",
+    "listing_url": "https://www.politicususa.com",
+    "rss_url": "https://www.politicususa.com/feed",
+    "description": "Progressive political news",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 428
+  },
+  {
+    "name": "GovTrack",
+    "listing_url": "https://www.govtrack.us",
+    "rss_url": "https://www.govtrack.us/rss",
+    "description": "Congressional bill tracking",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 429
+  },
+  {
+    "name": "OpenSecrets",
+    "listing_url": "https://www.opensecrets.org/news",
+    "rss_url": "https://www.opensecrets.org/news/feed",
+    "description": "Campaign finance tracking",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 430
+  },
+  {
+    "name": "FEC RSS Feeds",
+    "listing_url": "https://www.fec.gov/feed/candidates/",
+    "rss_url": "https://www.fec.gov/feed/candidates/",
+    "description": "Federal Election Commission data",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 431
+  },
+  {
+    "name": "Ballotpedia",
+    "listing_url": "https://ballotpedia.org",
+    "rss_url": "https://ballotpedia.org/rss/election_calendar.xml",
+    "description": "Election information and analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 432
+  },
+  {
+    "name": "Cook Political Report",
+    "listing_url": "https://cookpolitical.com",
+    "rss_url": "https://cookpolitical.com/feed",
+    "description": "Non-partisan election analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 433
+  },
+  {
+    "name": "Inside Elections",
+    "listing_url": "https://insideelections.com",
+    "rss_url": "https://insideelections.com/feeds",
+    "description": "Election analysis and ratings",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 434
+  },
+  {
+    "name": "Sabato's Crystal Ball",
+    "listing_url": "https://centerforpolitics.org/crystalball/",
+    "rss_url": "https://centerforpolitics.org/crystalball/feed/",
+    "description": "University of Virginia election analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 435
+  },
+  {
+    "name": "Roll Call",
+    "listing_url": "https://www.rollcall.com",
+    "rss_url": "https://www.rollcall.com/rss/all_news.xml",
+    "description": "Congressional news",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 436
+  },
+  {
+    "name": "CQ Magazine",
+    "listing_url": "https://library.cqpress.com/cqmagazine",
+    "rss_url": "https://library.cqpress.com/cqmagazine/feed",
+    "description": "Congressional Quarterly news",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 437
+  },
+  {
+    "name": "National Journal",
+    "listing_url": "https://www.nationaljournal.com",
+    "rss_url": "https://www.nationaljournal.com/rss",
+    "description": "Government and politics analysis",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 438
+  },
+  {
+    "name": "LegiStorm",
+    "listing_url": "https://www.legistorm.com",
+    "rss_url": "https://www.legistorm.com/feed",
+    "description": "Congressional staff and lobbying data",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 439
+  },
+  {
+    "name": "Congress.gov",
+    "listing_url": "https://www.congress.gov",
+    "rss_url": "https://www.congress.gov/rss",
+    "description": "Official congressional legislation",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 440
+  },
+  {
+    "name": "House.gov",
+    "listing_url": "https://www.house.gov",
+    "rss_url": "https://www.house.gov/rss",
+    "description": "U.S. House of Representatives",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 441
+  },
+  {
+    "name": "Senate.gov",
+    "listing_url": "https://www.senate.gov",
+    "rss_url": "https://www.senate.gov/rss",
+    "description": "U.S. Senate news",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 442
+  },
+  {
+    "name": "White House",
+    "listing_url": "https://www.whitehouse.gov",
+    "rss_url": "https://www.whitehouse.gov/feed/",
+    "description": "Official White House news",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 443
+  },
+  {
+    "name": "FactCheck.org",
+    "listing_url": "https://www.factcheck.org",
+    "rss_url": "https://www.factcheck.org/feed/",
+    "description": "Political fact-checking",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 444
+  },
+  {
+    "name": "PolitiFact",
+    "listing_url": "https://www.politifact.com",
+    "rss_url": "https://www.politifact.com/rss/all",
+    "description": "Truth-O-Meter fact-checking",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 445
+  },
+  {
+    "name": "Snopes Politics",
+    "listing_url": "https://www.snopes.com/politics/",
+    "rss_url": "https://www.snopes.com/feed/",
+    "description": "Urban legends and politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 446
+  },
+  {
+    "name": "Washington Post Fact Checker",
+    "listing_url": "https://www.washingtonpost.com/news/fact-checker/",
+    "rss_url": "https://www.washingtonpost.com/news/fact-checker/feed/",
+    "description": "Political fact-checking",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 447
+  },
+  {
+    "name": "AP Fact Check",
+    "listing_url": "https://apnews.com/hub/ap-fact-check",
+    "rss_url": "https://apnews.com/hub/ap-fact-check/feed",
+    "description": "AP fact-checking service",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 448
+  },
+  {
+    "name": "Lead Stories",
+    "listing_url": "https://leadstories.com",
+    "rss_url": "https://leadstories.com/atom.xml",
+    "description": "Fact-checking and debunking",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 449
+  },
+  {
+    "name": "BBC Reality Check",
+    "listing_url": "https://www.bbc.com/news/reality_check",
+    "rss_url": "https://www.bbc.com/news/reality_check/feed",
+    "description": "BBC fact-checking",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 450
+  },
+  {
+    "name": "Full Fact",
+    "listing_url": "https://fullfact.org",
+    "rss_url": "https://fullfact.org/feed/",
+    "description": "UK-based fact-checking",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 451
+  },
+  {
+    "name": "Cato Institute",
+    "listing_url": "https://www.cato.org/blog/topics/20",
+    "rss_url": "https://www.cato.org/blog/feed",
+    "description": "Libertarian policy analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 452
+  },
+  {
+    "name": "Center for American Progress",
+    "listing_url": "https://www.americanprogress.org/politics/",
+    "rss_url": "https://www.americanprogress.org/feed/",
+    "description": "Progressive policy research",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 453
+  },
+  {
+    "name": "Pew Research Politics",
+    "listing_url": "https://www.pewresearch.org/politics/",
+    "rss_url": "https://www.pewresearch.org/feed/",
+    "description": "Public opinion polling",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 454
+  },
+  {
+    "name": "RAND Corporation",
+    "listing_url": "https://www.rand.org/politics.html",
+    "rss_url": "https://www.rand.org/feed.xml",
+    "description": "Policy research and analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 455
+  },
+  {
+    "name": "Council on Foreign Relations",
+    "listing_url": "https://www.cfr.org/politics",
+    "rss_url": "https://www.cfr.org/feed",
+    "description": "Foreign policy analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 456
+  },
+  {
+    "name": "Carnegie Endowment",
+    "listing_url": "https://carnegieendowment.org/research/politics",
+    "rss_url": "https://carnegieendowment.org/feed",
+    "description": "International peace and politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 457
+  },
+  {
+    "name": "Urban Institute",
+    "listing_url": "https://www.urban.org/policy-centers/cross-center-initiatives/program-communities/politics",
+    "rss_url": "https://www.urban.org/feed",
+    "description": "Social policy research",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 458
+  },
+  {
+    "name": "Manhattan Institute",
+    "listing_url": "https://www.manhattan-institute.org/politics",
+    "rss_url": "https://www.manhattan-institute.org/feed",
+    "description": "Urban policy and politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 459
+  },
+  {
+    "name": "Hoover Institution",
+    "listing_url": "https://www.hoover.org/research/politics",
+    "rss_url": "https://www.hoover.org/feed",
+    "description": "Conservative policy research",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 460
+  },
+  {
+    "name": "New America Politics",
+    "listing_url": "https://www.newamerica.org/political-reform/",
+    "rss_url": "https://www.newamerica.org/feed/",
+    "description": "Political reform research",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 461
+  },
+  {
+    "name": "Brennan Center",
+    "listing_url": "https://www.brennancenter.org/issues/protect-democracy",
+    "rss_url": "https://www.brennancenter.org/feed",
+    "description": "Democracy and justice research",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 462
+  },
+  {
+    "name": "Texas Tribune",
+    "listing_url": "https://www.texastribune.org/topics/politics/",
+    "rss_url": "https://www.texastribune.org/feed/",
+    "description": "Texas politics coverage",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 463
+  },
+  {
+    "name": "Florida Politics",
+    "listing_url": "https://floridapolitics.com",
+    "rss_url": "https://floridapolitics.com/feed",
+    "description": "Florida political news",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 464
+  },
+  {
+    "name": "California Politics",
+    "listing_url": "https://calmatters.org/category/politics/",
+    "rss_url": "https://calmatters.org/feed/",
+    "description": "California politics coverage",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 465
+  },
+  {
+    "name": "New York Politics",
+    "listing_url": "https://www.nydailynews.com/politics/",
+    "rss_url": "https://www.nydailynews.com/politics/feed/",
+    "description": "New York politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 466
+  },
+  {
+    "name": "Illinois Politics",
+    "listing_url": "https://capitolnewsillinois.com",
+    "rss_url": "https://capitolnewsillinois.com/feed/",
+    "description": "Illinois state politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 467
+  },
+  {
+    "name": "Pennsylvania Politics",
+    "listing_url": "https://www.penncapital-star.com",
+    "rss_url": "https://www.penncapital-star.com/feed",
+    "description": "Pennsylvania politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 468
+  },
+  {
+    "name": "Ohio Politics",
+    "listing_url": "https://www.dispatch.com/news/politics-elections/",
+    "rss_url": "https://www.dispatch.com/news/politics-elections/feed/",
+    "description": "Ohio politics coverage",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 469
+  },
+  {
+    "name": "Michigan Politics",
+    "listing_url": "https://www.michiganadvance.com",
+    "rss_url": "https://www.michiganadvance.com/feed/",
+    "description": "Michigan politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 470
+  },
+  {
+    "name": "Georgia Politics",
+    "listing_url": "https://www.ajc.com/politics/",
+    "rss_url": "https://www.ajc.com/politics/feed/",
+    "description": "Georgia politics coverage",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 471
+  },
+  {
+    "name": "Arizona Politics",
+    "listing_url": "https://arizonamirror.com",
+    "rss_url": "https://arizonamirror.com/feed/",
+    "description": "Arizona politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 472
+  },
+  {
+    "name": "Colorado Politics",
+    "listing_url": "https://coloradopolitics.com",
+    "rss_url": "https://coloradopolitics.com/feed/",
+    "description": "Colorado politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 473
+  },
+  {
+    "name": "Wisconsin Politics",
+    "listing_url": "https://wisconsinexaminer.com",
+    "rss_url": "https://wisconsinexaminer.com/feed/",
+    "description": "Wisconsin politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 474
+  },
+  {
+    "name": "North Carolina Politics",
+    "listing_url": "https://ncnewsline.com",
+    "rss_url": "https://ncnewsline.com/feed/",
+    "description": "North Carolina politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 475
+  },
+  {
+    "name": "Virginia Politics",
+    "listing_url": "https://www.vpm.org/news/virginia-politics",
+    "rss_url": "https://www.vpm.org/news/virginia-politics/feed",
+    "description": "Virginia politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 476
+  },
+  {
+    "name": "New Jersey Politics",
+    "listing_url": "https://newjerseymonitor.com",
+    "rss_url": "https://newjerseymonitor.com/feed/",
+    "description": "New Jersey politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 477
+  },
+  {
+    "name": "Minnesota Politics",
+    "listing_url": "https://minnesotareformer.com",
+    "rss_url": "https://minnesotareformer.com/feed/",
+    "description": "Minnesota politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 478
+  },
+  {
+    "name": "Missouri Politics",
+    "listing_url": "https://missouriindependent.com",
+    "rss_url": "https://missouriindependent.com/feed/",
+    "description": "Missouri politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 479
+  },
+  {
+    "name": "Nevada Politics",
+    "listing_url": "https://thenevadaindependent.com",
+    "rss_url": "https://thenevadaindependent.com/feed/",
+    "description": "Nevada politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 480
+  },
+  {
+    "name": "Washington State Politics",
+    "listing_url": "https://washingtonstatestandard.com",
+    "rss_url": "https://washingtonstatestandard.com/feed/",
+    "description": "Washington state politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 481
+  },
+  {
+    "name": "Oregon Politics",
+    "listing_url": "https://oregoncapitalchronicle.com",
+    "rss_url": "https://oregoncapitalchronicle.com/feed/",
+    "description": "Oregon politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 482
+  },
+  {
+    "name": "RCP Polls",
+    "listing_url": "https://www.realclearpolitics.com/epolls/latest_polls/",
+    "rss_url": "https://www.realclearpolitics.com/epolls/latest_polls/feed",
+    "description": "Polling data aggregation",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 483
+  },
+  {
+    "name": "FiveThirtyEight Polls",
+    "listing_url": "https://projects.fivethirtyeight.com/polls/",
+    "rss_url": "https://projects.fivethirtyeight.com/polls/feed",
+    "description": "Polling analysis and forecasts",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 484
+  },
+  {
+    "name": "Pollster",
+    "listing_url": "https://pollster.trendecon.com",
+    "rss_url": "https://pollster.trendecon.com/feed",
+    "description": "Polling trends",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 485
+  },
+  {
+    "name": "Gallup Politics",
+    "listing_url": "https://news.gallup.com/politics.aspx",
+    "rss_url": "https://news.gallup.com/feed",
+    "description": "Public opinion polling",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 486
+  },
+  {
+    "name": "Quinnipiac Polls",
+    "listing_url": "https://poll.qu.edu",
+    "rss_url": "https://poll.qu.edu/feed",
+    "description": "University polling data",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 487
+  },
+  {
+    "name": "Marist Poll",
+    "listing_url": "https://maristpoll.marist.edu",
+    "rss_url": "https://maristpoll.marist.edu/feed/",
+    "description": "Political polling",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 488
+  },
+  {
+    "name": "Morning Consult Politics",
+    "listing_url": "https://morningconsult.com/category/politics/",
+    "rss_url": "https://morningconsult.com/feed/",
+    "description": "Polling and analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 489
+  },
+  {
+    "name": "YouGov Politics",
+    "listing_url": "https://today.yougov.com/politics",
+    "rss_url": "https://today.yougov.com/feed",
+    "description": "Public opinion data",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 490
+  },
+  {
+    "name": "Ipsos Politics",
+    "listing_url": "https://www.ipsos.com/en-us/politics",
+    "rss_url": "https://www.ipsos.com/en-us/feed",
+    "description": "Global polling data",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 491
+  },
+  {
+    "name": "Power Line",
+    "listing_url": "https://www.powerlineblog.com",
+    "rss_url": "https://www.powerlineblog.com/feed/",
+    "description": "Conservative blog",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 492
+  },
+  {
+    "name": "Instapundit",
+    "listing_url": "https://instapundit.com",
+    "rss_url": "https://instapundit.com/feed/",
+    "description": "Libertarian blog",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 493
+  },
+  {
+    "name": "Volokh Conspiracy",
+    "listing_url": "https://reason.com/volokh/",
+    "rss_url": "https://reason.com/volokh/feed/",
+    "description": "Legal and political blog",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 494
+  },
+  {
+    "name": "Wonkette",
+    "listing_url": "https://www.wonkette.com",
+    "rss_url": "https://www.wonkette.com/feed",
+    "description": "Political satire and commentary",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 495
+  },
+  {
+    "name": "Esquire Politics",
+    "listing_url": "https://www.esquire.com/news-politics/politics/",
+    "rss_url": "https://www.esquire.com/news-politics/politics/feed/",
+    "description": "Political commentary",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 496
+  },
+  {
+    "name": "Vanity Fair Politics",
+    "listing_url": "https://www.vanityfair.com/news/politics",
+    "rss_url": "https://www.vanityfair.com/feed/rss",
+    "description": "Political news and culture",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 497
+  },
+  {
+    "name": "New York Magazine Politics",
+    "listing_url": "https://nymag.com/intelligencer/politics/",
+    "rss_url": "https://nymag.com/intelligencer/politics/feed/",
+    "description": "Political analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 498
+  },
+  {
+    "name": "The Bulwark",
+    "listing_url": "https://thebulwark.com",
+    "rss_url": "https://thebulwark.com/feed/",
+    "description": "Anti-Trump conservative commentary",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 499
+  },
+  {
+    "name": "The Dispatch",
+    "listing_url": "https://thedispatch.com",
+    "rss_url": "https://thedispatch.com/feed/",
+    "description": "Conservative news and analysis",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 500
+  },
+  {
+    "name": "Commentary Magazine",
+    "listing_url": "https://www.commentary.org",
+    "rss_url": "https://www.commentary.org/feed/",
+    "description": "Conservative Jewish perspective",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 501
+  },
+  {
+    "name": "First Things",
+    "listing_url": "https://www.firstthings.com",
+    "rss_url": "https://www.firstthings.com/feed",
+    "description": "Religious conservative perspective",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 502
+  },
+  {
+    "name": "The American Prospect",
+    "listing_url": "https://prospect.org",
+    "rss_url": "https://prospect.org/api/rss/content.rss",
+    "description": "Progressive policy analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 503
+  },
+  {
+    "name": "Jacobin",
+    "listing_url": "https://jacobinmag.com",
+    "rss_url": "https://jacobinmag.com/feed",
+    "description": "Socialist perspective",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 504
+  },
+  {
+    "name": "Current Affairs",
+    "listing_url": "https://www.currentaffairs.org",
+    "rss_url": "https://www.currentaffairs.org/news/rss.xml",
+    "description": "Progressive magazine",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 505
+  },
+  {
+    "name": "The Baffler",
+    "listing_url": "https://thebaffler.com",
+    "rss_url": "https://thebaffler.com/feed",
+    "description": "Cultural and political criticism",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 506
+  },
+  {
+    "name": "Naked Capitalism",
+    "listing_url": "https://www.nakedcapitalism.com",
+    "rss_url": "https://www.nakedcapitalism.com/feed",
+    "description": "Finance and politics analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 507
+  },
+  {
+    "name": "Emptywheel",
+    "listing_url": "https://www.emptywheel.net",
+    "rss_url": "https://www.emptywheel.net/feed/",
+    "description": "National security and politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 508
+  },
+  {
+    "name": "Just Security",
+    "listing_url": "https://www.justsecurity.org",
+    "rss_url": "https://www.justsecurity.org/feed/",
+    "description": "National security analysis",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 509
+  },
+  {
+    "name": "Shadowproof",
+    "listing_url": "https://shadowproof.com",
+    "rss_url": "https://shadowproof.com/feed/",
+    "description": "Independent political journalism",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 510
+  },
+  {
+    "name": "Al Jazeera US Politics",
+    "listing_url": "https://www.aljazeera.com/news/us",
+    "rss_url": "https://www.aljazeera.com/news/us/feed",
+    "description": "Middle Eastern perspective on US",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 511
+  },
+  {
+    "name": "Financial Times US Politics",
+    "listing_url": "https://www.ft.com/us-politics",
+    "rss_url": "https://www.ft.com/us-politics?format=rss",
+    "description": "International business perspective",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 512
+  },
+  {
+    "name": "The Economist US Politics",
+    "listing_url": "https://www.economist.com/united-states/",
+    "rss_url": "https://www.economist.com/united-states/rss.xml",
+    "description": "International analysis",
+    "category": "politics",
+    "anti_scraping": "Paywall",
+    "status": "active",
+    "id": 513
+  },
+  {
+    "name": "The Guardian US",
+    "listing_url": "https://www.theguardian.com/us-news",
+    "rss_url": "https://www.theguardian.com/us-news/rss",
+    "description": "British liberal perspective",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 514
+  },
+  {
+    "name": "Spiegel US Politics",
+    "listing_url": "https://www.spiegel.de/international/world/",
+    "rss_url": "https://www.spiegel.de/international/world/rss",
+    "description": "German perspective",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 515
+  },
+  {
+    "name": "Le Monde US Politics",
+    "listing_url": "https://www.lemonde.fr/en/united-states/",
+    "rss_url": "https://www.lemonde.fr/en/united-states/rss",
+    "description": "French perspective",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 516
+  },
+  {
+    "name": "Deutsche Welle US",
+    "listing_url": "https://www.dw.com/en/united-states/t-17428142",
+    "rss_url": "https://www.dw.com/en/united-states/t-17428142/rss",
+    "description": "German public broadcaster",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 517
+  },
+  {
+    "name": "France 24 US",
+    "listing_url": "https://www.france24.com/en/americas/",
+    "rss_url": "https://www.france24.com/en/americas/rss",
+    "description": "French public broadcaster",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 518
+  },
+  {
+    "name": "NHK World US",
+    "listing_url": "https://www3.nhk.or.jp/nhkworld/en/news/",
+    "rss_url": "https://www3.nhk.or.jp/nhkworld/en/news/feed/",
+    "description": "Japanese perspective",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 519
+  },
+  {
+    "name": "AllSides",
+    "listing_url": "https://www.allsides.com/unbiased-balanced-news",
+    "rss_url": "https://www.allsides.com/feed",
+    "description": "Balanced news from left, center, right",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 520
+  },
+  {
+    "name": "Ground News",
+    "listing_url": "https://ground.news",
+    "rss_url": "https://ground.news/feed",
+    "description": "News comparison across spectrum",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 521
+  },
+  {
+    "name": "Newseum",
+    "listing_url": "https://www.newseum.org",
+    "rss_url": "https://www.newseum.org/feed",
+    "description": "News and First Amendment",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 522
+  },
+  {
+    "name": "Reporters Committee",
+    "listing_url": "https://www.rcfp.org",
+    "rss_url": "https://www.rcfp.org/feed/",
+    "description": "Press freedom and politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 523
+  },
+  {
+    "name": "Sunlight Foundation",
+    "listing_url": "https://sunlightfoundation.com",
+    "rss_url": "https://sunlightfoundation.com/feed/",
+    "description": "Government transparency",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 524
+  },
+  {
+    "name": "MapLight",
+    "listing_url": "https://maplight.org",
+    "rss_url": "https://maplight.org/feed/",
+    "description": "Money and politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 525
+  },
+  {
+    "name": "FollowTheMoney",
+    "listing_url": "https://www.followthemoney.org",
+    "rss_url": "https://www.followthemoney.org/feed",
+    "description": "Campaign finance tracking",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 526
+  },
+  {
+    "name": "Sludge",
+    "listing_url": "https://readsludge.com",
+    "rss_url": "https://readsludge.com/feed/",
+    "description": "Money in politics investigations",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 527
+  },
+  {
+    "name": "The Appeal",
+    "listing_url": "https://theappeal.org",
+    "rss_url": "https://theappeal.org/feed/",
+    "description": "Criminal justice and politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 528
+  },
+  {
+    "name": "The Marshall Project",
+    "listing_url": "https://www.themarshallproject.org",
+    "rss_url": "https://www.themarshallproject.org/rss",
+    "description": "Criminal justice politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 529
+  },
+  {
+    "name": "The 19th",
+    "listing_url": "https://19thnews.org",
+    "rss_url": "https://19thnews.org/feed/",
+    "description": "Gender, politics, and policy",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 530
+  },
+  {
+    "name": "States Newsroom",
+    "listing_url": "https://statesnewsroom.com",
+    "rss_url": "https://statesnewsroom.com/feed/",
+    "description": "State politics network",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 531
+  },
+  {
+    "name": "Route Fifty",
+    "listing_url": "https://www.route-fifty.com",
+    "rss_url": "https://www.route-fifty.com/feed/",
+    "description": "State and local government",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 532
+  },
+  {
+    "name": "Governing",
+    "listing_url": "https://www.governing.com",
+    "rss_url": "https://www.governing.com/feed",
+    "description": "State and local politics",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 533
+  },
+  {
+    "name": "Stateline",
+    "listing_url": "https://stateline.org",
+    "rss_url": "https://stateline.org/feed/",
+    "description": "Pew state politics coverage",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 534
+  },
+  {
+    "name": "The Fulcrum",
+    "listing_url": "https://thefulcrum.us",
+    "rss_url": "https://thefulcrum.us/feed/",
+    "description": "Democracy reform news",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 535
+  },
+  {
+    "name": "Issue One",
+    "listing_url": "https://www.issueone.org",
+    "rss_url": "https://www.issueone.org/feed/",
+    "description": "Money in politics reform",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 536
+  },
+  {
+    "name": "RepresentUs",
+    "listing_url": "https://represent.us",
+    "rss_url": "https://represent.us/feed/",
+    "description": "Anti-corruption advocacy",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 537
+  },
+  {
+    "name": "Common Cause",
+    "listing_url": "https://www.commoncause.org",
+    "rss_url": "https://www.commoncause.org/feed/",
+    "description": "Government reform advocacy",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 538
+  },
+  {
+    "name": "League of Women Voters",
+    "listing_url": "https://www.lwv.org",
+    "rss_url": "https://www.lwv.org/feed",
+    "description": "Voter education and advocacy",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 539
+  }
+]

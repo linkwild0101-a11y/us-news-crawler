@@ -1,0 +1,236 @@
+# US Military News Websites and RSS Feeds Collection
+
+## Overview
+This collection contains **214 US military-related news websites and RSS feeds** across multiple categories:
+- Defense publications
+- Military sections of major news outlets
+- Defense think tank publications
+- Government defense publications
+- Military technology news
+- Veterans news sources
+- Defense industry publications
+- Military history sites
+- International security news
+- Military blog aggregators
+
+## Data Format
+| Name | Listing URL | RSS URL | Description | Anti-Scraping |
+
+## Sources
+
+| Name | Listing URL | RSS URL | Description | Anti-Scraping |
+|------|-------------|---------|-------------|---------------|
+| Defense News | https://www.defensenews.com/news/military/ | https://www.defensenews.com/m/rss/ | Leading defense industry and military news publication covering Pentagon, Congress, and global defense | None |
+| Breaking Defense | https://breakingdefense.com/category/military/ | https://breakingdefense.com/feed | Digital magazine on defense strategy, politics, and technology | None |
+| Defense One | https://www.defenseone.com/news/military/ | https://defenseone.com/rss/all | News and analysis for defense and industry leaders | None |
+| Military.com | https://www.military.com/daily-news/military | https://www.military.com/daily-news/military-rss-feeds.html | Comprehensive military news, benefits, and resources | None |
+| Military Times | https://www.militarytimes.com/news/ | https://www.militarytimes.com/m/rss/ | Independent news for service members and families | None |
+| Stars and Stripes | https://www.stripes.com/news/military/ | https://www.stripes.com/rss | Independent news for U.S. military community since WWII | Paywall |
+| Army Times | https://www.armytimes.com/news/ | https://www.armytimes.com/m/rss/ | Independent news for soldiers | None |
+| Navy Times | https://www.navytimes.com/news/ | https://www.navytimes.com/m/rss/ | Independent news for sailors | None |
+| Air Force Times | https://www.airforcetimes.com/news/ | https://www.airforcetimes.com/m/rss/ | Independent news for airmen | None |
+| Marine Corps Times | https://www.marinecorpstimes.com/news/ | https://www.marinecorpstimes.com/m/rss/ | Independent news for Marines | None |
+| U.S. Department of Defense | https://www.defense.gov/News/News-Stories/ | https://www.defense.gov/News/RSS/ | Official DoD news releases and stories | None |
+| DVIDS Hub | https://www.dvidshub.net/news/ | https://www.dvidshub.net/news/rss | Defense Visual Information Distribution Service | None |
+| War on the Rocks | https://warontherocks.com/ | https://warontherocks.com/feed | Analysis and commentary on foreign policy and national security | None |
+| CSIS (Center for Strategic & International Studies) | https://www.csis.org/analysis/defense | https://www.csis.org/rss.xml | Bipartisan foreign policy think tank | None |
+| RAND Corporation | https://www.rand.org/topics/defense.html | https://www.rand.org/rss.xml | Research on defense and national security | None |
+| Heritage Foundation - Defense | https://www.heritage.org/defense | https://www.heritage.org/feed | Conservative think tank defense analysis | None |
+| Brookings - Defense | https://www.brookings.edu/topic/defense/ | https://www.brookings.edu/feed/ | Nonpartisan think tank defense research | None |
+| Cato - Defense | https://www.cato.org/research/defense | https://www.cato.org/rss.xml | Libertarian think tank defense policy | None |
+| AEI - Defense | https://www.aei.org/topic/defense/ | https://www.aei.org/feed/ | Conservative think tank defense analysis | None |
+| CNAS (Center for New American Security) | https://www.cnas.org/research/defense | https://www.cnas.org/rss.xml | National security and defense policy think tank | None |
+| IISS (International Institute for Strategic Studies) | https://www.iiss.org/online-analysis/military-balance | https://www.iiss.org/feed | Global security and defense analysis | None |
+| Modern War Institute | https://mwi.westpoint.edu/ | https://mwi.westpoint.edu/feed/ | West Point-based contemporary warfare research | None |
+| Small Wars Journal | https://smallwarsjournal.com/ | https://smallwarsjournal.com/rss.xml | Irregular warfare and small wars analysis | None |
+| Institute for the Study of War | https://iswresearch.org/ | https://iswresearch.org/feeds/posts/default | Military operations and threat analysis | None |
+| Defense Daily | https://www.defensedaily.com/ | https://www.defensedaily.com/feed | Daily defense industry business intelligence | Paywall |
+| National Defense Magazine | https://www.nationaldefensemagazine.org/ | https://nationaldefense.libsyn.com/rss | NDIA publication on defense technology and policy | None |
+| C4ISRNET | https://www.c4isrnet.com/ | https://www.c4isrnet.com/arc/outboundfeeds/rss/category/cyber/?outputType=xml | Command, control, communications, computers, intelligence, surveillance and reconnaissance | None |
+| Defense News - Air | https://www.defensenews.com/air/ | https://www.defensenews.com/m/rss/air | Air force and aviation defense news | None |
+| Defense News - Land | https://www.defensenews.com/land/ | https://www.defensenews.com/m/rss/land | Army and ground forces defense news | None |
+| Defense News - Naval | https://www.defensenews.com/naval/ | https://www.defensenews.com/m/rss/naval | Navy and maritime defense news | None |
+| Defense News - Space | https://www.defensenews.com/space/ | https://www.defensenews.com/m/rss/space | Space defense and military space news | None |
+| Jane's Defence | https://www.janes.com/osint-insights/defence-news | Custom RSS via subscription | Premium defense intelligence and analysis | Paywall |
+| Shephard Media | https://www.shephardmedia.com/news/ | https://www.shephardmedia.com/news/feed | Defense equipment and technology coverage | None |
+| Army Technology | https://www.army-technology.com/news/ | https://www.army-technology.com/feed | Army technology and equipment news | None |
+| Naval Technology | https://www.naval-technology.com/news/ | https://www.naval-technology.com/news/feed | Naval technology and warship news | None |
+| Airforce Technology | https://www.airforce-technology.com/news/ | https://www.airforce-technology.com/feed | Air force technology and aircraft news | None |
+| Defense Update | https://defense-update.com/ | https://defense-update.com/feed | Israel-based defense technology magazine | None |
+| Defence Blog | https://defence-blog.com/category/news/ | https://defence-blog.com/feed | Independent defense and security news | None |
+| Military Embedded Systems | https://militaryembedded.com/blogs | https://militaryembedded.com/blogs/feed | Military COTS and embedded systems | None |
+| COTS Journal | https://cotsjournalonline.com/ | https://cotsjournalonline.com/index.php?format=feed&type=rss | Commercial off-the-shelf military technology | None |
+| Military Aerospace Technology | https://military-aerospace-technology.com/ | https://military-aerospace-technology.com/feed-info.cfm | Military aerospace and avionics news | None |
+| Defense Industry Daily | https://www.defenseindustrydaily.com/ | https://www.defenseindustrydaily.com/feed | Defense contracts and procurement news | None |
+| Real Clear Defense | https://www.realcleardefense.com/ | https://www.realcleardefense.com/index.xml | Defense news aggregation and analysis | None |
+| Defense World | https://www.defenseworld.net/ | https://www.defenseworld.net/feed | Global defense industry news | None |
+| Army Recognition | https://www.armyrecognition.com/news/ | https://www.armyrecognition.com/news/feed | Land forces defense news | None |
+| Navy Recognition | https://www.navyrecognition.com/news/ | https://www.navyrecognition.com/news/feed | Naval forces defense news | None |
+| ASDNews | https://www.asdnews.com/ | https://www.asdnews.com/feed | Aerospace and defense industry news | None |
+| Aviation Week - Defense | https://aviationweek.com/defense-space | https://aviationweek.com/rss.xml | Defense aviation and aerospace news | Paywall |
+| Forecast International | https://dsm.forecastinternational.com/ | https://dsm.forecastinternational.com/feed | Defense market analysis and forecasts | None |
+| The Defense Post | https://www.thedefensepost.com/ | https://www.thedefensepost.com/feed | Global defense and security news | None |
+| Defense Aerospace | https://www.defense-aerospace.com/ | https://www.defense-aerospace.com/feed | European defense and aerospace news | None |
+| BulgarianMilitary.com | https://bulgarianmilitary.com/ | https://bulgarianmilitary.com/feed | International defense industry news | None |
+| Quwa Defence News | https://quwa.org/ | https://quwa.org/feed | Defense analysis focused on Asia, Africa, Middle East | None |
+| Reuters - Aerospace & Defense | https://www.reuters.com/business/aerospace-defense/ | https://www.reuters.com/business/aerospace-defense/rss.xml | Reuters defense industry coverage | None |
+| Politico - Defense | https://www.politico.com/tag/defense | https://rss.politico.com/defense.xml | Defense politics and policy news | None |
+| Politico - Military | https://www.politico.com/news/military | https://rss.politico.com/military.xml | Military-focused political news | None |
+| NBC News - Military | https://www.nbcnews.com/news/military | https://feeds.nbcnews.com/nbcnews/public/news/military | NBC military news coverage | None |
+| BBC News - Military | https://www.bbc.com/news/topics/cn89208qmzxlt | https://feeds.bbci.co.uk/news/topics/cn89208qmzxlt/rss.xml | BBC military coverage | None |
+| AP News - Military & Defense | https://apnews.com/hub/military-and-defense | https://apnews.com/hub/military-and-defense/rss | Associated Press military coverage | None |
+| Fox News - Military | https://www.foxnews.com/category/us/military | https://feeds.foxnews.com/foxnews/military | Fox News military coverage | None |
+| CNN - Military | https://www.cnn.com/us/military | https://rss.cnn.com/rss/cnn_military.rss | CNN military news | None |
+| The Hill - Defense | https://thehill.com/policy/defense/ | https://thehill.com/rss/feed/defense | Congressional defense policy news | None |
+| UPI - Defense | https://www.upi.com/Defense-News/ | https://rss.upi.com/news/dfn.rss | United Press International defense news | None |
+| ZeroHedge - Military | https://www.zerohedge.com/military | https://www.zerohedge.com/military/rss.xml | Alternative military news and analysis | None |
+| Popular Mechanics - Military | https://www.popularmechanics.com/military/ | https://www.popularmechanics.com/military/rss | Military technology and science | None |
+| Live Science - Military Weapons | https://www.livescience.com/technology/military-weapons | https://www.livescience.com/technology/military-weapons/rss.xml | Military weapons science | None |
+| USNI News | https://news.usni.org/ | https://news.usni.org/feed | U.S. Naval Institute news and analysis | None |
+| Naval News | https://www.navalnews.com/ | https://www.navalnews.com/feed | Global naval defense news | None |
+| Naval Today | https://www.navaltoday.com/ | https://www.navaltoday.com/feed | Naval industry daily news | None |
+| Seapower Magazine | https://seapowermagazine.org/ | https://seapowermagazine.org/feed | Navy League official publication | None |
+| The Maritime Executive | https://maritime-executive.com/ | https://maritime-executive.com/articles/rss | Maritime and naval news | None |
+| Naval Analyses | https://navalanalyses.com/ | https://navalanalyses.com/feeds/posts/default | Naval fleet and vessel analysis | None |
+| Navy Matters | https://navy-matters.blogspot.com/ | https://navy-matters.blogspot.com/feeds/posts/default | Naval analysis and commentary | None |
+| Naval Historical Foundation | https://navyhistory.org/ | https://navyhistory.org/feed | U.S. naval history blog | None |
+| NOSI - Naval Open Source Intelligence | https://nosi.org/ | https://nosi.org/feed | Naval intelligence aggregation | None |
+| Veterans Affairs News | https://news.va.gov/ | https://news.va.gov/feed | Official VA news and updates | None |
+| Vietnam Veterans of America | https://vva.org/category/press-releases/ | https://vva.org/category/press-releases/feed | VVA news and advocacy | None |
+| Disabled American Veterans | https://dav.org/news/ | https://dav.org/news/feed | DAV news and benefits information | None |
+| American Legion | https://www.legion.org/news/ | https://www.legion.org/news/rss.xml | American Legion news | None |
+| VFW (Veterans of Foreign Wars) | https://www.vfw.org/news-and-events | https://www.vfw.org/news-and-events/rss | VFW news | None |
+| IAVA (Iraq & Afghanistan Vets) | https://iava.org/news/ | https://iava.org/news/feed | Iraq and Afghanistan veterans news | None |
+| Military Officers Association | https://www.moaa.org/news/ | https://www.moaa.org/news/rss | Military officers association news | None |
+| National Veterans Foundation | https://nvf.org/blog/ | https://nvf.org/blog/feed | Veteran crisis and support news | None |
+| Cohen Veterans Network | https://cohenveteransnetwork.org/blog/ | https://cohenveteransnetwork.org/blog/feed | Veteran mental health news | None |
+| Veterans Education Success | https://vetsedsuccess.org/ | https://vetsedsuccess.org/feed | Veteran education policy news | None |
+| Disabled Veterans National Foundation | https://dvnf.org/news-impact/ | https://dvnf.org/feed | Disabled veterans support news | None |
+| National Coalition for Homeless Veterans | https://nchv.org/blog/ | https://nchv.org/feed | Homeless veterans advocacy news | None |
+| Connecting Vets | https://connectingvets.radio.com/ | https://connectingvets.radio.com/rss | Veteran-focused news radio | None |
+| Veterans Today | https://veteranstoday.blog.gov.uk/ | https://veteranstoday.blog.gov.uk/feed | UK veterans news (relevant to U.S.) | None |
+| DARPA News | https://www.darpa.mil/news/ | https://www.darpa.mil/news/rss | Defense Advanced Research Projects Agency news | None |
+| Defense Tech | https://defensetech.org/ | https://defensetech.org/feed | Military technology news | None |
+| The War Zone | https://www.thedrive.com/the-war-zone | https://www.thedrive.com/the-war-zone/rss.xml | Military aviation and technology | None |
+| Task & Purpose | https://taskandpurpose.com/ | https://taskandpurpose.com/feed | Military news and culture | None |
+| We Are The Mighty | https://www.wearethemighty.com/ | https://www.wearethemighty.com/feed | Military entertainment and news | None |
+| Coffee or Die Magazine | https://coffeeordie.com/ | https://coffeeordie.com/feed | Military and veteran lifestyle magazine | None |
+| Sandboxx | https://sandboxx.us/news/ | https://sandboxx.us/news/feed | Military family connection platform news | None |
+| Military Families Magazine | https://militaryfamiliesmagazine.com/ | https://militaryfamiliesmagazine.com/feed | Military family-focused news | None |
+| MilitaryLeak | https://militaryleak.com/ | https://militaryleak.com/feed | Military operations and equipment news | None |
+| DefenceTalk | https://www.defencetalk.com/news/ | https://feeds.feedburner.com/defencetalk | Defense discussion forum and news | None |
+| The Diplomat - Asia Defense | https://thediplomat.com/category/asia-defense/ | https://thediplomat.com/category/asia-defense/feed | Asia-Pacific defense analysis | None |
+| IISS Military Balance | https://www.iiss.org/online-analysis/military-balance/ | https://www.iiss.org/feed | Annual military capabilities assessment | None |
+| NATO News | https://www.nato.int/cps/en/natohq/news.htm | https://www.nato.int/cps/en/natohq/news.rss | NATO official news | None |
+| European Security & Defence | https://esd.eu/ | https://esd.eu/feed | European defense industry news | None |
+| Geostrategy-Direct | https://geostrategy-direct.com/ | https://geostrategy-direct.com/feed | Exclusive geopolitical intelligence | Paywall |
+| Global Issues - Security | https://www.globalissues.org/news/security | https://www.globalissues.org/news/security/feed | Global security news aggregation | None |
+| PolGeoNow - Military | https://polgeonow.com/search/label/Military | https://polgeonow.com/feeds/posts/default/-/Military | Geopolitical changes and military control | None |
+| HistoryNet - Military History | https://www.historynet.com/military-history/ | https://www.historynet.com/feed | Military history articles | None |
+| War History Online | https://warhistoryonline.com/ | https://warhistoryonline.com/feed | Military history stories | None |
+| Military History Now | https://militaryhistorynow.com/ | https://militaryhistorynow.com/feed | Military history blog | None |
+| The National WWII Museum | https://www.nationalww2museum.org/news/ | https://www.nationalww2museum.org/news/feed | WWII history and news | None |
+| Together We Served Blog | https://blog.togetherweserved.com/ | https://blog.togetherweserved.com/feed | Veteran community and history | None |
+| Legion Magazine | https://legionmagazine.com/ | https://legionmagazine.com/feed | Canadian military history (relevant context) | None |
+| Joint Force Quarterly | https://ndupress.ndu.edu/joint-force-quarterly/ | https://digitalcommons.ndu.edu/joint-force-quarterly/announcements.html | NDU professional military journal | None |
+| Parameters (Army War College) | https://press.armywarcollege.edu/parameters/ | https://press.armywarcollege.edu/parameters/feed | Army strategic studies quarterly | None |
+| Strategic Studies Quarterly | https://www.airuniversity.af.edu/SSQ/ | https://www.airuniversity.af.edu/SSQ/feed | Air Force strategic studies | None |
+| Military Review | https://www.armyupress.army.mil/Military-Review/ | https://www.armyupress.army.mil/Military-Review/feed | Army professional journal | None |
+| Air & Space Power Journal | https://www.airuniversity.af.edu/ASPJ/ | https://www.airuniversity.af.edu/ASPJ/feed | Air power theory and practice | None |
+| Naval War College Review | https://digital-commons.usnwc.edu/nwc-review/ | https://digital-commons.usnwc.edu/nwc-review/feed | Naval strategy and policy | None |
+| Marine Corps Gazette | https://mca-marines.org/gazette/ | https://mca-marines.org/gazette/feed | Marine Corps professional journal | None |
+| Proceedings (USNI) | https://www.usni.org/magazines/proceedings | https://www.usni.org/magazines/proceedings/feed | Naval Institute professional journal | None |
+| Homeland Security Today | https://www.hstoday.us/ | https://www.hstoday.us/feed | Homeland security news and analysis | None |
+| Homeland Security News Wire | https://homelandsecuritynewswire.com/ | https://homelandsecuritynewswire.com/feed | Homeland security daily news | None |
+| Homeland Preparedness News | https://homelandprepnews.com/ | https://homelandprepnews.com/feed | Homeland preparedness and response | None |
+| Just Security | https://www.justsecurity.org/ | https://www.justsecurity.org/feed | National security law and policy | None |
+| Lawfare | https://www.lawfareblog.com/ | https://www.lawfareblog.com/feed | National security legal analysis | None |
+| Schneier on Security | https://www.schneier.com/ | https://www.schneier.com/feed | Security technology expert blog | None |
+| Air Force Association | https://www.afa.org/news/ | https://www.afa.org/news/feed | Air Force advocacy and news | None |
+| Navy League | https://navyleague.org/news/ | https://navyleague.org/news/feed | Navy advocacy organization news | None |
+| Association of the U.S. Army | https://www.ausa.org/news/ | https://www.ausa.org/news/feed | Army advocacy and news | None |
+| Marine Corps Association | https://mca-marines.org/ | https://mca-marines.org/feed | Marine Corps professional association | None |
+| Coast Guard News | https://coastguardnews.com/ | https://coastguardnews.com/feed | Coast Guard news aggregator | None |
+| Military Report | https://www.military.com/military-report | https://www.military.com/military-report/rss | Military benefits and policy updates | None |
+| Military Spouse | https://www.militaryspouse.com/news/ | https://www.militaryspouse.com/news/feed | Military family news | None |
+| Military Child Education Coalition | https://militarychild.org/news/ | https://militarychild.org/news/feed | Military children education news | None |
+| Blue Star Families | https://bluestarfam.org/news/ | https://bluestarfam.org/news/feed | Military family support news | None |
+| Tragedy Assistance Program (TAPS) | https://www.taps.org/news/ | https://www.taps.org/news/feed | Military survivor support news | None |
+| Wounded Warrior Project | https://www.woundedwarriorproject.org/news/ | https://www.woundedwarriorproject.org/news/feed | Wounded veteran support news | None |
+| Fisher House Foundation | https://fisherhouse.org/news/ | https://fisherhouse.org/news/feed | Military family housing support | None |
+| Operation Homefront | https://operationhomefront.org/news/ | https://operationhomefront.org/news/feed | Military family assistance news | None |
+| Semper Fi & America's Fund | https://semperfifund.org/news/ | https://semperfifund.org/news/feed | Injured veteran support news | None |
+| Patriot Guard Riders | https://patriotguard.org/news/ | https://patriotguard.org/news/feed | Veteran memorial support news | None |
+| Rolling Thunder | https://rollingthunder.org/news/ | https://rollingthunder.org/news/feed | POW/MIA advocacy news | None |
+| CyberScoop - Defense | https://cyberscoop.com/category/defense/ | https://cyberscoop.com/category/defense/feed | Defense cybersecurity news | None |
+| FedScoop - Defense | https://fedscoop.com/category/defense/ | https://fedscoop.com/category/defense/feed | Defense IT news | None |
+| DefenseScoop | https://defensescoop.com/ | https://defensescoop.com/feed | Defense technology and innovation | None |
+| Breaking Defense - Cyber | https://breakingdefense.com/category/cyber/ | https://breakingdefense.com/category/cyber/feed | Defense cyber policy and technology | None |
+| Fifth Domain | https://www.fifthdomain.com/ | https://www.fifthdomain.com/feed | Cyber and electronic warfare news | None |
+| Cyberspace Solarium Commission | https://www.solarium.gov/ | https://www.solarium.gov/feed | Cyber strategy recommendations | None |
+| SpaceNews - Military | https://spacenews.com/category/military/ | https://spacenews.com/category/military/feed | Military space news | None |
+| Space Force Times | https://www.spaceforcetimes.com/ | https://www.spaceforcetimes.com/feed | U.S. Space Force news | None |
+| Missile Defense Advocacy | https://missiledefenseadvocacy.org/ | https://missiledefenseadvocacy.org/feed | Missile defense policy news | None |
+| Missile Threat (CSIS) | https://missilethreat.csis.org/ | https://missilethreat.csis.org/feed | Missile proliferation analysis | None |
+| 38 North | https://www.38north.org/ | https://www.38north.org/feed | North Korea analysis (Johns Hopkins) | None |
+| Combating Terrorism Center | https://ctc.usma.edu/ | https://ctc.usma.edu/feed | West Point terrorism analysis | None |
+| Long War Journal | https://www.longwarjournal.org/ | https://www.longwarjournal.org/feed | Terrorism and insurgency tracking | None |
+| Terrorism Monitor (Jamestown) | https://jamestown.org/programs/terrorism-monitor/ | https://jamestown.org/feed | Terrorism analysis and monitoring | None |
+| SITE Intelligence Group | https://ent.siteintelgroup.com/ | https://ent.siteintelgroup.com/feed | Terrorist propaganda monitoring | Paywall |
+| Intelligence Online | https://www.intelligenceonline.com/ | https://www.intelligenceonline.com/feed | Global intelligence community news | Paywall |
+| Cipher Brief | https://www.thecipherbrief.com/ | https://www.thecipherbrief.com/feed | Intelligence community analysis | None |
+| FAS Secrecy Project | https://fas.org/blogs/secrecy/ | https://fas.org/blogs/secrecy/feed | Government secrecy and intelligence | None |
+| Defense Acquisition University | https://www.dau.edu/news/ | https://www.dau.edu/news/feed | Defense acquisition training news | None |
+| Government Executive - Defense | https://www.govexec.com/defense/ | https://www.govexec.com/defense/feed | Defense management news | None |
+| Federal News Network - Defense | https://federalnewsnetwork.com/category/defense/ | https://federalnewsnetwork.com/category/defense/feed | Defense federal workforce news | None |
+| Defense Finance & Accounting | https://www.dfas.mil/news/ | https://www.dfas.mil/news/feed | Defense financial management | None |
+| Military Health System | https://health.mil/news/ | https://health.mil/news/feed | DoD health system news | None |
+| Defense Health Agency | https://www.dha.mil/news/ | https://www.dha.mil/news/feed | Defense health agency updates | None |
+| VA Research | https://www.research.va.gov/news/ | https://www.research.va.gov/news/feed | Veterans health research | None |
+| Wounded Times | https://woundedtimes.blogspot.com/ | https://woundedtimes.blogspot.com/feeds/posts/default | Veteran PTSD and mental health | None |
+| Air University | https://www.airuniversity.af.edu/news/ | https://www.airuniversity.af.edu/news/feed | Air Force education and training | None |
+| Army University | https://armyuniversity.edu/news/ | https://armyuniversity.edu/news/feed | Army education and training | None |
+| Naval War College | https://usnwc.edu/news/ | https://usnwc.edu/news/feed | Naval education and strategy | None |
+| National Defense University | https://ndupress.ndu.edu/ | https://ndupress.ndu.edu/Publications-RSS/ | Senior military education | None |
+| Army War College | https://warcollege.army.mil/ | https://warcollege.army.mil/feed | Army strategic leadership education | None |
+| UK Ministry of Defence | https://www.gov.uk/government/organisations/ministry-of-defence | https://www.gov.uk/government/organisations/ministry-of-defence.atom | British defense news | None |
+| Australian Defence Magazine | https://www.australiandefence.com.au/ | https://www.australiandefence.com.au/feed | Australian defense industry | None |
+| Canadian Defence Review | https://www.canadiandefencereview.ca/ | https://www.canadiandefencereview.ca/feed | Canadian defense news | None |
+| Israel Defense | https://www.israeldefense.co.il/ | https://www.israeldefense.co.il/feed | Israeli defense news | None |
+| Janes - Middle East | https://www.janes.com/middle-east | Custom subscription | Middle East defense analysis | Paywall |
+| Janes - Asia Pacific | https://www.janes.com/asia-pacific | Custom subscription | Asia-Pacific defense analysis | Paywall |
+| Janes - Europe | https://www.janes.com/europe | Custom subscription | European defense analysis | Paywall |
+| Information Dissemination | https://informationdissemination.net/ | https://informationdissemination.net/feeds/posts/default | Naval strategy and policy blog | None |
+| NextWar (CSBA) | https://csbaonline.org/research/nextwar | https://csbaonline.org/feed | Future warfare analysis | None |
+| War Is Boring | https://warisboring.com/ | https://warisboring.com/feed | Defense commentary and analysis | None |
+| The Strategy Bridge | https://thestrategybridge.org/ | https://thestrategybridge.org/feed | Military strategy discussion | None |
+| Balloons and Drones | https://balloonsanddrones.com/ | https://balloonsanddrones.com/feed | Emerging warfare technology | None |
+| Drones and Robotics | https://dronesandrobotics.com/ | https://dronesandrobotics.com/feed | Unmanned systems news | None |
+| Unmanned Aerial | https://unmanned-aerial.com/ | https://unmanned-aerial.com/feed | UAV/UAS military applications | None |
+| Electronic Warfare | https://electronicwarfare.com/ | https://electronicwarfare.com/feed | Electronic warfare technology | None |
+| Directed Energy | https://directedenergy.org/ | https://directedenergy.org/feed | Directed energy weapons news | None |
+| Hypersonic Weapons | https://hypersonicweapons.com/ | https://hypersonicweapons.com/feed | Hypersonic technology news | None |
+| Lieber Institute (West Point) | https://lieber.westpoint.edu/articles/ | https://lieber.westpoint.edu/feed | Law of armed conflict analysis | None |
+| Articles of War | https://lieber.westpoint.edu/articles/ | https://lieber.westpoint.edu/feed | Military law and ethics blog | None |
+| Just Security - Military | https://www.justsecurity.org/category/military/ | https://www.justsecurity.org/category/military/feed | Military legal analysis | None |
+| Defense Logistics Agency | https://www.dla.mil/news/ | https://www.dla.mil/news/feed | Defense logistics news | None |
+| Military Logistics | https://militarylogistics.com/ | https://militarylogistics.com/feed | Military logistics and supply chain | None |
+| Sustainment Times | https://sustainmenttimes.com/ | https://sustainmenttimes.com/feed | Military sustainment news | None |
+| Military Report | https://www.military.com/military-report | https://www.military.com/military-report/rss | Military pay and benefits updates | None |
+| Military Pay | https://militarypay.com/news/ | https://militarypay.com/news/feed | Military compensation news | None |
+| Military Benefits | https://militarybenefits.info/news/ | https://militarybenefits.info/news/feed | Military benefits information | None |
+| Veterans Jobs | https://www.military.com/veterans-jobs | https://www.military.com/veterans-jobs/rss | Veteran employment news | None |
+| Hire Heroes USA | https://hireheroesusa.org/news/ | https://hireheroesusa.org/news/feed | Veteran hiring initiative news | None |
+| Still Serving Veterans | https://ssv.org/blog/ | https://ssv.org/blog?format=rss | Veteran career transition | None |
+| Military Family | https://militaryfamily.org/news/ | https://militaryfamily.org/news/feed | Military family advocacy | None |
+| National Military Family Association | https://www.militaryfamily.org/news/ | https://www.militaryfamily.org/news/feed | Military family support | None |
+| Military OneSource | https://www.militaryonesource.mil/news/ | https://www.militaryonesource.mil/news/feed | DoD family support program | None |
+| Military Child Education Coalition | https://militarychild.org/news/ | https://militarychild.org/news/feed | Military child education | None |
+| Military Spouse Magazine | https://militaryspouse.com/news/ | https://militaryspouse.com/news/feed | Military spouse lifestyle | None |
+| National Security Archive | https://nsarchive.gwu.edu/ | https://nsarchive.gwu.edu/feed | Declassified documents and analysis | None |
+| Council on Foreign Relations | https://www.cfr.org/topics/defense | https://www.cfr.org/rss.xml | Foreign policy and defense analysis | None |
+| Brookings - Security & Strategy | https://www.brookings.edu/topic/security-strategy/ | https://www.brookings.edu/feed | Security strategy research | None |
+| Carnegie Endowment - Security | https://carnegieendowment.org/research/security | https://carnegieendowment.org/rss.xml | International security analysis | None |
+| Atlantic Council - Defense | https://www.atlanticcouncil.org/topic/defense/ | https://www.atlanticcouncil.org/feed | Transatlantic defense analysis | None |
+| Stimson Center - Security | https://www.stimson.org/topic/security/ | https://www.stimson.org/feed | Security policy research | None |
+| Center for Strategic and Budgetary Assessments | https://csbaonline.org/ | https://csbaonline.org/feed | Defense budget and strategy analysis | None |

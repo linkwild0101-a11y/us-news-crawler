@@ -1,0 +1,9 @@
+feedparser>=6.0.11
+aiohttp>=3.9.1
+supabase>=2.0.0
+simhash>=2.1.0
+newspaper3k>=0.2.8
+beautifulsoup4>=4.12.2
+requests>=2.31.0
+lxml>=4.9.3
+python-dateutil>=2.8.2
