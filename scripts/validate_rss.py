@@ -127,7 +127,10 @@ class RSSValidator:
             async with aiohttp.ClientSession(timeout=timeout) as worker_session:
                 async with worker_session.post(
                     f"{WORKER_URL}/extract",
-                    json={"url": source["rss_url"]},
+                    json={
+                        "url": source["rss_url"],
+                        "raw": True,
+                    },  # 使用 raw 模式获取原始 RSS XML
                     headers={"Content-Type": "application/json"},
                 ) as resp:
                     result["http_status"] = resp.status
