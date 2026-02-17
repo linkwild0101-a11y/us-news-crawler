@@ -23,66 +23,202 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# CSS 样式 (适配明亮/黑暗模式)
+# CSS 样式 (专业分析系统风格)
 st.markdown(
     """
 <style>
-    /* 主标题 */
+    /* CSS 变量 - 专业配色 */
+    :root {
+        --primary-blue: #1e40af;
+        --primary-blue-light: #3b82f6;
+        --primary-blue-dark: #1e3a8a;
+        --text-primary: #1f2937;
+        --text-secondary: #4b5563;
+        --text-tertiary: #6b7280;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --bg-tertiary: #f1f5f9;
+        --border-light: #e2e8f0;
+        --border-medium: #cbd5e1;
+        --success: #059669;
+        --warning: #d97706;
+        --danger: #dc2626;
+        --info: #2563eb;
+    }
+    
+    /* 全局背景 - 干净的白/浅灰 */
+    .stApp {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+    
+    /* 主标题 - 专业深蓝 */
     .main-header {
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #1f77b4;
-        margin-bottom: 1rem;
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.02em;
+        border-bottom: 3px solid #1e40af;
+        padding-bottom: 0.75rem;
     }
     
-    /* 指标卡片 - 使用 Streamlit 主题色 */
+    /* 指标卡片 - 专业卡片风格 */
     .metric-card {
-        background-color: rgba(128, 128, 128, 0.1);
-        padding: 1rem;
+        background: #ffffff;
+        padding: 1.25rem;
         border-radius: 0.5rem;
-        border-left: 4px solid #1f77b4;
+        border: 1px solid #e2e8f0;
+        border-top: 4px solid #1e40af;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
     }
     
-    /* 热点卡片 - 使用主题背景色 */
+    .metric-card:hover {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+        border-color: #3b82f6;
+    }
+    
+    /* 热点卡片 - 简洁专业 */
     .hotspot-card {
-        background-color: rgba(128, 128, 128, 0.05);
-        padding: 1rem;
+        background: #ffffff;
+        padding: 1.25rem;
         border-radius: 0.5rem;
-        border: 1px solid rgba(128, 128, 128, 0.2);
+        border: 1px solid #e2e8f0;
         margin-bottom: 1rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        color: inherit;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        transition: all 0.2s ease;
+        border-left: 4px solid #3b82f6;
+    }
+    
+    .hotspot-card:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+        border-color: #3b82f6;
     }
     
     /* 热点卡片标题 */
-    .hotspot-card h4, .hotspot-card h5 {
-        color: inherit;
+    .hotspot-card h4 {
+        color: #1e3a8a;
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+        line-height: 1.4;
+    }
+    
+    .hotspot-card h5 {
+        color: #1e40af;
+        font-weight: 600;
+        font-size: 1rem;
         margin-bottom: 0.5rem;
     }
     
     /* 热点卡片段落 */
     .hotspot-card p {
-        color: inherit;
-        margin-bottom: 0.5rem;
+        color: #374151;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 0.75rem;
     }
     
     /* 元信息文字 */
     .hotspot-card .meta-text {
-        color: rgba(128, 128, 128, 0.8);
-        font-size: 0.9rem;
+        color: #6b7280;
+        font-size: 0.85rem;
+        font-weight: 500;
     }
     
-    /* 信号徽章 */
+    /* 信号徽章 - 专业状态色 */
     .signal-badge {
         display: inline-block;
-        padding: 0.25rem 0.5rem;
+        padding: 0.25rem 0.75rem;
         border-radius: 0.25rem;
-        font-size: 0.8rem;
-        font-weight: bold;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
     }
-    .signal-high { background-color: #ff4b4b; color: white; }
-    .signal-medium { background-color: #ffa500; color: black; }
-    .signal-low { background-color: #4caf50; color: white; }
+    
+    .signal-high { 
+        background-color: #fef2f2;
+        color: #dc2626;
+        border: 1px solid #fca5a5;
+    }
+    
+    .signal-medium { 
+        background-color: #fffbeb;
+        color: #d97706;
+        border: 1px solid #fcd34d;
+    }
+    
+    .signal-low { 
+        background-color: #ecfdf5;
+        color: #059669;
+        border: 1px solid #6ee7b7;
+    }
+    
+    /* 分割线 */
+    hr {
+        border: none;
+        height: 1px;
+        background: linear-gradient(90deg, transparent 0%, #e2e8f0 50%, transparent 100%);
+        margin: 1.5rem 0;
+    }
+    
+    /* 滚动条 */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: #94a3b8;
+        border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: #64748b;
+    }
+    
+    /* 数据高亮 */
+    .data-highlight {
+        color: #1e40af;
+        font-weight: 700;
+    }
+    
+    /* 链接按钮 */
+    .stLinkButton > button {
+        background: #eff6ff !important;
+        border: 1px solid #3b82f6 !important;
+        color: #1e40af !important;
+        font-weight: 500 !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .stLinkButton > button:hover {
+        background: #dbeafe !important;
+        border-color: #1e40af !important;
+    }
+    
+    /* 分类标签 */
+    .category-military {
+        color: #dc2626;
+        font-weight: 600;
+    }
+    
+    .category-politics {
+        color: #7c3aed;
+        font-weight: 600;
+    }
+    
+    .category-economy {
+        color: #059669;
+        font-weight: 600;
+    }
 </style>
 """,
     unsafe_allow_html=True,
