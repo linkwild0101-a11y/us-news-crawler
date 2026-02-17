@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 """
 LLM Client Module
-集成阿里 Qwen3-Plus API 进行中文摘要生成
+集成阿里 Qwen API 进行中文摘要生成 (使用 OpenAI 兼容模式)
 """
 
 import os
 import json
-import time
 import hashlib
 import logging
 import asyncio
 from typing import Dict, Optional, Any
 from datetime import datetime, timedelta
-import aiohttp
+from openai import AsyncOpenAI
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
@@ -37,7 +36,7 @@ _cache_ttl = timedelta(hours=1)
 
 
 class LLMClient:
-    """LLM API 客户端"""
+    """LLM API 客户端 (使用 OpenAI SDK)"""
 
     def __init__(self, api_key: Optional[str] = None):
         """
@@ -52,11 +51,17 @@ class LLMClient:
                 "API key 未设置。请设置 ALIBABA_API_KEY 环境变量或传入 api_key 参数"
             )
 
+        # 初始化 OpenAI 客户端
+        self.client = AsyncOpenAI(
+            api_key=self.api_key,
+            base_url=BASE_URL,
+        )
+
         self.total_calls = 0
         self.total_tokens = 0
         self.failed_calls = 0
 
-        logger.info("LLMClient 初始化完成")
+        logger.info("LLMClient 初始化完成 (使用 OpenAI SDK)")
 
     def _generate_cache_key(self, prompt: str, model: str = MODEL_NAME) -> str:
         """生成缓存键"""
@@ -80,13 +85,7 @@ class LLMClient:
         _cache[cache_key] = (result, datetime.now())
         logger.info(f"已缓存: {cache_key[:8]}...")
 
-    def _estimate_tokens(self, text: str) -> int:
-        """估算 token 数量（粗略估计）"""
-        # 英文平均 1 token ≈ 4 字符，中文平均 1 token ≈ 1.5 字符
-        # 保守估计，按平均 1 token ≈ 2 字符
-        return len(text) // 2
-
-    async def _call_api(self, prompt: str, model: str = MODEL_NAME) -> Dict:
+    async def _call_api(self, prompt: str, model: str = MODEL_NAME) -> str:
         """
         调用 LLM API
 
@@ -95,69 +94,25 @@ class LLMClient:
             model: 模型名称
 
         Returns:
-            API 响应
+            API 响应内容 (字符串)
         """
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-        }
-
-        payload = {
-            "model": model,
-            "messages": [{"role": "user", "content": prompt}],
-            "max_tokens": MAX_TOKENS,
-            "temperature": TEMPERATURE,
-        }
-
         for attempt in range(MAX_RETRIES):
             try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.post(
-                        BASE_URL,
-                        headers=headers,
-                        json=payload,
-                        timeout=aiohttp.ClientTimeout(total=60),
-                    ) as response:
-                        if response.status == 200:
-                            data = await response.json()
-                            self.total_calls += 1
+                response = await self.client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=MAX_TOKENS,
+                    temperature=TEMPERATURE,
+                )
 
-                            # 估算 token 使用量 (OpenAI 兼容格式)
-                            output_text = (
-                                data.get("choices", [{}])[0]
-                                .get("message", {})
-                                .get("content", "")
-                            )
-                            tokens_used = self._estimate_tokens(
-                                prompt
-                            ) + self._estimate_tokens(output_text)
-                            self.total_tokens += tokens_used
+                self.total_calls += 1
+                self.total_tokens += (
+                    response.usage.total_tokens if response.usage else 0
+                )
 
-                            logger.info(f"API 调用成功 (尝试 {attempt + 1})")
-                            return data
-                        elif response.status == 429:
-                            # 速率限制，等待后重试
-                            wait_time = RETRY_DELAY * (2**attempt)
-                            logger.warning(f"速率限制，等待 {wait_time} 秒后重试...")
-                            await asyncio.sleep(wait_time)
-                        else:
-                            error_text = await response.text()
-                            logger.error(
-                                f"API 错误: HTTP {response.status}, {error_text}"
-                            )
-                            if attempt == MAX_RETRIES - 1:
-                                self.failed_calls += 1
-                                raise Exception(
-                                    f"API 调用失败: HTTP {response.status}, {error_text}"
-                                )
-                            await asyncio.sleep(RETRY_DELAY)
+                logger.info(f"API 调用成功 (尝试 {attempt + 1})")
+                return response.choices[0].message.content
 
-            except aiohttp.ClientError as e:
-                logger.error(f"网络错误 (尝试 {attempt + 1}): {e}")
-                if attempt == MAX_RETRIES - 1:
-                    self.failed_calls += 1
-                    raise Exception(f"网络错误: {e}")
-                await asyncio.sleep(RETRY_DELAY)
             except Exception as e:
                 logger.error(f"错误 (尝试 {attempt + 1}): {e}")
                 if attempt == MAX_RETRIES - 1:
@@ -188,32 +143,24 @@ class LLMClient:
                 return cached_result
 
         # 调用 API
-        response = await self._call_api(prompt)
+        content = await self._call_api(prompt)
 
-        # 提取内容 (OpenAI 兼容格式)
-        content = ""  # 初始化，避免未绑定错误
+        # 尝试解析 JSON
+        # 有时候 LLM 会在 JSON 外面加 markdown 代码块标记
+        content = content.strip()
+        if content.startswith("```json"):
+            content = content[7:]
+        if content.startswith("```"):
+            content = content[3:]
+        if content.endswith("```"):
+            content = content[:-3]
+        content = content.strip()
+
         try:
-            content = (
-                response.get("choices", [{}])[0].get("message", {}).get("content", "")
-            )
-
-            # 尝试解析 JSON
-            # 有时候 LLM 会在 JSON 外面加 markdown 代码块标记
-            content = content.strip()
-            if content.startswith("```json"):
-                content = content[7:]
-            if content.startswith("```"):
-                content = content[3:]
-            if content.endswith("```"):
-                content = content[:-3]
-            content = content.strip()
-
             result = json.loads(content)
-
             # 保存到缓存
             if use_cache:
                 self._save_to_cache(cache_key, result)
-
             return result
 
         except json.JSONDecodeError as e:
@@ -239,51 +186,27 @@ class LLMClient:
             if cached_result:
                 return cached_result.get("content", "")
 
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-        }
-
-        payload = {
-            "model": MODEL_NAME,
-            "messages": messages,
-            "max_tokens": MAX_TOKENS,
-            "temperature": TEMPERATURE,
-        }
-
         for attempt in range(MAX_RETRIES):
             try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.post(
-                        BASE_URL,
-                        headers=headers,
-                        json=payload,
-                        timeout=aiohttp.ClientTimeout(total=60),
-                    ) as response:
-                        if response.status == 200:
-                            data = await response.json()
-                            self.total_calls += 1
+                response = await self.client.chat.completions.create(
+                    model=MODEL_NAME,
+                    messages=messages,
+                    max_tokens=MAX_TOKENS,
+                    temperature=TEMPERATURE,
+                )
 
-                            content = (
-                                data.get("choices", [{}])[0]
-                                .get("message", {})
-                                .get("content", "")
-                            )
+                self.total_calls += 1
+                self.total_tokens += (
+                    response.usage.total_tokens if response.usage else 0
+                )
 
-                            # 保存到缓存
-                            if use_cache:
-                                self._save_to_cache(cache_key, {"content": content})
+                content = response.choices[0].message.content
 
-                            return content
-                        else:
-                            error_text = await response.text()
-                            logger.error(
-                                f"API 错误: HTTP {response.status}, {error_text}"
-                            )
-                            if attempt == MAX_RETRIES - 1:
-                                self.failed_calls += 1
-                                raise Exception(f"API 调用失败: HTTP {response.status}")
-                            await asyncio.sleep(RETRY_DELAY)
+                # 保存到缓存
+                if use_cache:
+                    self._save_to_cache(cache_key, {"content": content})
+
+                return content
 
             except Exception as e:
                 logger.error(f"错误 (尝试 {attempt + 1}): {e}")
