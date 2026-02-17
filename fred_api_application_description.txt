@@ -1,0 +1,13 @@
+I am developing an open-source US news monitoring and analysis system that tracks political, economic, and military news from 199 RSS sources. 
+
+The application uses machine learning to cluster related news articles and detect emerging hotspots. I need FRED API access to enhance the analysis by correlating news events with real-time economic indicators such as:
+- Federal Funds Rate (for Fed policy news verification)
+- Consumer Price Index/CPI (for inflation-related news)
+- Unemployment Rate (for labor market analysis)
+- GDP growth data
+
+The integration will help validate economic news accuracy and provide contextual economic background when detecting signals from financial news sources like Bloomberg, WSJ, and Reuters.
+
+This is a non-commercial research project for educational and information monitoring purposes only. I will respect the 120 requests/minute rate limit and use the data responsibly.
+
+Project URL: https://github.com/linkwild0101-a11y/us-news-crawler
