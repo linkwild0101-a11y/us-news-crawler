@@ -327,12 +327,29 @@ class HotspotAnalyzer:
 
         # 3. 生成摘要
         logger.info("生成聚类摘要...")
+        processed_count = 0
         for i, cluster in enumerate(clusters):
             logger.info(
                 f"  处理聚类 {i + 1}/{len(clusters)}: {cluster['primary_title'][:50]}..."
             )
-            summary = self.generate_cluster_summary(cluster)
-            cluster["summary"] = summary
+            try:
+                summary = self.generate_cluster_summary(cluster)
+                cluster["summary"] = summary
+                processed_count += 1
+                # 每处理 10 个聚类，保存一次进度
+                if not dry_run and processed_count % 10 == 0:
+                    logger.info(f"  已处理 {processed_count} 个聚类，保存进度...")
+                    # 只保存已处理的部分
+                    self.save_analysis_results(clusters[:processed_count], [])
+            except Exception as e:
+                logger.error(f"  处理聚类 {i + 1} 失败: {e}")
+                # 继续处理下一个
+                cluster["summary"] = {
+                    "summary": cluster["primary_title"],
+                    "error": str(e),
+                }
+
+        logger.info(f"成功处理 {processed_count}/{len(clusters)} 个聚类")
 
         # 4. 信号检测
         logger.info("检测信号...")
@@ -343,8 +360,11 @@ class HotspotAnalyzer:
             logger.info(f"检测到 {len(signals)} 个信号:")
             for signal in signals[:5]:  # 只显示前5个
                 icon = SIGNAL_TYPES.get(signal["signal_type"], {}).get("icon", "⚡")
+                signal_name = SIGNAL_TYPES.get(signal["signal_type"], {}).get(
+                    "name", signal["signal_type"]
+                )
                 logger.info(
-                    f"  {icon} {signal['name']}: 置信度 {signal['confidence']:.2f}"
+                    f"  {icon} {signal_name}: 置信度 {signal['confidence']:.2f}"
                 )
 
         # 5. 保存结果
