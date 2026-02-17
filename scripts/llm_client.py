@@ -23,7 +23,7 @@ BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 
 # 模型配置
 MODEL_NAME = "qwen3.5-plus"
-MAX_TOKENS = 4000
+MAX_TOKENS = 6000  # 增加 token 限制，防止 JSON 被截断
 TEMPERATURE = 0.7
 
 # 重试配置
@@ -158,8 +158,58 @@ class LLMClient:
             return result
 
         except json.JSONDecodeError as e:
+            logger.warning(f"JSON 解析错误，尝试修复: {e}")
+            # 尝试修复截断的 JSON
+            fixed_content = self._fix_truncated_json(content)
+            if fixed_content:
+                try:
+                    result = json.loads(fixed_content)
+                    logger.info("JSON 修复成功")
+                    if use_cache:
+                        self._save_to_cache(cache_key, result)
+                    return result
+                except:
+                    pass
+
             logger.error(f"JSON 解析错误: {e}, 内容: {content[:200]}")
+            # 返回原始内容
             return {"raw_content": content, "error": "JSON 解析失败", "parsed": False}
+
+    def _fix_truncated_json(self, content: str) -> str:
+        """
+        尝试修复截断的 JSON
+
+        Args:
+            content: 可能截断的 JSON 字符串
+
+        Returns:
+            修复后的 JSON 字符串，如果无法修复则返回空字符串
+        """
+        content = content.strip()
+
+        # 统计未闭合的括号
+        open_braces = content.count("{") - content.count("}")
+        open_brackets = content.count("[") - content.count("]")
+
+        # 补全缺失的闭合符号
+        fixed = content
+        if open_braces > 0:
+            fixed += "}" * open_braces
+        if open_brackets > 0:
+            fixed += "]" * open_brackets
+
+        # 如果最后一个字符是逗号，移除它
+        if fixed.rstrip().endswith(","):
+            fixed = fixed.rstrip()[:-1]
+
+        # 确保以 } 结尾
+        if not fixed.rstrip().endswith("}"):
+            # 找到最后一个完整的键值对，然后闭合
+            last_brace = fixed.rfind("}")
+            if last_brace > 0:
+                fixed = fixed[: last_brace + 1]
+
+        return fixed
 
     def chat(self, messages: list, use_cache: bool = True) -> str:
         """
