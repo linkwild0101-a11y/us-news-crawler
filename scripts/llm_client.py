@@ -165,19 +165,22 @@ class LLMClient:
 
         raise Exception("达到最大重试次数")
 
-    def summarize(self, prompt: str, use_cache: bool = True) -> Dict[str, Any]:
+    def summarize(
+        self, prompt: str, use_cache: bool = True, model: str = None
+    ) -> Dict[str, Any]:
         """
         生成摘要 (同步)
 
         Args:
             prompt: 提示词
             use_cache: 是否使用缓存
+            model: 模型名称，不传则使用默认 MODEL_NAME
 
         Returns:
             解析后的 JSON 结果
         """
         total_start = time.time()
-        cache_key = self._generate_cache_key(prompt)
+        cache_key = self._generate_cache_key(prompt + (model or MODEL_NAME))
 
         logger.info(
             f"[SUMMARIZE_START] 开始生成摘要 | cache_key: {cache_key[:8]}... | use_cache: {use_cache}"
@@ -201,7 +204,7 @@ class LLMClient:
 
         # 调用 API
         api_start = time.time()
-        content = self._call_api(prompt)
+        content = self._call_api(prompt, model=model or MODEL_NAME)
         api_duration = time.time() - api_start
         content_length = len(content)
         logger.info(

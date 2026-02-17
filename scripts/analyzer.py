@@ -10,6 +10,7 @@ import logging
 import os
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional
 
@@ -90,6 +91,12 @@ class HotspotAnalyzer:
             "errors": 0,
         }
 
+        # 分层分析配置
+        self.hot_threshold = 3  # 热点阈值：文章数>=3
+        self.concurrent_workers = 5  # 并发数
+        self.cold_model = "qwen-flash"  # 冷门新闻使用轻量级模型
+        self.hot_model = "qwen-plus"  # 热点新闻使用高质量模型
+
     def load_unanalyzed_articles(
         self, limit: int = None, hours: int = 24
     ) -> List[Dict]:
@@ -135,23 +142,28 @@ class HotspotAnalyzer:
             self.stats["errors"] += 1
             return []
 
-    def generate_cluster_summary(self, cluster: Dict) -> Dict:
+    def generate_cluster_summary(self, cluster: Dict, depth: str = "full") -> Dict:
         """
-        为聚类生成中文摘要
+        为聚类生成中文摘要（支持分层处理）
 
         Args:
             cluster: 聚类数据
+            depth: 分析深度，"full"=完整分析，"shallow"=快速翻译
 
         Returns:
             摘要结果字典
         """
         total_start = time.time()
         cluster_id_short = cluster["cluster_id"][:8]
+        article_count = cluster.get("article_count", 0)
+
+        # 判断是否为热点
+        is_hot = article_count >= self.hot_threshold
 
         logger.info(
             f"[CLUSTER_START] 开始处理聚类 | cluster_id: {cluster_id_short}... | "
-            f"文章数: {cluster.get('article_count', 0)} | "
-            f"标题: {cluster['primary_title'][:50]}..."
+            f"文章数: {article_count} | 类型: {'热点' if is_hot else '冷门'} | "
+            f"深度: {depth} | 标题: {cluster['primary_title'][:50]}..."
         )
 
         if not self.llm_client:
@@ -161,20 +173,15 @@ class HotspotAnalyzer:
                 "key_entities": [],
                 "impact": "",
                 "trend": "",
+                "analysis_depth": depth,
+                "is_hot": is_hot,
             }
 
-        # 检查是否超过LLM调用限制
-        if self.stats["llm_calls"] >= MAX_LLM_CALLS:
-            logger.warning(
-                f"[CLUSTER_SKIP] 已达到LLM调用限制 ({MAX_LLM_CALLS})，跳过摘要生成"
-            )
-            return {
-                "summary": cluster["primary_title"],
-                "key_entities": [],
-                "impact": "",
-                "trend": "",
-            }
+        # 快速翻译模式（冷门新闻）
+        if depth == "shallow":
+            return self._quick_translate(cluster, is_hot)
 
+        # 完整分析模式（热点新闻）
         try:
             # 准备提示词
             prep_start = time.time()
@@ -205,6 +212,11 @@ class HotspotAnalyzer:
             self.stats["llm_calls"] += 1
             total_duration = time.time() - total_start
 
+            # 添加元数据
+            result["analysis_depth"] = "full"
+            result["is_hot"] = is_hot
+            result["processing_time"] = total_duration
+
             # 检查结果是否成功
             if result.get("error"):
                 logger.warning(
@@ -218,7 +230,7 @@ class HotspotAnalyzer:
                     f"准备: {prep_duration:.3f}s | LLM: {llm_duration:.2f}s | "
                     f"总耗时: {total_duration:.2f}s | "
                     f"摘要长度: {len(result.get('summary', ''))}字符 | "
-                    f"LLM调用次数: {self.stats['llm_calls']}/{MAX_LLM_CALLS}"
+                    f"LLM调用次数: {self.stats['llm_calls']}"
                 )
 
             return result
@@ -235,6 +247,72 @@ class HotspotAnalyzer:
                 "key_entities": [],
                 "impact": "",
                 "trend": "",
+                "analysis_depth": "full",
+                "is_hot": is_hot,
+                "error": str(e),
+            }
+
+    def _quick_translate(self, cluster: Dict, is_hot: bool) -> Dict:
+        """
+        快速翻译模式（仅翻译标题，低成本）
+
+        Args:
+            cluster: 聚类数据
+            is_hot: 是否为热点
+
+        Returns:
+            简化版结果字典
+        """
+        total_start = time.time()
+        cluster_id_short = cluster["cluster_id"][:8]
+
+        try:
+            # 准备简化提示词（只翻译标题）
+            title = cluster["primary_title"]
+            prompt = f"请将以下英文新闻标题翻译成中文（只返回翻译结果，不要解释）：\n\n{title}"
+
+            # 使用轻量级模型（qwen-flash）
+            llm_start = time.time()
+            result = self.llm_client.summarize(prompt, model=self.cold_model)
+            llm_duration = time.time() - llm_start
+
+            self.stats["llm_calls"] += 1
+            total_duration = time.time() - total_start
+
+            # 提取翻译结果
+            translated_title = result.get("summary", title)
+            if isinstance(translated_title, dict):
+                translated_title = translated_title.get("summary", title)
+
+            logger.info(
+                f"[CLUSTER_QUICK_DONE] 快速翻译完成 | cluster_id: {cluster_id_short}... | "
+                f"耗时: {total_duration:.2f}s | 原文: {title[:50]}... | "
+                f"译文: {translated_title[:50]}..."
+            )
+
+            return {
+                "summary": translated_title,
+                "key_entities": [],
+                "impact": "",
+                "trend": "",
+                "analysis_depth": "shallow",
+                "is_hot": is_hot,
+                "processing_time": total_duration,
+                "note": "点击进行深度分析",
+            }
+
+        except Exception as e:
+            logger.error(
+                f"[CLUSTER_QUICK_ERROR] 快速翻译失败 | cluster_id: {cluster_id_short}... | 错误: {str(e)}"
+            )
+            return {
+                "summary": cluster["primary_title"],
+                "key_entities": [],
+                "impact": "",
+                "trend": "",
+                "analysis_depth": "shallow",
+                "is_hot": is_hot,
+                "error": str(e),
             }
 
     def save_analysis_results(self, clusters: List[Dict], signals: List[Dict]):
@@ -368,14 +446,17 @@ class HotspotAnalyzer:
 
     def run_analysis(self, limit: int = None, dry_run: bool = False):
         """
-        运行完整的分析流程
+        运行完整的分析流程（支持分层处理和并发）
 
         Args:
             limit: 最大处理文章数
             dry_run: 试运行模式（不保存到数据库）
         """
         logger.info("=" * 60)
-        logger.info("开始热点分析")
+        logger.info("开始热点分析（智能分层 + 并发处理）")
+        logger.info(
+            f"配置: 热点阈值={self.hot_threshold}, 并发数={self.concurrent_workers}"
+        )
         logger.info("=" * 60)
 
         start_time = datetime.now()
@@ -393,35 +474,35 @@ class HotspotAnalyzer:
         self.stats["clusters_created"] = len(clusters)
         logger.info(f"创建了 {len(clusters)} 个聚类")
 
-        # 3. 生成摘要
-        logger.info("生成聚类摘要...")
-        processed_count = 0
-        for i, cluster in enumerate(clusters):
-            logger.info(
-                f"  处理聚类 {i + 1}/{len(clusters)}: {cluster['primary_title'][:50]}..."
-            )
-            try:
-                summary = self.generate_cluster_summary(cluster)
-                cluster["summary"] = summary
-                processed_count += 1
-                # 每处理 10 个聚类，保存一次进度
-                if not dry_run and processed_count % 10 == 0:
-                    logger.info(f"  已处理 {processed_count} 个聚类，保存进度...")
-                    # 只保存已处理的部分
-                    self.save_analysis_results(clusters[:processed_count], [])
-            except Exception as e:
-                logger.error(f"  处理聚类 {i + 1} 失败: {e}")
-                # 继续处理下一个
-                cluster["summary"] = {
-                    "summary": cluster["primary_title"],
-                    "error": str(e),
-                }
+        # 3. 分层：分离热点和冷门
+        hot_clusters = [
+            c for c in clusters if c.get("article_count", 0) >= self.hot_threshold
+        ]
+        cold_clusters = [
+            c for c in clusters if c.get("article_count", 0) < self.hot_threshold
+        ]
 
-        logger.info(f"成功处理 {processed_count}/{len(clusters)} 个聚类")
+        logger.info(
+            f"分层结果: 热点 {len(hot_clusters)} 个, 冷门 {len(cold_clusters)} 个"
+        )
 
-        # 4. 信号检测
-        logger.info("检测信号...")
-        signals = detect_all_signals(clusters)
+        # 4. 并发处理热点（完整分析）
+        logger.info(f"开始并发处理 {len(hot_clusters)} 个热点聚类...")
+        self._process_clusters_concurrent(hot_clusters, depth="full", dry_run=dry_run)
+
+        # 5. 快速处理冷门（仅翻译）
+        logger.info(f"开始快速处理 {len(cold_clusters)} 个冷门聚类...")
+        self._process_clusters_concurrent(
+            cold_clusters, depth="shallow", dry_run=dry_run
+        )
+
+        logger.info(
+            f"成功处理 {len(hot_clusters) + len(cold_clusters)}/{len(clusters)} 个聚类"
+        )
+
+        # 6. 信号检测（只对热点聚类）
+        logger.info("检测信号（仅热点聚类）...")
+        signals = detect_all_signals(hot_clusters)
         self.stats["signals_detected"] = len(signals)
 
         if signals:
@@ -435,12 +516,12 @@ class HotspotAnalyzer:
                     f"  {icon} {signal_name}: 置信度 {signal['confidence']:.2f}"
                 )
 
-        # 5. 保存结果
+        # 7. 保存结果
         if not dry_run:
             logger.info("保存分析结果...")
             self.save_analysis_results(clusters, signals)
 
-            # 6. 标记文章
+            # 8. 标记文章
             article_ids = [a["id"] for a in articles]
             self.mark_articles_analyzed(article_ids)
         else:
@@ -455,12 +536,72 @@ class HotspotAnalyzer:
         logger.info(f"耗时: {duration:.1f} 秒")
         logger.info(f"处理文章: {self.stats['articles_loaded']}")
         logger.info(f"创建聚类: {self.stats['clusters_created']}")
+        logger.info(f"热点聚类: {len(hot_clusters)} (完整分析)")
+        logger.info(f"冷门聚类: {len(cold_clusters)} (快速翻译)")
         logger.info(f"检测信号: {self.stats['signals_detected']}")
         logger.info(f"LLM调用: {self.stats['llm_calls']}")
         if self.llm_client:
             llm_stats = self.llm_client.get_stats()
             logger.info(f"预估成本: ${llm_stats['estimated_cost']:.4f}")
         logger.info("=" * 60)
+
+    def _process_clusters_concurrent(
+        self, clusters: List[Dict], depth: str = "full", dry_run: bool = False
+    ):
+        """
+        并发处理聚类列表
+
+        Args:
+            clusters: 聚类列表
+            depth: 分析深度，"full" 或 "shallow"
+            dry_run: 试运行模式
+        """
+        if not clusters:
+            return
+
+        total = len(clusters)
+        processed = 0
+        errors = 0
+
+        logger.info(
+            f"启动 {self.concurrent_workers} 个并发 worker 处理 {total} 个聚类..."
+        )
+
+        with ThreadPoolExecutor(max_workers=self.concurrent_workers) as executor:
+            # 提交所有任务
+            future_to_cluster = {
+                executor.submit(self.generate_cluster_summary, cluster, depth): cluster
+                for cluster in clusters
+            }
+
+            # 处理完成的任务
+            for future in as_completed(future_to_cluster):
+                cluster = future_to_cluster[future]
+                cluster_id_short = cluster.get("cluster_id", "")[:8]
+
+                try:
+                    result = future.result()
+                    cluster["summary"] = result
+                    processed += 1
+
+                    # 每处理10个聚类保存一次进度
+                    if not dry_run and processed % 10 == 0:
+                        logger.info(
+                            f"  并发进度: {processed}/{total} ({processed / total * 100:.1f}%)"
+                        )
+
+                except Exception as e:
+                    logger.error(
+                        f"  并发处理失败 {cluster_id_short}...: {str(e)[:100]}"
+                    )
+                    cluster["summary"] = {
+                        "summary": cluster["primary_title"],
+                        "error": str(e),
+                        "analysis_depth": depth,
+                    }
+                    errors += 1
+
+        logger.info(f"并发处理完成: 成功 {processed}, 失败 {errors}, 总计 {total}")
 
 
 def main():
