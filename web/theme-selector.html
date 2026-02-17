@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>US-Monitor 配色方案选择器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 3rem;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 4rem;
+            font-size: 1.1rem;
+        }
+        
+        .themes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .theme-card {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+        }
+        
+        .theme-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .theme-preview {
+            padding: 2rem;
+            min-height: 400px;
+        }
+        
+        .theme-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .theme-desc {
+            opacity: 0.8;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+        
+        /* 示例组件样式 */
+        .preview-header {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid;
+        }
+        
+        .preview-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .preview-metric {
+            padding: 1rem;
+            border-radius: 8px;
+            border-top: 4px solid;
+        }
+        
+        .preview-metric-label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-bottom: 0.25rem;
+        }
+        
+        .preview-metric-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+        
+        .preview-card {
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid;
+        }
+        
+        .preview-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .preview-card p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+        
+        .preview-meta {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        .preview-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+        
+        .color-info {
+            padding: 1rem 1.5rem;
+            background: #1a1a1a;
+            border-top: 1px solid #333;
+        }
+        
+        .color-info h3 {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            color: #aaa;
+        }
+        
+        .color-swatches {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .swatch {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: #2a2a2a;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+        
+        .swatch-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid #444;
+        }
+        
+        .swatch-code {
+            font-family: 'Monaco', 'Consolas', monospace;
+            color: #888;
+        }
+
+        /* ============ 主题 1: 深蓝商务 ============ */
+        .theme-corporate-blue .theme-preview {
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+        }
+        .theme-corporate-blue .preview-header {
+            color: #f8fafc;
+            border-color: #3b82f6;
+        }
+        .theme-corporate-blue .preview-metric {
+            background: #1e293b;
+            border-color: #3b82f6;
+            color: #f8fafc;
+        }
+        .theme-corporate-blue .preview-card {
+            background: #1e293b;
+            border-color: #3b82f6;
+            color: #cbd5e1;
+        }
+        .theme-corporate-blue .preview-card h4 {
+            color: #f8fafc;
+        }
+        .theme-corporate-blue .preview-badge {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.5);
+        }
+
+        /* ============ 主题 2: 森林墨绿 ============ */
+        .theme-forest-green .theme-preview {
+            background: linear-gradient(180deg, #064e3b 0%, #065f46 100%);
+        }
+        .theme-forest-green .preview-header {
+            color: #ecfdf5;
+            border-color: #10b981;
+        }
+        .theme-forest-green .preview-metric {
+            background: rgba(6, 95, 70, 0.6);
+            border-color: #10b981;
+            color: #ecfdf5;
+        }
+        .theme-forest-green .preview-card {
+            background: rgba(6, 95, 70, 0.6);
+            border-color: #10b981;
+            color: #d1fae5;
+        }
+        .theme-forest-green .preview-card h4 {
+            color: #ecfdf5;
+        }
+        .theme-forest-green .preview-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.5);
+        }
+
+        /* ============ 主题 3: 皇家紫苑 ============ */
+        .theme-royal-purple .theme-preview {
+            background: linear-gradient(180deg, #2e1065 0%, #4c1d95 100%);
+        }
+        .theme-royal-purple .preview-header {
+            color: #faf5ff;
+            border-color: #8b5cf6;
+        }
+        .theme-royal-purple .preview-metric {
+            background: rgba(76, 29, 149, 0.6);
+            border-color: #8b5cf6;
+            color: #faf5ff;
+        }
+        .theme-royal-purple .preview-card {
+            background: rgba(76, 29, 149, 0.6);
+            border-color: #8b5cf6;
+            color: #e9d5ff;
+        }
+        .theme-royal-purple .preview-card h4 {
+            color: #faf5ff;
+        }
+        .theme-royal-purple .preview-badge {
+            background: rgba(139, 92, 246, 0.2);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.5);
+        }
+
+        /* ============ 主题 4: 暗红警戒 ============ */
+        .theme-alert-red .theme-preview {
+            background: linear-gradient(180deg, #450a0a 0%, #7f1d1d 100%);
+        }
+        .theme-alert-red .preview-header {
+            color: #fef2f2;
+            border-color: #ef4444;
+        }
+        .theme-alert-red .preview-metric {
+            background: rgba(127, 29, 29, 0.6);
+            border-color: #ef4444;
+            color: #fef2f2;
+        }
+        .theme-alert-red .preview-card {
+            background: rgba(127, 29, 29, 0.6);
+            border-color: #ef4444;
+            color: #fecaca;
+        }
+        .theme-alert-red .preview-card h4 {
+            color: #fef2f2;
+        }
+        .theme-alert-red .preview-badge {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.5);
+        }
+
+        /* ============ 主题 5: 青灰科技 ============ */
+        .theme-slate-tech .theme-preview {
+            background: linear-gradient(180deg, #1e293b 0%, #334155 100%);
+        }
+        .theme-slate-tech .preview-header {
+            color: #f8fafc;
+            border-color: #06b6d4;
+        }
+        .theme-slate-tech .preview-metric {
+            background: rgba(51, 65, 85, 0.6);
+            border-color: #06b6d4;
+            color: #f8fafc;
+        }
+        .theme-slate-tech .preview-card {
+            background: rgba(51, 65, 85, 0.6);
+            border-color: #06b6d4;
+            color: #cbd5e1;
+        }
+        .theme-slate-tech .preview-card h4 {
+            color: #f8fafc;
+        }
+        .theme-slate-tech .preview-badge {
+            background: rgba(6, 182, 212, 0.2);
+            color: #67e8f9;
+            border: 1px solid rgba(6, 182, 212, 0.5);
+        }
+
+        .select-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #2a2a2a;
+            border: none;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            border-top: 1px solid #333;
+        }
+        
+        .select-btn:hover {
+            background: #3a3a3a;
+        }
+
+        .selected .select-btn {
+            background: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 US-Monitor 配色方案选择器</h1>
+    <p class="subtitle">选择 2-3 种您喜欢的配色方案作为页面皮肤</p>
+    
+    <div class="themes-grid">
+        <!-- 主题 1: 深蓝商务 -->
+        <div class="theme-card theme-corporate-blue" data-theme="corporate-blue">
+            <div class="theme-preview">
+                <div class="theme-name">💼 深蓝商务</div>
+                <div class="theme-desc">经典商务蓝，专业稳重，适合金融、企业分析场景</div>
+                
+                <div class="preview-header">🇺🇸 US-Monitor 热点分析</div>
+                
+                <div class="preview-metrics">
+                    <div class="preview-metric">
+                        <div class="preview-metric-label">今日聚类</div>
+                        <div class="preview-metric-value">5</div>
+                    </div>
+                    <div class="preview-metric">
+                        <div class="preview-metric-label">今日信号</div>
+                        <div class="preview-metric-value">1</div>
+                    </div>
+                </div>
+                
+                <div class="preview-card">
+                    <h4>Bitcoin price drop: ETF flows are down...</h4>
+                    <p>中文摘要: Bitcoin price drop analysis shows...</p>
+                    <div class="preview-meta">📁 economy | 📄 1 篇文章 | ⏰ 2026-02-17</div>
+                    <span class="preview-badge">economy</span>
+                </div>
+            </div>
+            <div class="color-info">
+                <h3>配色详情</h3>
+                <div class="color-swatches">
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #0f172a;"></div>
+                        <span class="swatch-code">#0f172a 背景</span>
+                    </div>
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #3b82f6;"></div>
+                        <span class="swatch-code">#3b82f6 主色</span>
+                    </div>
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #1e293b;"></div>
+                        <span class="swatch-code">#1e293b 卡片</span>
+                    </div>
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #60a5fa;"></div>
+                        <span class="swatch-code">#60a5fa 强调</span>
+                    </div>
+                </div>
+            </div>
+            <button class="select-btn" onclick="toggleSelect(this)">选择此配色</button>
+        </div>
+
+        <!-- 主题 2: 森林墨绿 -->
+        <div class="theme-card theme-forest-green" data-theme="forest-green">
+            <div class="theme-preview">
+                <div class="theme-name">🌲 森林墨绿</div>
+                <div class="theme-desc">自然沉稳，适合环保、能源、可持续发展主题</div>
+                
+                <div class="preview-header">🇺🇸 US-Monitor 热点分析</div>
+                
+                <div class="preview-metrics">
+                    <div class="preview-metric">
+                        <div class="preview-metric-label">今日聚类</div>
+                        <div class="preview-metric-value">5</div>
+                    </div>
+                    <div class="preview-metric">
+                        <div class="preview-metric-label">今日信号</div>
+                        <div class="preview-metric-value">1</div>
+                    </div>
+                </div>
+                
+                <div class="preview-card">
+                    <h4>Bitcoin price drop: ETF flows are down...</h4>
+                    <p>中文摘要: Bitcoin price drop analysis shows...</p>
+                    <div class="preview-meta">📁 economy | 📄 1 篇文章 | ⏰ 2026-02-17</div>
+                    <span class="preview-badge">economy</span>
+                </div>
+            </div>
+            <div class="color-info">
+                <h3>配色详情</h3>
+                <div class="color-swatches">
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #064e3b;"></div>
+                        <span class="swatch-code">#064e3b 背景</span>
+                    </div>
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #10b981;"></div>
+                        <span class="swatch-code">#10b981 主色</span>
+                    </div>
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #065f46;"></div>
+                        <span class="swatch-code">#065f46 卡片</span>
+                    </div>
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #6ee7b7;"></div>
+                        <span class="swatch-code">#6ee7b7 强调</span>
+                    </div>
+                </div>
+            </div>
+            <button class="select-btn" onclick="toggleSelect(this)">选择此配色</button>
+        </div>
+
+        <!-- 主题 3: 皇家紫苑 -->
+        <div class="theme-card theme-royal-purple" data-theme="royal-purple">
+            <div class="theme-preview">
+                <div class="theme-name">👑 皇家紫苑</div>
+                <div class="theme-desc">高贵典雅，适合高端分析、战略规划场景</div>
+                
+                <div class="preview-header">🇺🇸 US-Monitor 热点分析</div>
+                
+                <div class="preview-metrics">
+                    <div class="preview-metric">
+                        <div class="preview-metric-label">今日聚类</div>
+                        <div class="preview-metric-value">5</div>
+                    </div>
+                    <div class="preview-metric">
+                        <div class="preview-metric-label">今日信号</div>
+                        <div class="preview-metric-value">1</div>
+                    </div>
+                </div>
+                
+                <div class="preview-card">
+                    <h4>Bitcoin price drop: ETF flows are down...</h4>
+                    <p>中文摘要: Bitcoin price drop analysis shows...</p>
+                    <div class="preview-meta">📁 economy | 📄 1 篇文章 | ⏰ 2026-02-17</div>
+                    <span class="preview-badge">economy</span>
+                </div>
+            </div>
+            <div class="color-info">
+                <h3>配色详情</h3>
+                <div class="color-swatches">
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #2e1065;"></div>
+                        <span class="swatch-code">#2e1065 背景</span>
+                    </div>
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #8b5cf6;"></div>
+                        <span class="swatch-code">#8b5cf6 主色</span>
+                    </div>
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #4c1d95;"></div>
+                        <span class="swatch-code">#4c1d95 卡片</span>
+                    </div>
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #c4b5fd;"></div>
+                        <span class="swatch-code">#c4b5fd 强调</span>
+                    </div>
+                </div>
+            </div>
+            <button class="select-btn" onclick="toggleSelect(this)">选择此配色</button>
+        </div>
+
+        <!-- 主题 4: 暗红警戒 -->
+        <div class="theme-card theme-alert-red" data-theme="alert-red">
+            <div class="theme-preview">
+                <div class="theme-name">🚨 暗红警戒</div>
+                <div class="theme-desc">醒目警示，适合军事、安全、风险监控场景</div>
+                
+                <div class="preview-header">🇺🇸 US-Monitor 热点分析</div>
+                
+                <div class="preview-metrics">
+                    <div class="preview-metric">
+                        <div class="preview-metric-label">今日聚类</div>
+                        <div class="preview-metric-value">5</div>
+                    </div>
+                    <div class="preview-metric">
+                        <div class="preview-metric-label">今日信号</div>
+                        <div class="preview-metric-value">1</div>
+                    </div>
+                </div>
+                
+                <div class="preview-card">
+                    <h4>Bitcoin price drop: ETF flows are down...</h4>
+                    <p>中文摘要: Bitcoin price drop analysis shows...</p>
+                    <div class="preview-meta">📁 economy | 📄 1 篇文章 | ⏰ 2026-02-17</div>
+                    <span class="preview-badge">economy</span>
+                </div>
+            </div>
+            <div class="color-info">
+                <h3>配色详情</h3>
+                <div class="color-swatches">
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #450a0a;"></div>
+                        <span class="swatch-code">#450a0a 背景</span>
+                    </div>
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #ef4444;"></div>
+                        <span class="swatch-code">#ef4444 主色</span>
+                    </div>
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #7f1d1d;"></div>
+                        <span class="swatch-code">#7f1d1d 卡片</span>
+                    </div>
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #fca5a5;"></div>
+                        <span class="swatch-code">#fca5a5 强调</span>
+                    </div>
+                </div>
+            </div>
+            <button class="select-btn" onclick="toggleSelect(this)">选择此配色</button>
+        </div>
+
+        <!-- 主题 5: 青灰科技 -->
+        <div class="theme-card theme-slate-tech" data-theme="slate-tech">
+            <div class="theme-preview">
+                <div class="theme-name">🔧 青灰科技</div>
+                <div class="theme-desc">中性科技风，适合综合监控、数据分析场景</div>
+                
+                <div class="preview-header">🇺🇸 US-Monitor 热点分析</div>
+                
+                <div class="preview-metrics">
+                    <div class="preview-metric">
+                        <div class="preview-metric-label">今日聚类</div>
+                        <div class="preview-metric-value">5</div>
+                    </div>
+                    <div class="preview-metric">
+                        <div class="preview-metric-label">今日信号</div>
+                        <div class="preview-metric-value">1</div>
+                    </div>
+                </div>
+                
+                <div class="preview-card">
+                    <h4>Bitcoin price drop: ETF flows are down...</h4>
+                    <p>中文摘要: Bitcoin price drop analysis shows...</p>
+                    <div class="preview-meta">📁 economy | 📄 1 篇文章 | ⏰ 2026-02-17</div>
+                    <span class="preview-badge">economy</span>
+                </div>
+            </div>
+            <div class="color-info">
+                <h3>配色详情</h3>
+                <div class="color-swatches">
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #1e293b;"></div>
+                        <span class="swatch-code">#1e293b 背景</span>
+                    </div>
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #06b6d4;"></div>
+                        <span class="swatch-code">#06b6d4 主色</span>
+                    </div>
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #334155;"></div>
+                        <span class="swatch-code">#334155 卡片</span>
+                    </div>
+                    <div class="swatch">
+                        <div class="swatch-color" style="background: #67e8f9;"></div>
+                        <span class="swatch-code">#67e8f9 强调</span>
+                    </div>
+                </div>
+            </div>
+            <button class="select-btn" onclick="toggleSelect(this)">选择此配色</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleSelect(btn) {
+            const card = btn.closest('.theme-card');
+            card.classList.toggle('selected');
+            
+            if (card.classList.contains('selected')) {
+                btn.textContent = '✓ 已选择';
+            } else {
+                btn.textContent = '选择此配色';
+            }
+            
+            // 检查已选择的数量
+            const selected = document.querySelectorAll('.theme-card.selected');
+            if (selected.length > 3) {
+                alert('最多只能选择 3 种配色方案');
+                card.classList.remove('selected');
+                btn.textContent = '选择此配色';
+            }
+        }
+    </script>
+</body>
+</html>

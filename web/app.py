@@ -23,82 +23,80 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# CSS 样式 (专业分析系统风格)
+# CSS 样式 (深色专业分析系统风格)
 st.markdown(
     """
 <style>
-    /* CSS 变量 - 专业配色 */
+    /* CSS 变量 - 深色专业配色 */
     :root {
-        --primary-blue: #1e40af;
-        --primary-blue-light: #3b82f6;
-        --primary-blue-dark: #1e3a8a;
-        --text-primary: #1f2937;
-        --text-secondary: #4b5563;
-        --text-tertiary: #6b7280;
-        --bg-primary: #ffffff;
-        --bg-secondary: #f8fafc;
-        --bg-tertiary: #f1f5f9;
-        --border-light: #e2e8f0;
-        --border-medium: #cbd5e1;
-        --success: #059669;
-        --warning: #d97706;
-        --danger: #dc2626;
-        --info: #2563eb;
+        --primary: #3b82f6;
+        --primary-light: #60a5fa;
+        --primary-dark: #1d4ed8;
+        --text-primary: #f1f5f9;
+        --text-secondary: #cbd5e1;
+        --text-tertiary: #94a3b8;
+        --bg-primary: #0f172a;
+        --bg-secondary: #1e293b;
+        --bg-card: #1e293b;
+        --border: #334155;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
     }
     
-    /* 全局背景 - 干净的白/浅灰 */
+    /* 全局背景 - 深蓝灰色 */
     .stApp {
-        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
     }
     
-    /* 主标题 - 专业深蓝 */
+    /* 主标题 */
     .main-header {
         font-size: 2.2rem;
         font-weight: 700;
-        color: #1e3a8a;
+        color: #f8fafc;
         margin-bottom: 1.5rem;
         letter-spacing: -0.02em;
-        border-bottom: 3px solid #1e40af;
+        border-bottom: 3px solid #3b82f6;
         padding-bottom: 0.75rem;
     }
     
-    /* 指标卡片 - 专业卡片风格 */
+    /* 指标卡片 - 深色卡片 */
     .metric-card {
-        background: #ffffff;
+        background: #1e293b;
         padding: 1.25rem;
         border-radius: 0.5rem;
-        border: 1px solid #e2e8f0;
-        border-top: 4px solid #1e40af;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #334155;
+        border-top: 4px solid #3b82f6;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         transition: all 0.2s ease;
     }
     
     .metric-card:hover {
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
         transform: translateY(-2px);
-        border-color: #3b82f6;
+        border-color: #60a5fa;
     }
     
-    /* 热点卡片 - 简洁专业 */
+    /* 热点卡片 - 深色卡片 */
     .hotspot-card {
-        background: #ffffff;
+        background: #1e293b;
         padding: 1.25rem;
         border-radius: 0.5rem;
-        border: 1px solid #e2e8f0;
+        border: 1px solid #334155;
         margin-bottom: 1rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         transition: all 0.2s ease;
         border-left: 4px solid #3b82f6;
     }
     
     .hotspot-card:hover {
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
-        border-color: #3b82f6;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        border-color: #475569;
     }
     
     /* 热点卡片标题 */
     .hotspot-card h4 {
-        color: #1e3a8a;
+        color: #f8fafc;
         font-weight: 600;
         font-size: 1.1rem;
         margin-bottom: 0.75rem;
@@ -106,7 +104,7 @@ st.markdown(
     }
     
     .hotspot-card h5 {
-        color: #1e40af;
+        color: #e2e8f0;
         font-weight: 600;
         font-size: 1rem;
         margin-bottom: 0.5rem;
@@ -114,7 +112,7 @@ st.markdown(
     
     /* 热点卡片段落 */
     .hotspot-card p {
-        color: #374151;
+        color: #cbd5e1;
         font-size: 0.95rem;
         line-height: 1.6;
         margin-bottom: 0.75rem;
@@ -122,12 +120,12 @@ st.markdown(
     
     /* 元信息文字 */
     .hotspot-card .meta-text {
-        color: #6b7280;
+        color: #94a3b8;
         font-size: 0.85rem;
         font-weight: 500;
     }
     
-    /* 信号徽章 - 专业状态色 */
+    /* 信号徽章 - 深色状态色 */
     .signal-badge {
         display: inline-block;
         padding: 0.25rem 0.75rem;
@@ -139,28 +137,28 @@ st.markdown(
     }
     
     .signal-high { 
-        background-color: #fef2f2;
-        color: #dc2626;
-        border: 1px solid #fca5a5;
+        background-color: rgba(239, 68, 68, 0.2);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.5);
     }
     
     .signal-medium { 
-        background-color: #fffbeb;
-        color: #d97706;
-        border: 1px solid #fcd34d;
+        background-color: rgba(245, 158, 11, 0.2);
+        color: #fbbf24;
+        border: 1px solid rgba(245, 158, 11, 0.5);
     }
     
     .signal-low { 
-        background-color: #ecfdf5;
-        color: #059669;
-        border: 1px solid #6ee7b7;
+        background-color: rgba(16, 185, 129, 0.2);
+        color: #34d399;
+        border: 1px solid rgba(16, 185, 129, 0.5);
     }
     
     /* 分割线 */
     hr {
         border: none;
         height: 1px;
-        background: linear-gradient(90deg, transparent 0%, #e2e8f0 50%, transparent 100%);
+        background: linear-gradient(90deg, transparent 0%, #334155 50%, transparent 100%);
         margin: 1.5rem 0;
     }
     
@@ -171,12 +169,12 @@ st.markdown(
     }
     
     ::-webkit-scrollbar-track {
-        background: #f1f5f9;
+        background: #1e293b;
         border-radius: 4px;
     }
     
     ::-webkit-scrollbar-thumb {
-        background: #94a3b8;
+        background: #475569;
         border-radius: 4px;
     }
     
@@ -186,37 +184,37 @@ st.markdown(
     
     /* 数据高亮 */
     .data-highlight {
-        color: #1e40af;
+        color: #60a5fa;
         font-weight: 700;
     }
     
     /* 链接按钮 */
     .stLinkButton > button {
-        background: #eff6ff !important;
+        background: #1e293b !important;
         border: 1px solid #3b82f6 !important;
-        color: #1e40af !important;
+        color: #60a5fa !important;
         font-weight: 500 !important;
         transition: all 0.2s ease !important;
     }
     
     .stLinkButton > button:hover {
-        background: #dbeafe !important;
-        border-color: #1e40af !important;
+        background: #334155 !important;
+        border-color: #60a5fa !important;
     }
     
     /* 分类标签 */
     .category-military {
-        color: #dc2626;
+        color: #f87171;
         font-weight: 600;
     }
     
     .category-politics {
-        color: #7c3aed;
+        color: #a78bfa;
         font-weight: 600;
     }
     
     .category-economy {
-        color: #059669;
+        color: #34d399;
         font-weight: 600;
     }
 </style>
