@@ -9,6 +9,7 @@ import json
 import time
 import hashlib
 import logging
+import asyncio
 from typing import Dict, Optional, Any
 from datetime import datetime, timedelta
 import aiohttp
@@ -19,9 +20,7 @@ logger = logging.getLogger(__name__)
 
 # API 配置
 API_KEY = os.getenv("ALIBABA_API_KEY")
-BASE_URL = (
-    "https://dashscope.aliyuncs.com/compatible-mode/v1"
-)
+BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 
 # 模型配置
 MODEL_NAME = "qwen3.5-plus"
@@ -183,9 +182,11 @@ class LLMClient:
         Returns:
             解析后的 JSON 结果
         """
+        # 生成缓存键（无论是否使用缓存，都需要用于一致性）
+        cache_key = self._generate_cache_key(prompt)
+
         # 检查缓存
         if use_cache:
-            cache_key = self._generate_cache_key(prompt)
             cached_result = self._get_from_cache(cache_key)
             if cached_result:
                 return cached_result
@@ -194,6 +195,7 @@ class LLMClient:
         response = await self._call_api(prompt)
 
         # 提取内容
+        content = ""  # 初始化，避免未绑定错误
         try:
             content = (
                 response.get("output", {})
@@ -237,9 +239,9 @@ class LLMClient:
         Returns:
             文本回复
         """
-        # 生成缓存键
+        # 生成缓存键（无论是否使用缓存）
+        cache_key = self._generate_cache_key(str(messages))
         if use_cache:
-            cache_key = self._generate_cache_key(str(messages))
             cached_result = self._get_from_cache(cache_key)
             if cached_result:
                 return cached_result.get("content", "")
