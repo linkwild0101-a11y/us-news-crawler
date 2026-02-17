@@ -104,12 +104,9 @@ class LLMClient:
 
         payload = {
             "model": model,
-            "input": {"messages": [{"role": "user", "content": prompt}]},
-            "parameters": {
-                "max_tokens": MAX_TOKENS,
-                "temperature": TEMPERATURE,
-                "result_format": "message",
-            },
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": MAX_TOKENS,
+            "temperature": TEMPERATURE,
         }
 
         for attempt in range(MAX_RETRIES):
@@ -125,10 +122,9 @@ class LLMClient:
                             data = await response.json()
                             self.total_calls += 1
 
-                            # 估算 token 使用量
+                            # 估算 token 使用量 (OpenAI 兼容格式)
                             output_text = (
-                                data.get("output", {})
-                                .get("choices", [{}])[0]
+                                data.get("choices", [{}])[0]
                                 .get("message", {})
                                 .get("content", "")
                             )
@@ -194,14 +190,11 @@ class LLMClient:
         # 调用 API
         response = await self._call_api(prompt)
 
-        # 提取内容
+        # 提取内容 (OpenAI 兼容格式)
         content = ""  # 初始化，避免未绑定错误
         try:
             content = (
-                response.get("output", {})
-                .get("choices", [{}])[0]
-                .get("message", {})
-                .get("content", "")
+                response.get("choices", [{}])[0].get("message", {}).get("content", "")
             )
 
             # 尝试解析 JSON
@@ -253,12 +246,9 @@ class LLMClient:
 
         payload = {
             "model": MODEL_NAME,
-            "input": {"messages": messages},
-            "parameters": {
-                "max_tokens": MAX_TOKENS,
-                "temperature": TEMPERATURE,
-                "result_format": "message",
-            },
+            "messages": messages,
+            "max_tokens": MAX_TOKENS,
+            "temperature": TEMPERATURE,
         }
 
         for attempt in range(MAX_RETRIES):
@@ -275,8 +265,7 @@ class LLMClient:
                             self.total_calls += 1
 
                             content = (
-                                data.get("output", {})
-                                .get("choices", [{}])[0]
+                                data.get("choices", [{}])[0]
                                 .get("message", {})
                                 .get("content", "")
                             )
