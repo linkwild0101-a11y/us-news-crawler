@@ -9,6 +9,7 @@ import json
 import logging
 import os
 import sys
+import time
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional
 
@@ -27,11 +28,34 @@ from scripts.llm_client import LLMClient
 from scripts.clustering import cluster_news
 from scripts.signal_detector import detect_all_signals, generate_dedupe_key
 
-# 配置日志
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+# 配置日志 - 同时输出到控制台和文件
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# 清除现有的处理器
+if logger.handlers:
+    logger.handlers.clear()
+
+# 创建格式器
+formatter = logging.Formatter(
+    "%(asctime)s [%(levelname)s] %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+)
+
+# 控制台处理器
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
+
+# 文件处理器
+log_dir = os.path.dirname(os.path.abspath(__file__))
+log_file = os.path.join(log_dir, "..", "logs", "analyzer.log")
+os.makedirs(os.path.dirname(log_file), exist_ok=True)
+
+file_handler = logging.FileHandler(log_file, mode="a", encoding="utf-8")
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 
 class HotspotAnalyzer:
@@ -121,8 +145,17 @@ class HotspotAnalyzer:
         Returns:
             摘要结果字典
         """
+        total_start = time.time()
+        cluster_id_short = cluster["cluster_id"][:8]
+
+        logger.info(
+            f"[CLUSTER_START] 开始处理聚类 | cluster_id: {cluster_id_short}... | "
+            f"文章数: {cluster.get('article_count', 0)} | "
+            f"标题: {cluster['primary_title'][:50]}..."
+        )
+
         if not self.llm_client:
-            logger.warning("LLM 客户端不可用，跳过摘要生成")
+            logger.warning("[CLUSTER_SKIP] LLM 客户端不可用，跳过摘要生成")
             return {
                 "summary": cluster["primary_title"],
                 "key_entities": [],
@@ -132,7 +165,9 @@ class HotspotAnalyzer:
 
         # 检查是否超过LLM调用限制
         if self.stats["llm_calls"] >= MAX_LLM_CALLS:
-            logger.warning(f"已达到LLM调用限制 ({MAX_LLM_CALLS})，跳过摘要生成")
+            logger.warning(
+                f"[CLUSTER_SKIP] 已达到LLM调用限制 ({MAX_LLM_CALLS})，跳过摘要生成"
+            )
             return {
                 "summary": cluster["primary_title"],
                 "key_entities": [],
@@ -142,6 +177,7 @@ class HotspotAnalyzer:
 
         try:
             # 准备提示词
+            prep_start = time.time()
             content_samples = "\n".join(cluster["titles"][:3])  # 最多取3个标题作为样本
 
             prompt = LLM_PROMPTS["cluster_summary"].format(
@@ -150,17 +186,49 @@ class HotspotAnalyzer:
                 primary_title=cluster["primary_title"],
                 content_samples=content_samples[:500],
             )
+            prep_duration = time.time() - prep_start
+            prompt_length = len(prompt)
+
+            logger.info(
+                f"[CLUSTER_PREP] 提示词准备完成 | cluster_id: {cluster_id_short}... | "
+                f"耗时: {prep_duration:.3f}s | 提示词长度: {prompt_length}字符"
+            )
 
             # 调用LLM
-            logger.info(f"为聚类 {cluster['cluster_id'][:8]}... 生成摘要")
+            llm_start = time.time()
+            logger.info(
+                f"[CLUSTER_LLM_CALL] 调用LLM | cluster_id: {cluster_id_short}..."
+            )
             result = self.llm_client.summarize(prompt)
+            llm_duration = time.time() - llm_start
 
             self.stats["llm_calls"] += 1
+            total_duration = time.time() - total_start
+
+            # 检查结果是否成功
+            if result.get("error"):
+                logger.warning(
+                    f"[CLUSTER_LLM_PARTIAL] LLM返回部分结果 | cluster_id: {cluster_id_short}... | "
+                    f"LLM耗时: {llm_duration:.2f}s | 总耗时: {total_duration:.2f}s | "
+                    f"错误: {result.get('error')}"
+                )
+            else:
+                logger.info(
+                    f"[CLUSTER_SUCCESS] 聚类处理成功 | cluster_id: {cluster_id_short}... | "
+                    f"准备: {prep_duration:.3f}s | LLM: {llm_duration:.2f}s | "
+                    f"总耗时: {total_duration:.2f}s | "
+                    f"摘要长度: {len(result.get('summary', ''))}字符 | "
+                    f"LLM调用次数: {self.stats['llm_calls']}/{MAX_LLM_CALLS}"
+                )
 
             return result
 
         except Exception as e:
-            logger.error(f"生成摘要失败: {e}")
+            error_duration = time.time() - total_start
+            logger.error(
+                f"[CLUSTER_ERROR] 生成摘要失败 | cluster_id: {cluster_id_short}... | "
+                f"耗时: {error_duration:.2f}s | 错误: {str(e)}"
+            )
             self.stats["errors"] += 1
             return {
                 "summary": cluster["primary_title"],

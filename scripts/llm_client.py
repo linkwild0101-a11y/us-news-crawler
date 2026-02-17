@@ -13,9 +13,34 @@ from typing import Dict, Optional, Any
 from datetime import datetime, timedelta
 from openai import OpenAI
 
-# 配置日志
-logging.basicConfig(level=logging.INFO)
+# 配置日志 - 同时输出到控制台和文件
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# 清除现有的处理器
+if logger.handlers:
+    logger.handlers.clear()
+
+# 创建格式器 - 包含时间戳
+formatter = logging.Formatter(
+    "%(asctime)s [%(levelname)s] %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+)
+
+# 控制台处理器
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
+
+# 文件处理器 - 记录到日志文件
+log_dir = os.path.dirname(os.path.abspath(__file__))
+log_file = os.path.join(log_dir, "..", "logs", "llm_client.log")
+os.makedirs(os.path.dirname(log_file), exist_ok=True)
+
+file_handler = logging.FileHandler(log_file, mode="a", encoding="utf-8")
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 # API 配置
 API_KEY = os.getenv("DASHSCOPE_API_KEY") or os.getenv("ALIBABA_API_KEY")
@@ -95,25 +120,44 @@ class LLMClient:
         Returns:
             API 响应内容 (字符串)
         """
+        start_time = time.time()
+        prompt_length = len(prompt)
+
         for attempt in range(MAX_RETRIES):
             try:
+                api_start = time.time()
                 response = self.client.chat.completions.create(
                     model=model,
                     messages=[{"role": "user", "content": prompt}],
                     max_tokens=MAX_TOKENS,
                     temperature=TEMPERATURE,
                 )
+                api_duration = time.time() - api_start
 
                 self.total_calls += 1
                 self.total_tokens += (
                     response.usage.total_tokens if response.usage else 0
                 )
 
-                logger.info(f"API 调用成功 (尝试 {attempt + 1})")
+                total_duration = time.time() - start_time
+                logger.info(
+                    f"API 调用成功 | "
+                    f"尝试: {attempt + 1}/{MAX_RETRIES} | "
+                    f"API耗时: {api_duration:.2f}s | "
+                    f"总耗时: {total_duration:.2f}s | "
+                    f"提示词长度: {prompt_length}字符 | "
+                    f"Token使用: {response.usage.total_tokens if response.usage else 'N/A'}"
+                )
                 return response.choices[0].message.content
 
             except Exception as e:
-                logger.error(f"错误 (尝试 {attempt + 1}): {e}")
+                error_duration = time.time() - start_time
+                logger.error(
+                    f"API 错误 | "
+                    f"尝试: {attempt + 1}/{MAX_RETRIES} | "
+                    f"耗时: {error_duration:.2f}s | "
+                    f"错误: {str(e)[:100]}"
+                )
                 if attempt == MAX_RETRIES - 1:
                     self.failed_calls += 1
                     raise
@@ -132,16 +176,40 @@ class LLMClient:
         Returns:
             解析后的 JSON 结果
         """
+        total_start = time.time()
         cache_key = self._generate_cache_key(prompt)
 
+        logger.info(
+            f"[SUMMARIZE_START] 开始生成摘要 | cache_key: {cache_key[:8]}... | use_cache: {use_cache}"
+        )
+
+        # 检查缓存
+        cache_check_start = time.time()
         if use_cache:
             cached_result = self._get_from_cache(cache_key)
             if cached_result:
+                cache_duration = time.time() - cache_check_start
+                total_duration = time.time() - total_start
+                logger.info(
+                    f"[SUMMARIZE_CACHE_HIT] 缓存命中 | "
+                    f"检查缓存耗时: {cache_duration:.3f}s | "
+                    f"总耗时: {total_duration:.3f}s"
+                )
                 return cached_result
+        cache_check_duration = time.time() - cache_check_start
+        logger.info(f"[CACHE_CHECK] 缓存未命中 | 检查耗时: {cache_check_duration:.3f}s")
 
+        # 调用 API
+        api_start = time.time()
         content = self._call_api(prompt)
+        api_duration = time.time() - api_start
+        content_length = len(content)
+        logger.info(
+            f"[API_COMPLETE] API调用完成 | 耗时: {api_duration:.2f}s | 返回内容长度: {content_length}字符"
+        )
 
-        # 清理 markdown 代码块标记
+        # 清理 markdown
+        clean_start = time.time()
         content = content.strip()
         if content.startswith("```json"):
             content = content[7:]
@@ -150,28 +218,73 @@ class LLMClient:
         if content.endswith("```"):
             content = content[:-3]
         content = content.strip()
+        clean_duration = time.time() - clean_start
 
+        # 解析 JSON
+        parse_start = time.time()
         try:
             result = json.loads(content)
+            parse_duration = time.time() - parse_start
+
+            # 保存到缓存
             if use_cache:
+                cache_save_start = time.time()
                 self._save_to_cache(cache_key, result)
+                cache_save_duration = time.time() - cache_save_start
+            else:
+                cache_save_duration = 0
+
+            total_duration = time.time() - total_start
+            logger.info(
+                f"[SUMMARIZE_SUCCESS] 摘要生成成功 | "
+                f"总耗时: {total_duration:.2f}s | "
+                f"API调用: {api_duration:.2f}s | "
+                f"清理格式: {clean_duration:.3f}s | "
+                f"JSON解析: {parse_duration:.3f}s | "
+                f"缓存保存: {cache_save_duration:.3f}s | "
+                f"返回结果键: {list(result.keys())}"
+            )
             return result
 
         except json.JSONDecodeError as e:
-            logger.warning(f"JSON 解析错误，尝试修复: {e}")
+            parse_duration = time.time() - parse_start
+            logger.warning(
+                f"[JSON_PARSE_ERROR] JSON解析错误 | "
+                f"解析耗时: {parse_duration:.3f}s | "
+                f"错误: {str(e)[:100]} | "
+                f"尝试修复..."
+            )
+
             # 尝试修复截断的 JSON
+            fix_start = time.time()
             fixed_content = self._fix_truncated_json(content)
+            fix_duration = time.time() - fix_start
+
             if fixed_content:
                 try:
                     result = json.loads(fixed_content)
-                    logger.info("JSON 修复成功")
+                    total_duration = time.time() - total_start
+                    logger.info(
+                        f"[SUMMARIZE_FIXED] JSON修复成功 | "
+                        f"总耗时: {total_duration:.2f}s | "
+                        f"修复耗时: {fix_duration:.3f}s"
+                    )
                     if use_cache:
                         self._save_to_cache(cache_key, result)
                     return result
                 except:
                     pass
 
-            logger.error(f"JSON 解析错误: {e}, 内容: {content[:200]}")
+            total_duration = time.time() - total_start
+            logger.error(
+                f"[SUMMARIZE_FAILED] 摘要生成失败 | "
+                f"总耗时: {total_duration:.2f}s | "
+                f"API: {api_duration:.2f}s | "
+                f"清理: {clean_duration:.3f}s | "
+                f"解析: {parse_duration:.3f}s | "
+                f"修复: {fix_duration:.3f}s | "
+                f"内容前200字符: {content[:200]}"
+            )
             # 返回原始内容
             return {"raw_content": content, "error": "JSON 解析失败", "parsed": False}
 
