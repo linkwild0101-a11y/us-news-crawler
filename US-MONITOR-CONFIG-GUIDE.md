@@ -22,7 +22,7 @@ VALUES (
     'https://example.com/feed.xml',   -- RSS地址
     'politics',                       -- 分类：military/politics/economy
     'active',                         -- 状态
-    'None'                            -- 反爬标记：None/Cloudflare/Paywall
+    'None'                            -- 反爬标记：None/Cloudflare/Paywall/Railway
 );
 ```
 
@@ -122,7 +122,7 @@ SUPABASE_KEY=eyJhbGciOiJIUzI1NiIs...
 
 **GitHub Secrets配置**：
 ```
-ALIBABA_API_KEY=sk-xxxxx
+ALIBABA_API_KEY=sk-5882....
 ```
 
 **费用**：
@@ -142,7 +142,7 @@ ALIBABA_API_KEY=sk-xxxxx
 
 **GitHub Secrets配置**：
 ```
-FRED_API_KEY=xxxxxxxx
+FRED_API_KEY=c520669.....
 ```
 
 **功能**：
