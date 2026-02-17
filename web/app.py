@@ -23,30 +23,56 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# CSS 样式
+# CSS 样式 (适配明亮/黑暗模式)
 st.markdown(
     """
 <style>
+    /* 主标题 */
     .main-header {
         font-size: 2.5rem;
         font-weight: bold;
         color: #1f77b4;
         margin-bottom: 1rem;
     }
+    
+    /* 指标卡片 - 使用 Streamlit 主题色 */
     .metric-card {
-        background-color: #f0f2f6;
+        background-color: rgba(128, 128, 128, 0.1);
         padding: 1rem;
         border-radius: 0.5rem;
         border-left: 4px solid #1f77b4;
     }
+    
+    /* 热点卡片 - 使用主题背景色 */
     .hotspot-card {
-        background-color: white;
+        background-color: rgba(128, 128, 128, 0.05);
         padding: 1rem;
         border-radius: 0.5rem;
-        border: 1px solid #e0e0e0;
+        border: 1px solid rgba(128, 128, 128, 0.2);
         margin-bottom: 1rem;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        color: inherit;
     }
+    
+    /* 热点卡片标题 */
+    .hotspot-card h4, .hotspot-card h5 {
+        color: inherit;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* 热点卡片段落 */
+    .hotspot-card p {
+        color: inherit;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* 元信息文字 */
+    .hotspot-card .meta-text {
+        color: rgba(128, 128, 128, 0.8);
+        font-size: 0.9rem;
+    }
+    
+    /* 信号徽章 */
     .signal-badge {
         display: inline-block;
         padding: 0.25rem 0.5rem;
@@ -55,7 +81,7 @@ st.markdown(
         font-weight: bold;
     }
     .signal-high { background-color: #ff4b4b; color: white; }
-    .signal-medium { background-color: #ffa500; color: white; }
+    .signal-medium { background-color: #ffa500; color: black; }
     .signal-low { background-color: #4caf50; color: white; }
 </style>
 """,
@@ -217,10 +243,10 @@ def render_overview(supabase, hours: int, category: str):
                 <div class="hotspot-card">
                     <h4>{row.get("primary_title", "N/A")[:80]}...</h4>
                     <p><strong>中文摘要:</strong> {row.get("summary", "N/A")[:150]}...</p>
-                    <p>
-                        <span style="color: #666;">📁 {row.get("category", "N/A")}</span> |
-                        <span style="color: #666;">📄 {row.get("article_count", 0)} 篇文章</span> |
-                        <span style="color: #666;">⏰ {row.get("created_at", "N/A")[:10]}</span>
+                    <p class="meta-text">
+                        📁 {row.get("category", "N/A")} |
+                        📄 {row.get("article_count", 0)} 篇文章 |
+                        ⏰ {row.get("created_at", "N/A")[:10]}
                     </p>
                 </div>
                 """,
@@ -257,7 +283,7 @@ def render_overview(supabase, hours: int, category: str):
                     <span class="signal-badge {level_class}">{level_text} 置信度</span>
                 </h5>
                 <p>{row.get("description", "N/A")[:100]}...</p>
-                <p style="color: #666; font-size: 0.8rem;">
+                <p class="meta-text">
                     置信度: {confidence:.2f} | 时间: {row.get("created_at", "N/A")[:16]}
                 </p>
             </div>
@@ -365,7 +391,7 @@ def render_signals(supabase, hours: int):
                 <span style="color: {level_color}; font-weight: bold;">
                     置信度: {confidence:.2f}
                 </span> |
-                <span style="color: #666;">时间: {row.get("created_at", "N/A")[:16]}</span>
+                <span class="meta-text">时间: {row.get("created_at", "N/A")[:16]}</span>
             </p>
         </div>
         """,
