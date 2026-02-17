@@ -344,6 +344,20 @@ class HotspotAnalyzer:
                     "impact": cluster.get("summary", {}).get("impact", ""),
                     "trend": cluster.get("summary", {}).get("trend", ""),
                     "confidence": cluster.get("summary", {}).get("confidence", 0.8),
+                    # 新增分层分析字段
+                    "analysis_depth": cluster.get("summary", {}).get(
+                        "analysis_depth", "full"
+                    ),
+                    "is_hot": cluster.get("summary", {}).get(
+                        "is_hot", cluster["article_count"] >= 3
+                    ),
+                    "full_analysis_triggered": cluster.get("summary", {}).get(
+                        "analysis_depth"
+                    )
+                    == "full",
+                    "processing_time": cluster.get("summary", {}).get(
+                        "processing_time", 0.0
+                    ),
                 }
 
                 # 检查是否已存在
