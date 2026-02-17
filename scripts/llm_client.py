@@ -20,10 +20,10 @@ logger = logging.getLogger(__name__)
 
 # API 配置
 API_KEY = os.getenv("ALIBABA_API_KEY")
-BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+BASE_URL = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
 
 # 模型配置
-MODEL_NAME = "qwen-plus"
+MODEL_NAME = "qwen3.5-plus"
 MAX_TOKENS = 4000
 TEMPERATURE = 0.7
 
