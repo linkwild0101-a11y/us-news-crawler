@@ -23,110 +23,166 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# CSS 样式 (深色专业分析系统风格)
-st.markdown(
-    """
+# 初始化 session state
+if "theme" not in st.session_state:
+    st.session_state.theme = "corporate-blue"
+
+# 主题定义
+THEMES = {
+    "corporate-blue": {
+        "name": "💼 深蓝商务",
+        "bg_gradient": "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)",
+        "bg_primary": "#0f172a",
+        "bg_card": "#1e293b",
+        "primary": "#3b82f6",
+        "primary_light": "#60a5fa",
+        "primary_dark": "#1d4ed8",
+        "text_primary": "#f8fafc",
+        "text_secondary": "#e2e8f0",
+        "text_body": "#cbd5e1",
+        "text_muted": "#94a3b8",
+        "border": "#334155",
+        "border_card": "#3b82f6",
+        "signal_high": "#f87171",
+        "signal_medium": "#fbbf24",
+        "signal_low": "#34d399",
+        "category_military": "#f87171",
+        "category_politics": "#a78bfa",
+        "category_economy": "#34d399",
+    },
+    "slate-tech": {
+        "name": "🔧 青灰科技",
+        "bg_gradient": "linear-gradient(180deg, #1e293b 0%, #334155 100%)",
+        "bg_primary": "#1e293b",
+        "bg_card": "#334155",
+        "primary": "#06b6d4",
+        "primary_light": "#67e8f9",
+        "primary_dark": "#0891b2",
+        "text_primary": "#f8fafc",
+        "text_secondary": "#e2e8f0",
+        "text_body": "#cbd5e1",
+        "text_muted": "#94a3b8",
+        "border": "#475569",
+        "border_card": "#06b6d4",
+        "signal_high": "#f87171",
+        "signal_medium": "#fbbf24",
+        "signal_low": "#34d399",
+        "category_military": "#f87171",
+        "category_politics": "#a78bfa",
+        "category_economy": "#34d399",
+    },
+    "alert-red": {
+        "name": "🚨 红色警戒",
+        "bg_gradient": "linear-gradient(180deg, #450a0a 0%, #7f1d1d 100%)",
+        "bg_primary": "#450a0a",
+        "bg_card": "#7f1d1d",
+        "primary": "#ef4444",
+        "primary_light": "#fca5a5",
+        "primary_dark": "#dc2626",
+        "text_primary": "#fef2f2",
+        "text_secondary": "#fecaca",
+        "text_body": "#fecaca",
+        "text_muted": "#fca5a5",
+        "border": "#991b1b",
+        "border_card": "#ef4444",
+        "signal_high": "#fca5a5",
+        "signal_medium": "#fde047",
+        "signal_low": "#86efac",
+        "category_military": "#fca5a5",
+        "category_politics": "#d8b4fe",
+        "category_economy": "#86efac",
+    },
+}
+
+
+# 生成 CSS
+def get_css(theme_key):
+    t = THEMES[theme_key]
+    return f"""
 <style>
-    /* CSS 变量 - 深色专业配色 */
-    :root {
-        --primary: #3b82f6;
-        --primary-light: #60a5fa;
-        --primary-dark: #1d4ed8;
-        --text-primary: #f1f5f9;
-        --text-secondary: #cbd5e1;
-        --text-tertiary: #94a3b8;
-        --bg-primary: #0f172a;
-        --bg-secondary: #1e293b;
-        --bg-card: #1e293b;
-        --border: #334155;
-        --success: #10b981;
-        --warning: #f59e0b;
-        --danger: #ef4444;
-    }
-    
-    /* 全局背景 - 深蓝灰色 */
-    .stApp {
-        background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
-    }
+    /* 全局背景 */
+    .stApp {{
+        background: {t["bg_gradient"]};
+    }}
     
     /* 主标题 */
-    .main-header {
+    .main-header {{
         font-size: 2.2rem;
         font-weight: 700;
-        color: #f8fafc;
+        color: {t["text_primary"]};
         margin-bottom: 1.5rem;
         letter-spacing: -0.02em;
-        border-bottom: 3px solid #3b82f6;
+        border-bottom: 3px solid {t["primary"]};
         padding-bottom: 0.75rem;
-    }
+    }}
     
-    /* 指标卡片 - 深色卡片 */
-    .metric-card {
-        background: #1e293b;
+    /* 指标卡片 */
+    .metric-card {{
+        background: {t["bg_card"]};
         padding: 1.25rem;
         border-radius: 0.5rem;
-        border: 1px solid #334155;
-        border-top: 4px solid #3b82f6;
+        border: 1px solid {t["border"]};
+        border-top: 4px solid {t["primary"]};
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         transition: all 0.2s ease;
-    }
+    }}
     
-    .metric-card:hover {
+    .metric-card:hover {{
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
         transform: translateY(-2px);
-        border-color: #60a5fa;
-    }
+        border-color: {t["primary_light"]};
+    }}
     
-    /* 热点卡片 - 深色卡片 */
-    .hotspot-card {
-        background: #1e293b;
+    /* 热点卡片 */
+    .hotspot-card {{
+        background: {t["bg_card"]};
         padding: 1.25rem;
         border-radius: 0.5rem;
-        border: 1px solid #334155;
+        border: 1px solid {t["border"]};
         margin-bottom: 1rem;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         transition: all 0.2s ease;
-        border-left: 4px solid #3b82f6;
-    }
+        border-left: 4px solid {t["primary"]};
+    }}
     
-    .hotspot-card:hover {
+    .hotspot-card:hover {{
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        border-color: #475569;
-    }
+        border-color: {t["border"]};
+    }}
     
     /* 热点卡片标题 */
-    .hotspot-card h4 {
-        color: #f8fafc;
+    .hotspot-card h4 {{
+        color: {t["text_primary"]};
         font-weight: 600;
         font-size: 1.1rem;
         margin-bottom: 0.75rem;
         line-height: 1.4;
-    }
+    }}
     
-    .hotspot-card h5 {
-        color: #e2e8f0;
+    .hotspot-card h5 {{
+        color: {t["text_secondary"]};
         font-weight: 600;
         font-size: 1rem;
         margin-bottom: 0.5rem;
-    }
+    }}
     
     /* 热点卡片段落 */
-    .hotspot-card p {
-        color: #cbd5e1;
+    .hotspot-card p {{
+        color: {t["text_body"]};
         font-size: 0.95rem;
         line-height: 1.6;
         margin-bottom: 0.75rem;
-    }
+    }}
     
     /* 元信息文字 */
-    .hotspot-card .meta-text {
-        color: #94a3b8;
+    .hotspot-card .meta-text {{
+        color: {t["text_muted"]};
         font-size: 0.85rem;
         font-weight: 500;
-    }
+    }}
     
-    /* 信号徽章 - 深色状态色 */
-    .signal-badge {
+    /* 信号徽章 */
+    .signal-badge {{
         display: inline-block;
         padding: 0.25rem 0.75rem;
         border-radius: 0.25rem;
@@ -134,93 +190,95 @@ st.markdown(
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.02em;
-    }
+    }}
     
-    .signal-high { 
+    .signal-high {{
         background-color: rgba(239, 68, 68, 0.2);
-        color: #f87171;
+        color: {t["signal_high"]};
         border: 1px solid rgba(239, 68, 68, 0.5);
-    }
+    }}
     
-    .signal-medium { 
+    .signal-medium {{
         background-color: rgba(245, 158, 11, 0.2);
-        color: #fbbf24;
+        color: {t["signal_medium"]};
         border: 1px solid rgba(245, 158, 11, 0.5);
-    }
+    }}
     
-    .signal-low { 
+    .signal-low {{
         background-color: rgba(16, 185, 129, 0.2);
-        color: #34d399;
+        color: {t["signal_low"]};
         border: 1px solid rgba(16, 185, 129, 0.5);
-    }
+    }}
     
     /* 分割线 */
-    hr {
+    hr {{
         border: none;
         height: 1px;
-        background: linear-gradient(90deg, transparent 0%, #334155 50%, transparent 100%);
+        background: linear-gradient(90deg, transparent 0%, {t["border"]} 50%, transparent 100%);
         margin: 1.5rem 0;
-    }
+    }}
     
     /* 滚动条 */
-    ::-webkit-scrollbar {
+    ::-webkit-scrollbar {{
         width: 8px;
         height: 8px;
-    }
+    }}
     
-    ::-webkit-scrollbar-track {
-        background: #1e293b;
+    ::-webkit-scrollbar-track {{
+        background: {t["bg_card"]};
         border-radius: 4px;
-    }
+    }}
     
-    ::-webkit-scrollbar-thumb {
-        background: #475569;
+    ::-webkit-scrollbar-thumb {{
+        background: {t["border"]};
         border-radius: 4px;
-    }
+    }}
     
-    ::-webkit-scrollbar-thumb:hover {
-        background: #64748b;
-    }
+    ::-webkit-scrollbar-thumb:hover {{
+        background: {t["primary"]};
+    }}
     
     /* 数据高亮 */
-    .data-highlight {
-        color: #60a5fa;
+    .data-highlight {{
+        color: {t["primary_light"]};
         font-weight: 700;
-    }
+    }}
     
     /* 链接按钮 */
-    .stLinkButton > button {
-        background: #1e293b !important;
-        border: 1px solid #3b82f6 !important;
-        color: #60a5fa !important;
+    .stLinkButton > button {{
+        background: {t["bg_card"]} !important;
+        border: 1px solid {t["primary"]} !important;
+        color: {t["primary_light"]} !important;
         font-weight: 500 !important;
         transition: all 0.2s ease !important;
-    }
+    }}
     
-    .stLinkButton > button:hover {
-        background: #334155 !important;
-        border-color: #60a5fa !important;
-    }
+    .stLinkButton > button:hover {{
+        background: {t["border"]} !important;
+        border-color: {t["primary_light"]} !important;
+    }}
     
     /* 分类标签 */
-    .category-military {
-        color: #f87171;
+    .category-military {{
+        color: {t["category_military"]};
         font-weight: 600;
-    }
+    }}
     
-    .category-politics {
-        color: #a78bfa;
+    .category-politics {{
+        color: {t["category_politics"]};
         font-weight: 600;
-    }
+    }}
     
-    .category-economy {
-        color: #34d399;
+    .category-economy {{
+        color: {t["category_economy"]};
         font-weight: 600;
-    }
+    }}
 </style>
-""",
-    unsafe_allow_html=True,
-)
+"""
+
+
+# 应用当前主题的 CSS
+st.markdown(get_css(st.session_state.theme), unsafe_allow_html=True)
 
 
 # 初始化 Supabase
@@ -321,6 +379,29 @@ def render_sidebar():
     page = st.sidebar.radio(
         "选择页面:", ["🏠 概览首页", "🔥 热点详情", "📡 信号中心", "📈 数据统计"]
     )
+
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### 🎨 主题")
+
+    # 主题选择器
+    theme_options = {
+        "corporate-blue": "💼 深蓝商务",
+        "slate-tech": "🔧 青灰科技",
+        "alert-red": "🚨 红色警戒",
+    }
+
+    selected_theme = st.sidebar.selectbox(
+        "选择主题:",
+        options=list(theme_options.keys()),
+        format_func=lambda x: theme_options[x],
+        index=list(theme_options.keys()).index(st.session_state.theme),
+        key="theme_selector",
+    )
+
+    # 如果主题改变，更新 session state 并重新加载
+    if selected_theme != st.session_state.theme:
+        st.session_state.theme = selected_theme
+        st.rerun()
 
     st.sidebar.markdown("---")
     st.sidebar.markdown("### ⚙️ 设置")
