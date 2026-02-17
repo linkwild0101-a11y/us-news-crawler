@@ -4,7 +4,6 @@ US-Monitor 热点分析器主流水线
 协调聚类、LLM摘要、信号检测和数据库操作
 """
 
-import asyncio
 import argparse
 import json
 import logging
@@ -112,7 +111,7 @@ class HotspotAnalyzer:
             self.stats["errors"] += 1
             return []
 
-    async def generate_cluster_summary(self, cluster: Dict) -> Dict:
+    def generate_cluster_summary(self, cluster: Dict) -> Dict:
         """
         为聚类生成中文摘要
 
@@ -154,7 +153,7 @@ class HotspotAnalyzer:
 
             # 调用LLM
             logger.info(f"为聚类 {cluster['cluster_id'][:8]}... 生成摘要")
-            result = await self.llm_client.summarize(prompt)
+            result = self.llm_client.summarize(prompt)
 
             self.stats["llm_calls"] += 1
 
@@ -170,7 +169,7 @@ class HotspotAnalyzer:
                 "trend": "",
             }
 
-    async def save_analysis_results(self, clusters: List[Dict], signals: List[Dict]):
+    def save_analysis_results(self, clusters: List[Dict], signals: List[Dict]):
         """
         保存分析结果到数据库
 
@@ -272,7 +271,7 @@ class HotspotAnalyzer:
             self.stats["errors"] += 1
             raise
 
-    async def mark_articles_analyzed(self, article_ids: List[int]):
+    def mark_articles_analyzed(self, article_ids: List[int]):
         """
         标记文章为已分析
 
@@ -299,7 +298,7 @@ class HotspotAnalyzer:
             logger.error(f"标记文章失败: {e}")
             self.stats["errors"] += 1
 
-    async def run_analysis(self, limit: int = None, dry_run: bool = False):
+    def run_analysis(self, limit: int = None, dry_run: bool = False):
         """
         运行完整的分析流程
 
@@ -332,7 +331,7 @@ class HotspotAnalyzer:
             logger.info(
                 f"  处理聚类 {i + 1}/{len(clusters)}: {cluster['primary_title'][:50]}..."
             )
-            summary = await self.generate_cluster_summary(cluster)
+            summary = self.generate_cluster_summary(cluster)
             cluster["summary"] = summary
 
         # 4. 信号检测
@@ -351,11 +350,11 @@ class HotspotAnalyzer:
         # 5. 保存结果
         if not dry_run:
             logger.info("保存分析结果...")
-            await self.save_analysis_results(clusters, signals)
+            self.save_analysis_results(clusters, signals)
 
             # 6. 标记文章
             article_ids = [a["id"] for a in articles]
-            await self.mark_articles_analyzed(article_ids)
+            self.mark_articles_analyzed(article_ids)
         else:
             logger.info("试运行模式: 跳过保存")
 
@@ -376,7 +375,7 @@ class HotspotAnalyzer:
         logger.info("=" * 60)
 
 
-async def main():
+def main():
     """主函数"""
     parser = argparse.ArgumentParser(description="US-Monitor 热点分析器")
     parser.add_argument("--limit", type=int, default=None, help="最大处理文章数")
@@ -389,11 +388,11 @@ async def main():
 
     try:
         analyzer = HotspotAnalyzer()
-        await analyzer.run_analysis(limit=args.limit, dry_run=args.dry_run)
+        analyzer.run_analysis(limit=args.limit, dry_run=args.dry_run)
     except Exception as e:
         logger.error(f"分析器运行失败: {e}")
         raise
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
