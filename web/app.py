@@ -7,8 +7,10 @@ US-Monitor UI 仪表板
 import os
 import sys
 import json
+import html
 import logging
 from datetime import datetime, timedelta
+from typing import Dict, List, Tuple
 
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -17,10 +19,10 @@ import streamlit as st
 import pandas as pd
 from supabase import create_client
 
-from config.entity_config import (
-    ENTITY_TYPES,
-    PERSON_RULES,
-    DETECTION_PRIORITY,
+from scripts.entity_classification import (
+    ENTITY_TYPE_FILTER_OPTIONS,
+    merge_entity_metadata,
+    normalize_entity_mentions,
 )
 
 # 配置日志
@@ -43,17 +45,21 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# 主题配置 - 简洁黑白风，高对比度
+# 主题配置 - 技术风格，高对比度
 THEME = {
-    "bg_main": "#111111",
-    "bg_card": "#1a1a1a",
-    "bg_sidebar": "#0d0d0d",
-    "text_main": "#ffffff",
-    "text_body": "#e0e0e0",
-    "text_muted": "#888888",
-    "primary": "#ffffff",
-    "accent": "#00ff88",
-    "border": "#333333",
+    "bg_main": "#0b1020",
+    "bg_panel": "#0f172a",
+    "bg_card": "#111c34",
+    "bg_sidebar": "#0a1328",
+    "text_main": "#e6edf7",
+    "text_body": "#c7d2e7",
+    "text_muted": "#8ea0bf",
+    "primary": "#8bd3ff",
+    "accent": "#29f0ff",
+    "border": "#1f2d49",
+    "danger": "#ff6b7a",
+    "warn": "#ffd166",
+    "ok": "#67f7c2",
 }
 
 
@@ -62,171 +68,302 @@ def get_css():
     t = THEME
     return f"""
 <style>
-    /* Streamlit 全局覆盖 */
+    :root {{
+        color-scheme: dark !important;
+        --bg-main: {t["bg_main"]};
+        --bg-panel: {t["bg_panel"]};
+        --bg-card: {t["bg_card"]};
+        --bg-sidebar: {t["bg_sidebar"]};
+        --text-main: {t["text_main"]};
+        --text-body: {t["text_body"]};
+        --text-muted: {t["text_muted"]};
+        --accent: {t["accent"]};
+        --primary: {t["primary"]};
+        --border: {t["border"]};
+    }}
+
+    html, body {{
+        background: var(--bg-main) !important;
+        color: var(--text-main) !important;
+        font-family: "Inter", "SF Pro Text", "Segoe UI", sans-serif;
+    }}
+
+    /* 顶部白条和部署区域：统一深色，避免与主界面冲突 */
+    [data-testid="stHeader"] {{
+        background: var(--bg-panel) !important;
+        border-bottom: 1px solid var(--border);
+    }}
+    [data-testid="stToolbar"] {{
+        background: transparent !important;
+    }}
+    [data-testid="stAppDeployButton"] {{
+        display: none !important;
+    }}
+
+    /* Streamlit 全局容器 */
     .stApp {{
-        background: {t["bg_main"]};
+        background: var(--bg-main) !important;
+        color: var(--text-main) !important;
+    }}
+    [data-testid="stAppViewContainer"] {{
+        background: linear-gradient(180deg, #0b1020 0%, #0a1120 100%) !important;
+    }}
+    [data-testid="stMain"] {{
+        background: transparent !important;
+    }}
+    [data-testid="block-container"] {{
+        max-width: 1500px;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
     }}
     
     /* 侧边栏 */
     [data-testid="stSidebar"] {{
-        background: {t["bg_sidebar"]};
+        background: var(--bg-sidebar) !important;
+        border-right: 1px solid var(--border);
     }}
     
-    /* 所有文字白色高亮 */
-    .stMarkdown, .stText, p, h1, h2, h3, h4, h5, h6, label {{
-        color: {t["text_main"]} !important;
+    /* 统一文本颜色（无视系统明暗模式） */
+    .stMarkdown, .stText, p, li, h1, h2, h3, h4, h5, h6, label, span, div {{
+        color: var(--text-main) !important;
     }}
     
     /* 主标题 */
     .main-header {{
-        font-size: 2rem;
+        font-size: 2.1rem;
         font-weight: 700;
-        color: {t["text_main"]};
-        margin-bottom: 1.5rem;
-        border-bottom: 2px solid {t["accent"]};
-        padding-bottom: 0.5rem;
+        letter-spacing: 0.2px;
+        color: var(--text-main);
+        margin-bottom: 1.2rem;
+        border-bottom: 2px solid var(--accent);
+        padding-bottom: 0.7rem;
+        text-shadow: 0 0 20px rgba(41, 240, 255, 0.15);
     }}
     
     /* 指标卡片 */
     [data-testid="stMetric"] {{
-        background: {t["bg_card"]};
+        background: var(--bg-card);
         padding: 1rem;
-        border-radius: 8px;
-        border: 1px solid {t["border"]};
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        box-shadow: inset 0 0 0 1px rgba(139, 211, 255, 0.05);
     }}
     
     [data-testid="stMetricLabel"] {{
-        color: {t["text_muted"]} !important;
+        color: var(--text-muted) !important;
+        font-weight: 600;
     }}
     
     [data-testid="stMetricValue"] {{
-        color: {t["text_main"]} !important;
+        color: var(--text-main) !important;
+        font-family: "JetBrains Mono", "SF Mono", "Consolas", monospace;
+        font-weight: 700;
     }}
     
     /* 热点卡片 */
     .hotspot-card {{
-        background: {t["bg_card"]};
+        background: var(--bg-card);
         padding: 1.25rem;
-        border-radius: 8px;
-        border: 1px solid {t["border"]};
+        border-radius: 10px;
+        border: 1px solid var(--border);
         margin-bottom: 1rem;
-        border-left: 3px solid {t["accent"]};
+        border-left: 3px solid var(--accent);
     }}
     
     .hotspot-card h4 {{
-        color: {t["text_main"]};
+        color: var(--text-main);
         font-weight: 600;
         font-size: 1.1rem;
         margin-bottom: 0.75rem;
     }}
     
     .hotspot-card h5 {{
-        color: {t["text_body"]};
+        color: var(--text-body);
         font-weight: 600;
     }}
     
     .hotspot-card p {{
-        color: {t["text_body"]};
+        color: var(--text-body);
         font-size: 0.95rem;
+        line-height: 1.55;
     }}
     
     .hotspot-card .meta-text {{
-        color: {t["text_muted"]};
+        color: var(--text-muted);
         font-size: 0.85rem;
     }}
     
     /* 信号徽章 */
     .signal-high {{
-        color: #ff6b6b;
+        color: {t["danger"]};
+        font-weight: 700;
     }}
     .signal-medium {{
-        color: #ffd93d;
+        color: {t["warn"]};
+        font-weight: 700;
     }}
     .signal-low {{
-        color: #6bcb77;
+        color: {t["ok"]};
+        font-weight: 700;
     }}
     
     /* 分割线 */
     hr {{
         border: none;
         height: 1px;
-        background: {t["border"]};
+        background: var(--border);
         margin: 1.5rem 0;
     }}
     
     /* 滚动条 */
     ::-webkit-scrollbar {{
-        width: 6px;
+        width: 8px;
     }}
     ::-webkit-scrollbar-track {{
-        background: {t["bg_main"]};
+        background: var(--bg-main);
     }}
     ::-webkit-scrollbar-thumb {{
-        background: {t["border"]};
+        background: #2b3e62;
+        border-radius: 8px;
+    }}
+    ::-webkit-scrollbar-thumb:hover {{
+        background: #3c5689;
     }}
     
     /* 按钮 */
     .stButton > button {{
-        background: {t["bg_card"]};
-        color: {t["text_main"]};
-        border: 1px solid {t["border"]};
+        background: var(--bg-panel);
+        color: var(--text-main);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-weight: 600;
     }}
     .stButton > button:hover {{
-        background: {t["border"]};
+        border-color: var(--primary);
+        color: var(--primary) !important;
+        box-shadow: 0 0 0 1px rgba(139, 211, 255, 0.35);
     }}
     
-    /* 下拉框 */
-    .stSelectbox > div > div {{
-        background: {t["bg_card"]};
-        color: {t["text_main"]};
+    /* 输入组件 */
+    [data-baseweb="select"] > div,
+    .stSelectbox > div > div,
+    .stTextInput > div > div > input,
+    .stNumberInput input {{
+        background: var(--bg-panel) !important;
+        color: var(--text-main) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 8px !important;
+    }}
+    [data-baseweb="select"] svg {{
+        fill: var(--text-muted) !important;
+    }}
+    /* 下拉选项菜单（portal 弹层） */
+    [data-baseweb="popover"] {{
+        background: transparent !important;
+    }}
+    [data-baseweb="popover"] [role="listbox"] {{
+        background: var(--bg-panel) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 10px !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+    }}
+    [data-baseweb="popover"] [role="option"] {{
+        background: transparent !important;
+        color: var(--text-main) !important;
+    }}
+    [data-baseweb="popover"] [role="option"]:hover {{
+        background: rgba(139, 211, 255, 0.16) !important;
+        color: var(--text-main) !important;
+    }}
+    [data-baseweb="popover"] [aria-selected="true"][role="option"] {{
+        background: rgba(41, 240, 255, 0.18) !important;
+        color: var(--text-main) !important;
     }}
     
     /* 单选按钮 */
     .stRadio > div {{
-        color: {t["text_body"]};
+        color: var(--text-body);
+    }}
+    [data-testid="stRadio"] label {{
+        background: transparent !important;
     }}
     
     /* 链接按钮 */
     .stLinkButton > button {{
         background: transparent;
-        border: 1px solid {t["accent"]};
-        color: {t["accent"]} !important;
+        border: 1px solid var(--accent);
+        color: var(--accent) !important;
+        border-radius: 8px;
+        font-weight: 600;
     }}
     .stLinkButton > button:hover {{
-        background: {t["accent"]};
-        color: {t["bg_main"]} !important;
+        background: rgba(41, 240, 255, 0.12);
+        color: var(--text-main) !important;
     }}
     
     /* 展开框 */
-    .streamlit-expanderHeader {{
-        color: {t["text_body"]} !important;
-        background: {t["bg_card"]};
+    [data-testid="stExpander"] {{
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+    }}
+    .streamlit-expanderHeader, [data-testid="stExpander"] summary {{
+        color: var(--text-body) !important;
+        background: var(--bg-card) !important;
+    }}
+    [data-testid="stExpander"] summary {{
+        align-items: flex-start !important;
+    }}
+    [data-testid="stExpander"] summary p {{
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        word-break: break-word !important;
+        line-height: 1.45 !important;
     }}
     
-    /* 表格 */
-    .stDataFrame {{
-        background: {t["bg_card"]};
+    /* Tabs / DataFrame / 图表 */
+    [data-baseweb="tab-list"] {{
+        gap: 4px;
     }}
-    
-    /* 图表 */
-    [data-testid="stChart"] {{
-        background: {t["bg_card"]};
+    [data-baseweb="tab"] {{
+        background: var(--bg-panel) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 8px 8px 0 0;
+        color: var(--text-muted) !important;
+    }}
+    [aria-selected="true"][data-baseweb="tab"] {{
+        color: var(--text-main) !important;
+        border-color: var(--primary) !important;
+    }}
+    .stDataFrame, [data-testid="stChart"] {{
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+    }}
+    /* Vega/Altair tooltip 对比度修复 */
+    .vg-tooltip,
+    .vega-embed .vg-tooltip {{
+        background: var(--bg-panel) !important;
+        color: var(--text-main) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 8px !important;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
+        font-size: 14px !important;
+        line-height: 1.5 !important;
+    }}
+    .vg-tooltip td,
+    .vg-tooltip th,
+    .vega-embed .vg-tooltip td,
+    .vega-embed .vg-tooltip th {{
+        color: var(--text-main) !important;
     }}
     
     /* 分类标签 */
-    .category-military {{ color: #ff6b6b; font-weight: 600; }}
-    .category-politics {{ color: #a78bfa; font-weight: 600; }}
-    .category-economy {{ color: #6bcb77; font-weight: 600; }}
+    .category-military {{ color: {t["danger"]}; font-weight: 600; }}
+    .category-politics {{ color: #b39cff; font-weight: 600; }}
+    .category-economy {{ color: {t["ok"]}; font-weight: 600; }}
     
-    /* 快速翻译徽章 */
-    .shallow-badge {{
-        background: #ffd93d;
-        color: #1a1a1a;
-        padding: 2px 8px;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        margin-left: 8px;
-    }}
 </style>
 """
 
@@ -251,7 +388,9 @@ def init_supabase():
 
 # 数据获取函数
 @st.cache_data(ttl=300)  # 缓存5分钟
-def get_clusters(_supabase, hours: int = 24, category: str = None) -> pd.DataFrame:
+def get_clusters(
+    _supabase, hours: int = 24, category: str = None, only_hot: bool = False
+) -> pd.DataFrame:
     """获取聚类数据"""
     cutoff = (datetime.now() - timedelta(hours=hours)).isoformat()
 
@@ -259,6 +398,8 @@ def get_clusters(_supabase, hours: int = 24, category: str = None) -> pd.DataFra
 
     if category and category != "全部":
         query = query.eq("category", category)
+    if only_hot:
+        query = query.eq("is_hot", True)
 
     result = query.order("created_at", desc=True).execute()
 
@@ -283,6 +424,231 @@ def get_signals(_supabase, hours: int = 24) -> pd.DataFrame:
     if result.data:
         return pd.DataFrame(result.data)
     return pd.DataFrame()
+
+
+@st.cache_data(ttl=300)
+def get_cluster_article_links(
+    _supabase, cluster_ids: Tuple[int, ...], per_cluster: int = 3
+) -> Dict[int, List[Dict[str, str]]]:
+    """批量获取聚类关联文章原文链接"""
+    if not cluster_ids:
+        return {}
+
+    relation_rows: List[Dict] = []
+    id_list = [int(item) for item in cluster_ids]
+    batch_size = 200
+    for i in range(0, len(id_list), batch_size):
+        batch_cluster_ids = id_list[i : i + batch_size]
+        result = (
+            _supabase.table("article_analyses")
+            .select("id, cluster_id, article_id")
+            .in_("cluster_id", batch_cluster_ids)
+            .order("id")
+            .execute()
+        )
+        relation_rows.extend(result.data or [])
+
+    cluster_article_ids: Dict[int, List[int]] = {}
+    for row in relation_rows:
+        cluster_id = int(row.get("cluster_id"))
+        article_id = int(row.get("article_id"))
+        ids = cluster_article_ids.setdefault(cluster_id, [])
+        if article_id not in ids and len(ids) < per_cluster:
+            ids.append(article_id)
+
+    all_article_ids = sorted(
+        {article_id for ids in cluster_article_ids.values() for article_id in ids}
+    )
+    if not all_article_ids:
+        return {}
+
+    article_map: Dict[int, Dict[str, str]] = {}
+    for i in range(0, len(all_article_ids), batch_size):
+        batch_article_ids = all_article_ids[i : i + batch_size]
+        result = (
+            _supabase.table("articles")
+            .select("id, title, url")
+            .in_("id", batch_article_ids)
+            .execute()
+        )
+        for article in result.data or []:
+            article_map[int(article["id"])] = {
+                "title": article.get("title", "原文链接"),
+                "url": article.get("url", ""),
+            }
+
+    links_map: Dict[int, List[Dict[str, str]]] = {}
+    for cluster_id, article_ids in cluster_article_ids.items():
+        links: List[Dict[str, str]] = []
+        for article_id in article_ids:
+            article = article_map.get(article_id)
+            if not article or not article.get("url"):
+                continue
+            links.append(article)
+        links_map[cluster_id] = links
+
+    return links_map
+
+
+SIGNAL_TYPE_NAMES = {
+    "velocity_spike": "🚀 速度激增",
+    "convergence": "🔄 多源聚合",
+    "triangulation": "📐 三角验证",
+    "hotspot_escalation": "🔥 热点升级",
+    "economic_indicator_alert": "📊 经济指标异常",
+    "natural_disaster_signal": "🌋 自然灾害",
+    "geopolitical_intensity": "🌍 地缘政治紧张",
+}
+
+
+def get_signal_name(row: pd.Series) -> str:
+    """获取信号展示名称"""
+    signal_name = row.get("name")
+    if signal_name and signal_name != "N/A":
+        return signal_name
+    signal_type = row.get("signal_type", "unknown")
+    return SIGNAL_TYPE_NAMES.get(signal_type, f"⚡ {signal_type}")
+
+
+def parse_signal_explanation(row: pd.Series) -> dict:
+    """解析信号解释信息，优先使用 LLM/数据库中的结构化解释"""
+    confidence = float(row.get("confidence", 0) or 0)
+    signal_type = row.get("signal_type", "unknown")
+    details = {}
+
+    raw_rationale = row.get("rationale")
+    if isinstance(raw_rationale, dict):
+        details = raw_rationale
+    elif isinstance(raw_rationale, str) and raw_rationale.strip():
+        try:
+            parsed = json.loads(raw_rationale)
+            if isinstance(parsed, dict):
+                details = parsed
+        except Exception:
+            details = {}
+
+    parsed_details = (
+        details.get("details") if isinstance(details.get("details"), dict) else details
+    )
+    related_events = details.get("related_events", []) if isinstance(details, dict) else []
+    if not isinstance(related_events, list):
+        related_events = []
+
+    # 兼容后续可能接入的 LLM 解释字段
+    if any(k in details for k in ["importance", "actionable", "confidence_reason"]):
+        return {
+            "why": details.get("importance", row.get("description", "暂无触发原因")),
+            "meaning": details.get("meaning", row.get("description", "暂无含义解释")),
+            "action": details.get("actionable", "建议继续观察后续变化"),
+            "confidence_reason": details.get(
+                "confidence_reason", f"当前系统评分置信度为 {confidence:.2f}"
+            ),
+            "events": related_events,
+        }
+
+    def _format_source_types(value) -> str:
+        if isinstance(value, list):
+            return ", ".join(str(v) for v in value if v)
+        if value:
+            return str(value)
+        return "N/A"
+
+    if signal_type == "velocity_spike":
+        cluster_count = parsed_details.get("cluster_count", "N/A")
+        threshold = parsed_details.get("threshold", "N/A")
+        window_hours = parsed_details.get("time_window_hours", 1)
+        why = f"{window_hours}小时内聚类数达到 {cluster_count}，超过阈值 {threshold}"
+        meaning = "代表短时间内相关新闻密度上升，事件可能进入快速发酵阶段。"
+        action = "建议优先跟踪该时段新增聚类，观察是否出现跨主题扩散。"
+    elif signal_type == "convergence":
+        source_count = parsed_details.get("source_count", "N/A")
+        source_types = _format_source_types(parsed_details.get("source_types", []))
+        why = f"同一事件被 {source_count} 类来源同时报道（{source_types}）"
+        meaning = "代表事件可验证性上升，单一来源偏差风险下降。"
+        action = "建议重点查看来源差异，确认关键事实是否一致。"
+    elif signal_type == "triangulation":
+        source_types = _format_source_types(parsed_details.get("source_types", []))
+        why = f"已出现多类关键来源交叉验证（{source_types}）"
+        meaning = "代表信号可靠性高，事件真实性通常更强。"
+        action = "建议将该类信号作为重点预警输入。"
+    elif signal_type == "hotspot_escalation":
+        level = parsed_details.get("escalation_level", "unknown")
+        score = parsed_details.get("total_score", "N/A")
+        article_count = parsed_details.get("article_count", "N/A")
+        why = f"升级等级 {level}，总评分 {score}，聚类文章数 {article_count}"
+        meaning = "代表事件热度和影响面正在抬升，后续可能升级。"
+        action = "建议结合实体趋势与来源变化，持续复核升级方向。"
+    else:
+        why = row.get("description", "暂无触发原因")
+        meaning = "代表系统检测到值得关注的异常变化。"
+        action = "建议结合上下文进一步人工复核。"
+
+    return {
+        "why": why,
+        "meaning": meaning,
+        "action": action,
+        "confidence_reason": f"当前系统评分置信度为 {confidence:.2f}",
+        "events": related_events,
+    }
+
+
+def format_related_events(events: list, limit: int = 2) -> str:
+    """格式化关联事件标题列表"""
+    if not events:
+        return ""
+    titles = []
+    for event in events[:limit]:
+        if isinstance(event, dict) and event.get("title"):
+            titles.append(str(event["title"]))
+    return "；".join(titles)
+
+
+def get_related_event_links(
+    events: list, cluster_links_map: Dict[int, List[Dict[str, str]]]
+) -> List[Dict[str, str]]:
+    """将信号关联事件转换为可点击链接信息"""
+    results: List[Dict[str, str]] = []
+    for event in events:
+        if not isinstance(event, dict):
+            continue
+        title = str(event.get("title") or "关联事件").strip()
+        cluster_id_raw = event.get("cluster_id")
+        cluster_id = None
+        if isinstance(cluster_id_raw, int):
+            cluster_id = cluster_id_raw
+        elif isinstance(cluster_id_raw, str) and cluster_id_raw.isdigit():
+            cluster_id = int(cluster_id_raw)
+
+        url = ""
+        if cluster_id is not None:
+            candidates = cluster_links_map.get(cluster_id, [])
+            if candidates:
+                url = candidates[0].get("url", "")
+
+        results.append({"title": title, "url": url})
+    return results
+
+
+def render_external_link(label: str, url: str):
+    """渲染外部链接，兼容不支持 key 参数的旧版 Streamlit"""
+    if not url:
+        return
+    safe_label = html.escape(label)
+    safe_url = html.escape(url, quote=True)
+    st.markdown(
+        f'<a href="{safe_url}" target="_blank" rel="noopener noreferrer">🔗 {safe_label}</a>',
+        unsafe_allow_html=True,
+    )
+
+
+def short_text(text: str, max_len: int = 80) -> str:
+    """压缩文本，便于在列表中快速扫描"""
+    if not text:
+        return ""
+    cleaned = " ".join(str(text).split())
+    if len(cleaned) <= max_len:
+        return cleaned
+    return f"{cleaned[:max_len]}..."
 
 
 @st.cache_data(ttl=300)
@@ -374,7 +740,7 @@ def render_overview(supabase, hours: int, category: str):
     st.markdown("---")
 
     # 获取数据
-    clusters_df = get_clusters(supabase, hours, category)
+    clusters_df = get_clusters(supabase, hours, category, only_hot=True)
     signals_df = get_signals(supabase, hours)
 
     # 最新热点
@@ -383,20 +749,22 @@ def render_overview(supabase, hours: int, category: str):
     if clusters_df.empty:
         st.info("暂无热点数据")
     else:
-        for idx, row in clusters_df.head(5).iterrows():
-            with st.container():
-                # 判断分析深度
-                is_shallow = row.get("analysis_depth") == "shallow"
-                depth_badge = (
-                    "<span style='background-color: rgba(245, 158, 11, 0.3); color: #fbbf24; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 8px;'>快速翻译</span>"
-                    if is_shallow
-                    else ""
-                )
+        top_clusters = clusters_df.head(5)
+        top_cluster_ids = tuple(
+            int(cluster_id)
+            for cluster_id in top_clusters["id"].tolist()
+            if pd.notna(cluster_id)
+        )
+        top_links_map = get_cluster_article_links(
+            supabase, top_cluster_ids, per_cluster=1
+        )
 
+        for idx, row in top_clusters.iterrows():
+            with st.container():
                 st.markdown(
                     f"""
                 <div class="hotspot-card">
-                    <h4>{row.get("primary_title", "N/A")[:80]}...{depth_badge}</h4>
+                    <h4>{row.get("primary_title", "N/A")}</h4>
                     <p><strong>中文摘要:</strong> {row.get("summary", "N/A")[:150]}...</p>
                     <p class="meta-text">
                         📁 {row.get("category", "N/A")} |
@@ -408,30 +776,14 @@ def render_overview(supabase, hours: int, category: str):
                     unsafe_allow_html=True,
                 )
 
-                # 根据分析深度显示不同按钮
-                col1, col2 = st.columns([1, 1])
-                with col1:
-                    if row.get("primary_link"):
-                        st.link_button("🔗 查看英文原文", row["primary_link"])
-                with col2:
-                    if is_shallow:
-                        # 浅层分析显示深度分析按钮
-                        if st.button(
-                            f"🔍 深度分析", key=f"deep_analysis_{row.get('id')}"
-                        ):
-                            with st.spinner("正在进行深度分析，请稍候..."):
-                                try:
-                                    # 调用后端API进行深度分析
-                                    result = trigger_deep_analysis(
-                                        supabase, row.get("id")
-                                    )
-                                    if result:
-                                        st.success("✅ 深度分析完成！")
-                                        st.rerun()
-                                    else:
-                                        st.error("❌ 分析失败，请稍后重试")
-                                except Exception as e:
-                                    st.error(f"❌ 分析出错: {str(e)}")
+                cluster_id = int(row["id"]) if pd.notna(row.get("id")) else None
+                primary_link = row.get("primary_link")
+                if not primary_link and cluster_id:
+                    candidates = top_links_map.get(cluster_id, [])
+                    primary_link = candidates[0]["url"] if candidates else ""
+
+                if primary_link:
+                    render_external_link("查看英文原文", primary_link)
 
     # 最新信号
     st.markdown("### 📡 最新信号")
@@ -451,21 +803,9 @@ def render_overview(supabase, hours: int, category: str):
                 level_class = "signal-low"
                 level_text = "低"
 
-            # 获取信号名称，如果没有name字段，使用signal_type转换
-            signal_name = row.get("name")
-            if not signal_name or signal_name == "N/A":
-                signal_type = row.get("signal_type", "unknown")
-                # 信号类型到中文名称的映射
-                type_names = {
-                    "velocity_spike": "🚀 速度激增",
-                    "convergence": "🔄 多源聚合",
-                    "triangulation": "📐 三角验证",
-                    "hotspot_escalation": "🔥 热点升级",
-                    "economic_indicator_alert": "📊 经济指标异常",
-                    "natural_disaster_signal": "🌋 自然灾害",
-                    "geopolitical_intensity": "🌍 地缘政治紧张",
-                }
-                signal_name = type_names.get(signal_type, f"⚡ {signal_type}")
+            signal_name = get_signal_name(row)
+            explanation = parse_signal_explanation(row)
+            event_text = format_related_events(explanation.get("events", []), limit=2)
 
             st.markdown(
                 f"""
@@ -474,9 +814,13 @@ def render_overview(supabase, hours: int, category: str):
                     {row.get("icon", "⚡")} {signal_name}
                     <span class="signal-badge {level_class}">{level_text} 置信度</span>
                 </h5>
-                <p>{row.get("description", "N/A")[:100]}...</p>
+                <p><strong>触发原因:</strong> {explanation["why"]}</p>
+                <p><strong>代表含义:</strong> {explanation["meaning"]}</p>
+                <p><strong>建议动作:</strong> {explanation["action"]}</p>
+                <p><strong>关联事件:</strong> {event_text or "无可用关联事件"}</p>
                 <p class="meta-text">
-                    置信度: {confidence:.2f} | 时间: {row.get("created_at", "N/A")[:16]}
+                    置信度: {confidence:.2f} | 时间: {row.get("created_at", "N/A")[:16]} |
+                    依据: {explanation["confidence_reason"]}
                 </p>
             </div>
             """,
@@ -489,11 +833,18 @@ def render_hotspots(supabase, hours: int, category: str):
     """渲染热点详情页"""
     st.markdown('<div class="main-header">🔥 热点详情</div>', unsafe_allow_html=True)
 
-    clusters_df = get_clusters(supabase, hours, category)
+    clusters_df = get_clusters(supabase, hours, category, only_hot=True)
 
     if clusters_df.empty:
         st.info("暂无热点数据")
         return
+
+    cluster_ids = tuple(
+        int(cluster_id)
+        for cluster_id in clusters_df["id"].tolist()
+        if pd.notna(cluster_id)
+    )
+    links_map = get_cluster_article_links(supabase, cluster_ids, per_cluster=3)
 
     # 分类标签
     tabs = st.tabs(["全部", "军事", "政治", "经济"])
@@ -509,18 +860,23 @@ def render_hotspots(supabase, hours: int, category: str):
             st.write(f"共 {len(filtered_df)} 个热点")
 
             for idx, row in filtered_df.iterrows():
-                with st.expander(f"📰 {row.get('primary_title', 'N/A')[:60]}..."):
+                with st.expander(f"📰 {row.get('primary_title', 'N/A')}"):
                     st.markdown(f"**中文摘要:**")
                     st.write(row.get("summary", "N/A"))
 
                     st.markdown(f"**关键实体:**")
                     try:
-                        entities = eval(row.get("key_entities", "[]"))
+                        raw_entities = row.get("key_entities", "[]")
+                        entities = (
+                            raw_entities
+                            if isinstance(raw_entities, list)
+                            else json.loads(raw_entities)
+                        )
                         if entities:
                             st.write(", ".join(entities))
                         else:
                             st.write("无")
-                    except:
+                    except Exception:
                         st.write("无")
 
                     st.markdown(f"**影响分析:**")
@@ -535,8 +891,24 @@ def render_hotspots(supabase, hours: int, category: str):
                         st.write(f"📄 文章数: {row.get('article_count', 0)}")
                     with col2:
                         st.write(f"⏰ 创建时间: {row.get('created_at', 'N/A')[:16]}")
-                        if row.get("primary_link"):
-                            st.link_button("🔗 查看原文", row["primary_link"])
+
+                    cluster_id = int(row["id"]) if pd.notna(row.get("id")) else None
+                    primary_link = row.get("primary_link")
+                    article_links = links_map.get(cluster_id, []) if cluster_id else []
+                    if not primary_link and article_links:
+                        primary_link = article_links[0]["url"]
+
+                    if primary_link:
+                        render_external_link("查看主原文", primary_link)
+
+                    if article_links:
+                        st.markdown("**相关新闻原文:**")
+                        for link_idx, link in enumerate(article_links[:3], 1):
+                            title = (link.get("title") or "原文链接").strip()[:80]
+                            render_external_link(
+                                f"原文{link_idx}: {title}",
+                                link.get("url", ""),
+                            )
 
 
 # 信号中心页
@@ -561,10 +933,56 @@ def render_signals(supabase, hours: int):
     min_confidence = st.slider("最小置信度:", 0.0, 1.0, 0.5, 0.1)
     signals_df = signals_df[signals_df["confidence"] >= min_confidence]
 
-    st.write(f"共 {len(signals_df)} 个信号")
+    col_a, col_b = st.columns([1, 1])
+    with col_a:
+        view_mode = st.radio(
+            "展示模式:",
+            ["精简", "详细"],
+            horizontal=True,
+            index=0,
+        )
+    with col_b:
+        max_per_type = st.slider("同类型最多显示:", 1, 20, 5, 1)
+
+    if "signal_type" in signals_df.columns:
+        type_counts = signals_df["signal_type"].value_counts()
+        if not type_counts.empty:
+            dominant_type = type_counts.index[0]
+            dominant_count = int(type_counts.iloc[0])
+            if dominant_count >= 10 and dominant_count >= len(signals_df) * 0.7:
+                st.warning(
+                    f"当前信号高度集中在 `{dominant_type}`（{dominant_count}/{len(signals_df)}）。"
+                    "已按同类型上限做压缩展示。"
+                )
+        signals_df = (
+            signals_df.sort_values("confidence", ascending=False)
+            .groupby("signal_type", group_keys=False)
+            .head(max_per_type)
+            .reset_index(drop=True)
+        )
+
+    st.write(f"当前展示 {len(signals_df)} 个信号")
+
+    parsed_signals: List[Tuple[int, pd.Series, Dict]] = []
+    related_cluster_ids = set()
+    for idx, row in signals_df.iterrows():
+        explanation = parse_signal_explanation(row)
+        parsed_signals.append((idx, row, explanation))
+        for event in explanation.get("events", []):
+            if not isinstance(event, dict):
+                continue
+            cluster_id_raw = event.get("cluster_id")
+            if isinstance(cluster_id_raw, int):
+                related_cluster_ids.add(cluster_id_raw)
+            elif isinstance(cluster_id_raw, str) and cluster_id_raw.isdigit():
+                related_cluster_ids.add(int(cluster_id_raw))
+
+    related_links_map = get_cluster_article_links(
+        supabase, tuple(sorted(related_cluster_ids)), per_cluster=1
+    )
 
     # 显示信号列表
-    for idx, row in signals_df.iterrows():
+    for idx, row, explanation in parsed_signals:
         confidence = row.get("confidence", 0)
 
         if confidence >= 0.8:
@@ -574,37 +992,60 @@ def render_signals(supabase, hours: int):
         else:
             level_color = "#4caf50"
 
-        # 获取信号名称，如果没有name字段，使用signal_type转换
-        signal_name = row.get("name")
-        if not signal_name or signal_name == "N/A":
-            signal_type = row.get("signal_type", "unknown")
-            # 信号类型到中文名称的映射
-            type_names = {
-                "velocity_spike": "🚀 速度激增",
-                "convergence": "🔄 多源聚合",
-                "triangulation": "📐 三角验证",
-                "hotspot_escalation": "🔥 热点升级",
-                "economic_indicator_alert": "📊 经济指标异常",
-                "natural_disaster_signal": "🌋 自然灾害",
-                "geopolitical_intensity": "🌍 地缘政治紧张",
-            }
-            signal_name = type_names.get(signal_type, f"⚡ {signal_type}")
+        signal_name = get_signal_name(row)
+        event_text = format_related_events(explanation.get("events", []), limit=3)
 
-        st.markdown(
-            f"""
-        <div class="hotspot-card" style="border-left: 4px solid {level_color};">
-            <h4>{row.get("icon", "⚡")} {signal_name}</h4>
-            <p>{row.get("description", "N/A")}</p>
-            <p>
-                <span style="color: {level_color}; font-weight: bold;">
-                    置信度: {confidence:.2f}
-                </span> |
-                <span class="meta-text">时间: {row.get("created_at", "N/A")[:16]}</span>
-            </p>
-        </div>
-        """,
-            unsafe_allow_html=True,
+        if view_mode == "精简":
+            compact_event = short_text(event_text or "无可用关联事件", 72)
+            compact_reason = short_text(explanation["why"], 90)
+            compact_meaning = short_text(explanation["meaning"], 90)
+            st.markdown(
+                f"""
+            <div class="hotspot-card" style="border-left: 4px solid {level_color};">
+                <h4>{row.get("icon", "⚡")} {signal_name}</h4>
+                <p><strong>事件:</strong> {compact_event}</p>
+                <p><strong>触发:</strong> {compact_reason}</p>
+                <p><strong>含义:</strong> {compact_meaning}</p>
+                <p class="meta-text">
+                    置信度: {confidence:.2f} | 时间: {row.get("created_at", "N/A")[:16]}
+                </p>
+            </div>
+            """,
+                unsafe_allow_html=True,
+            )
+        else:
+            st.markdown(
+                f"""
+            <div class="hotspot-card" style="border-left: 4px solid {level_color};">
+                <h4>{row.get("icon", "⚡")} {signal_name}</h4>
+                <p><strong>触发原因:</strong> {explanation["why"]}</p>
+                <p><strong>代表含义:</strong> {explanation["meaning"]}</p>
+                <p><strong>建议动作:</strong> {explanation["action"]}</p>
+                <p><strong>关联事件:</strong> {event_text or "无可用关联事件"}</p>
+                <p>
+                    <span style="color: {level_color}; font-weight: bold;">
+                        置信度: {confidence:.2f}
+                    </span> |
+                    <span class="meta-text">时间: {row.get("created_at", "N/A")[:16]}</span> |
+                    <span class="meta-text">依据: {explanation["confidence_reason"]}</span>
+                </p>
+            </div>
+            """,
+                unsafe_allow_html=True,
+            )
+
+        event_links = get_related_event_links(
+            explanation.get("events", []), related_links_map
         )
+        if event_links:
+            st.markdown("**关联事件原文:**")
+            for link_idx, event_link in enumerate(event_links[:3], 1):
+                event_title = event_link.get("title", "关联事件原文")[:80]
+                event_url = event_link.get("url", "")
+                if event_url:
+                    render_external_link(f"事件{link_idx}: {event_title}", event_url)
+                else:
+                    st.write(f"- {event_title}（暂无原文链接）")
 
     # 信号统计图表
     if not signals_df.empty:
@@ -627,118 +1068,26 @@ def render_signals(supabase, hours: int):
             st.bar_chart(conf_dist)
 
 
-# 实体管理函数
-def get_cluster_articles(supabase, cluster_id: int) -> list:
-    """获取聚类关联的所有文章"""
-    try:
-        # 获取关联的文章ID
-        relations = (
-            supabase.table("article_analyses")
-            .select("article_id")
-            .eq("cluster_id", cluster_id)
-            .execute()
-        )
-
-        if not relations.data:
-            return []
-
-        article_ids = [r["article_id"] for r in relations.data]
-
-        # 获取文章详情
-        articles = []
-        for aid in article_ids:
-            result = (
-                supabase.table("articles")
-                .select("id, title, content, url, category")
-                .eq("id", aid)
-                .execute()
-            )
-            if result.data:
-                articles.append(result.data[0])
-
-        return articles
-    except Exception as e:
-        logger.error(f"获取聚类文章失败: {e}")
-        return []
-
-
-def _detect_entity_type(entity_name: str) -> str:
-    """
-    检测实体类型
-
-    从配置文件读取关键词进行检测
-
-    Args:
-        entity_name: 实体名称
-
-    Returns:
-        实体类型: person/organization/location/event/concept
-    """
-    name = entity_name.strip()
-
-    # 按优先级检测
-    for entity_type in DETECTION_PRIORITY:
-        if entity_type == "concept":
-            continue
-
-        if entity_type == "person":
-            # 人名特殊处理
-            rules = PERSON_RULES
-            name_len = len(name)
-            min_len = rules["chinese_name_length"]["min"]
-            max_len = rules["chinese_name_length"]["max"]
-
-            # 中文人名长度判断
-            if min_len <= name_len <= max_len:
-                return "person"
-
-            # 英文人名判断
-            indicators = rules["english_indicators"]
-            if "contains_space" in indicators and " " in name:
-                return "person"
-            if "title_capitalized" in indicators and name and name[0].isupper():
-                # 检查是否是常见英文名
-                common_names = rules.get("common_english_names", [])
-                name_parts = name.split()
-                for part in name_parts:
-                    if part in common_names:
-                        return "person"
-
-            continue
-
-        # 其他类型：从配置读取关键词
-        config = ENTITY_TYPES.get(entity_type, {})
-        keywords_config = config.get("keywords", {})
-
-        # 合并中英文关键词
-        all_keywords = []
-        all_keywords.extend(keywords_config.get("zh", []))
-        all_keywords.extend(keywords_config.get("en", []))
-
-        # 检查关键词匹配
-        for keyword in all_keywords:
-            if keyword in name:
-                return entity_type
-
-    # 默认为概念
-    return "concept"
-
-
 def update_entities(supabase, cluster_id: int, entities: list, category: str):
     """更新实体表和实体-聚类关联表"""
     try:
-        for entity_name in entities:
-            if not entity_name or len(entity_name) < 2:
-                continue
-
-            # 自动检测实体类型
-            entity_type = _detect_entity_type(entity_name)
+        normalized_entities = normalize_entity_mentions(entities)
+        for entity in normalized_entities:
+            entity_name = entity["canonical_name"]
+            entity_type = entity["entity_type"]
+            metadata = merge_entity_metadata(
+                existing_metadata={},
+                entity=entity,
+                model_name="qwen-plus",
+                prompt_version="cluster_summary_v2",
+            )
 
             # 检查实体是否已存在
             existing = (
                 supabase.table("entities")
-                .select("id, mention_count_total")
+                .select("id, mention_count_total, metadata")
                 .eq("name", entity_name)
+                .eq("entity_type", entity_type)
                 .execute()
             )
 
@@ -746,12 +1095,19 @@ def update_entities(supabase, cluster_id: int, entities: list, category: str):
                 # 更新现有实体
                 entity_id = existing.data[0]["id"]
                 new_count = existing.data[0]["mention_count_total"] + 1
+                metadata = merge_entity_metadata(
+                    existing_metadata=existing.data[0].get("metadata"),
+                    entity=entity,
+                    model_name="qwen-plus",
+                    prompt_version="cluster_summary_v2",
+                )
 
                 supabase.table("entities").update(
                     {
                         "last_seen": datetime.now().isoformat(),
                         "mention_count_total": new_count,
                         "category": category,
+                        "metadata": metadata,
                     }
                 ).eq("id", entity_id).execute()
             else:
@@ -764,6 +1120,7 @@ def update_entities(supabase, cluster_id: int, entities: list, category: str):
                             "entity_type": entity_type,
                             "category": category,
                             "mention_count_total": 1,
+                            "metadata": metadata,
                         }
                     )
                     .execute()
@@ -782,100 +1139,9 @@ def update_entities(supabase, cluster_id: int, entities: list, category: str):
             except Exception as e:
                 logger.warning(f"实体关联创建失败（可能已存在）: {e}")
 
-        logger.info(f"实体更新完成: {len(entities)} 个实体")
+        logger.info(f"实体更新完成: {len(normalized_entities)} 个实体")
     except Exception as e:
         logger.error(f"更新实体失败: {e}")
-
-
-def trigger_deep_analysis(supabase, cluster_id: int) -> bool:
-    """
-    触发对浅层分析聚类的深度分析
-
-    Args:
-        supabase: Supabase 客户端
-        cluster_id: 聚类ID
-
-    Returns:
-        是否成功
-    """
-    try:
-        import sys
-        import os
-
-        # 添加项目根目录到路径
-        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-        from scripts.llm_client import LLMClient
-        from config.analysis_config import LLM_PROMPTS
-
-        logger.info(f"开始深度分析聚类 {cluster_id}")
-
-        # 1. 获取聚类信息
-        cluster_result = (
-            supabase.table("analysis_clusters")
-            .select("*")
-            .eq("id", cluster_id)
-            .execute()
-        )
-
-        if not cluster_result.data:
-            logger.error(f"聚类 {cluster_id} 不存在")
-            return False
-
-        cluster = cluster_result.data[0]
-
-        # 2. 获取关联的文章
-        articles = get_cluster_articles(supabase, cluster_id)
-
-        if not articles:
-            logger.warning(f"聚类 {cluster_id} 没有关联文章")
-            # 仍然尝试分析，使用已有标题
-            articles = [{"title": cluster["primary_title"], "content": ""}]
-
-        # 3. 准备分析数据
-        titles = [a["title"] for a in articles]
-        content_samples = "\n".join([a.get("content", "")[:500] for a in articles[:3]])
-
-        # 4. 调用LLM进行完整分析
-        llm_client = LLMClient()
-
-        prompt = LLM_PROMPTS["cluster_summary"].format(
-            article_count=cluster["article_count"],
-            sources=", ".join(titles[:5]),
-            primary_title=cluster["primary_title"],
-            content_samples=content_samples[:1000],
-        )
-
-        logger.info(f"调用LLM进行深度分析...")
-        result = llm_client.summarize(prompt, model="qwen-plus")
-
-        # 5. 更新聚类数据
-        update_data = {
-            "summary": result.get("summary", cluster["primary_title"]),
-            "key_entities": json.dumps(result.get("key_entities", [])),
-            "impact": result.get("impact", ""),
-            "trend": result.get("trend", ""),
-            "analysis_depth": "full",
-            "full_analysis_triggered": True,
-            "is_hot": cluster["article_count"] >= 3,
-            "updated_at": datetime.now().isoformat(),
-        }
-
-        supabase.table("analysis_clusters").update(update_data).eq(
-            "id", cluster_id
-        ).execute()
-
-        # 6. 更新实体追踪
-        entities = result.get("key_entities", [])
-        if entities:
-            update_entities(supabase, cluster_id, entities, cluster["category"])
-
-        logger.info(f"深度分析完成: 聚类 {cluster_id}")
-        return True
-
-    except Exception as e:
-        logger.error(f"深度分析失败: {e}")
-        return False
 
 
 # 实体数据获取函数
@@ -960,7 +1226,7 @@ def render_entities(supabase):
     with col1:
         entity_type = st.selectbox(
             "实体类型:",
-            ["全部", "person", "organization", "location", "event", "concept"],
+            ["全部"] + ENTITY_TYPE_FILTER_OPTIONS,
         )
     with col2:
         category = st.selectbox(
@@ -1019,7 +1285,7 @@ def render_entities(supabase):
             related_clusters = get_entity_related_clusters(supabase, entity_id, limit=5)
             if not related_clusters.empty:
                 for _, cluster in related_clusters.iterrows():
-                    st.write(f"- {cluster.get('primary_title', 'N/A')[:60]}...")
+                    st.write(f"- {cluster.get('primary_title', 'N/A')}")
             else:
                 st.write("暂无关联热点")
 

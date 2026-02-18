@@ -1,6 +1,6 @@
-# US-Monitor 分层分析系统 - 开发文档
+# US-Monitor 全量分析系统 - 开发文档
 
-**版本**: Phase 1 + Phase 2  
+**版本**: Phase 3 (v0.3.0)  
 **日期**: 2026-02-18  
 **状态**: ✅ 已完成并部署
 
@@ -10,30 +10,31 @@
 
 1. [系统概述](#系统概述)
 2. [架构设计](#架构设计)
-3. [Phase 1: 分层并发分析](#phase-1-分层并发分析)
-4. [Phase 2: 按需深度分析](#phase-2-按需深度分析)
-5. [实体追踪系统](#实体追踪系统)
-6. [前端界面](#前端界面)
-7. [配置文件](#配置文件)
-8. [性能优化](#性能优化)
-9. [部署指南](#部署指南)
-10. [故障排除](#故障排除)
+3. [Phase 1: 分层并发分析（历史）](#phase-1-分层并发分析历史)
+4. [Phase 2: 按需深度分析（历史）](#phase-2-按需深度分析历史)
+5. [Phase 3: 全量完整分析](#phase-3-全量完整分析)
+6. [实体追踪系统](#实体追踪系统)
+7. [前端界面](#前端界面)
+8. [配置文件](#配置文件)
+9. [性能优化](#性能优化)
+10. [部署指南](#部署指南)
+11. [故障排除](#故障排除)
 
 ---
 
 ## 系统概述
 
 ### 目标
-- **成本优化**: 从 ¥48/次降至 ~¥10/次（节省 80%）
-- **速度提升**: 从 8 小时降至 ~1.5 小时（5 倍提升）
-- **灵活性**: 支持冷/热点分级处理，按需深度分析
+- **准确性优先**: 全聚类统一完整分析，避免浅层摘要丢信息
+- **稳定性优先**: 批量入库、重试与异步补充，降低外部服务抖动影响
+- **可读性优先**: 前端高对比主题、原文可跳转、信号解释可快速理解
 
 ### 核心功能
-1. **分层分析**: 热点(≥3篇)完整LLM分析，冷门(<3篇)快速翻译
-2. **并发处理**: 5个并发worker处理聚类
-3. **双模型支持**: qwen-plus(热点) + qwen-flash(冷门)
-4. **按需分析**: Web界面点击按钮触发深度分析
-5. **实体追踪**: 自动提取并追踪实体热度
+1. **全量完整分析**: 所有聚类统一走完整 LLM 分析链路
+2. **并发处理**: 默认 10 个 worker 并发处理聚类
+3. **LLM 实体分类**: 在总结阶段直接输出实体类型，程序仅做标准化与兜底校验
+4. **信号解释增强**: 先规则解释入库，再异步 LLM 增强（可独立补跑）
+5. **前端可读性重构**: 强制高对比样式，热点/详情/信号均支持原文链接
 
 ---
 
@@ -44,26 +45,24 @@
 ```
 RSS源 → 爬虫 → 数据库 → 分析器 → 聚类 → LLM处理 → 数据库
                                     ↓
-                              分层处理:
-                              - 热点: 完整分析
-                              - 冷门: 快速翻译
+                              全量完整分析
                                     ↓
-                              信号检测 → 实体追踪
+                         信号检测 → 解释增强 → 实体追踪
 ```
 
 ### 核心组件
 
 | 组件 | 文件 | 职责 |
 |------|------|------|
-| **分析器** | `scripts/analyzer.py` | 主分析流程，分层并发处理 |
+| **分析器** | `scripts/analyzer.py` | 主分析流程，全量完整分析并发处理 |
 | **增强分析器** | `scripts/enhanced_analyzer.py` | 扩展外部数据源(FRED/USGS/GDELT) |
 | **LLM客户端** | `scripts/llm_client.py` | LLM调用，缓存，翻译 |
-| **Web界面** | `web/app.py` | Streamlit前端，按需分析 |
-| **实体配置** | `config/entity_config.py` | 实体分类规则配置 |
+| **Web界面** | `web/app.py` | Streamlit前端，热点/信号/详情可跳原文 |
+| **实体标准化** | `scripts/entity_classification.py` | LLM实体分类标准化与规则兜底 |
 
 ---
 
-## Phase 1: 分层并发分析
+## Phase 1: 分层并发分析（历史）
 
 ### 1.1 热点/冷门分层逻辑
 
@@ -112,7 +111,7 @@ with ThreadPoolExecutor(max_workers=5) as executor:
 
 ---
 
-## Phase 2: 按需深度分析
+## Phase 2: 按需深度分析（历史）
 
 ### 2.1 功能说明
 
@@ -121,30 +120,55 @@ with ThreadPoolExecutor(max_workers=5) as executor:
 2. 更新数据库为完整分析结果
 3. 提取并保存实体信息
 
-### 2.2 实现代码
+> 当前主流程已切换为全量完整分析，`trigger_deep_analysis` 与浅层分析入口已移除。
 
-```python
-def trigger_deep_analysis(supabase, cluster_id: int) -> bool:
-    """触发对浅层分析聚类的深度分析"""
-    # 1. 获取聚类信息
-    # 2. 获取关联文章
-    # 3. 调用 LLM (qwen-plus)
-    # 4. 更新数据库
-    # 5. 更新实体追踪
-```
+## Phase 3: 全量完整分析
 
-### 2.3 UI 效果
+### 3.1 主流程调整
 
-- **浅层分析**: 显示 "快速翻译" 黄色徽章
-- **深度分析按钮**: 位于浅层分析卡片下方
-- **分析中**: 显示 spinner "正在进行深度分析，请稍候..."
-- **完成后**: 自动刷新页面
+- 移除冷门快速翻译路径，统一完整分析
+- 分析并发调整为 `10`（`HotspotAnalyzer.concurrent_workers`）
+- 信号检测仍以 `article_count >= 3` 的聚类为目标，但聚类摘要均为完整分析结果
+
+### 3.2 实体分类改造
+
+- LLM 提示词直接输出实体类型（person / organization / location / ...）
+- `scripts/entity_classification.py` 负责：
+  - 类型归一化（别名映射）
+  - 低置信度兜底
+  - 人名/组织/节日/地点强规则纠偏
+- 入库时统一走标准化后的实体数据结构，减少错分污染
+
+### 3.3 信号解释增强
+
+- 规则解释先入库，保障分析主链路稳定
+- 新增异步补充解释能力（已整合进 `scripts/analyzer.py`）：
+  - `--enrich-signals-only`
+  - `--enrich-signals-after-run`
+  - `--enrich-hours`
+  - `--enrich-limit`
+  - `--enrich-workers`
+- `scripts/enhanced_analyzer.py` 同步支持 `--enrich-signals-after-run`
+
+### 3.4 重置能力增强
+
+- `scripts/reset_analysis.py --all` 除文章分析状态外，同时清理：
+  - 聚类结果
+  - 信号表
+  - 实体档案与实体关联
+
+### 3.5 前端改造
+
+- 统一高对比技术风配色，弱化系统亮暗模式干扰
+- 热点页仅显示 `is_hot=true`
+- 首页与信号中心改为“解释优先”展示，不再堆叠长文本
+- 热点、新闻详情、信号关联事件均支持跳转新闻原文链接
 
 ---
 
 ## 实体追踪系统
 
-### 3.1 实体分类
+### 4.1 实体分类
 
 5种实体类型:
 
@@ -156,7 +180,7 @@ def trigger_deep_analysis(supabase, cluster_id: int) -> bool:
 | **person** | 人名 | 2-6字符 | James Smith, 张三四 |
 | **concept** | 概念 | 其他 | 其他 |
 
-### 3.2 配置文件
+### 4.2 配置文件
 
 文件: `config/entity_config.py`
 
@@ -179,7 +203,7 @@ PERSON_RULES = {
 }
 ```
 
-### 3.3 数据库表
+### 4.3 数据库表
 
 **entities 表**:
 - `id` (PK): 实体ID
@@ -198,7 +222,7 @@ PERSON_RULES = {
 - `cluster_id` (FK)
 - `mention_count`
 
-### 3.4 实体档案页面
+### 4.4 实体档案页面
 
 Web界面 "📁 实体档案" 页面:
 - 显示前10热门实体（卡片形式）
@@ -211,7 +235,7 @@ Web界面 "📁 实体档案" 页面:
 
 ## 前端界面
 
-### 4.1 主题设计
+### 5.1 主题设计
 
 单一主题：简洁黑白风，高对比度
 
@@ -225,7 +249,7 @@ THEME = {
 }
 ```
 
-### 4.2 页面结构
+### 5.2 页面结构
 
 侧边栏导航:
 - 🏠 概览首页
@@ -234,7 +258,7 @@ THEME = {
 - 📁 实体档案（新增）
 - 📈 数据统计
 
-### 4.3 信号显示
+### 5.3 信号显示
 
 信号类型映射:
 
@@ -252,7 +276,7 @@ THEME = {
 
 ## 配置文件
 
-### 5.1 实体配置
+### 6.1 实体配置
 
 **文件**: `config/entity_config.py`
 
@@ -275,7 +299,7 @@ ENTITY_TYPES["organization"]["keywords"]["en"].append("Startup")
 ENTITY_TYPES["location"]["keywords"]["en"].append("Singapore")
 ```
 
-### 5.2 分析配置
+### 6.2 分析配置
 
 **文件**: `config/analysis_config.py`
 
@@ -289,28 +313,28 @@ ENTITY_TYPES["location"]["keywords"]["en"].append("Singapore")
 
 ## 性能优化
 
-### 6.1 速度优化
+### 7.1 速度优化
 
 | 优化项 | 效果 |
 |--------|------|
-| ThreadPoolExecutor(5) | 并发处理聚类 |
-| 分层处理 | 冷门用 qwen-flash (更快) |
+| ThreadPoolExecutor(10) | 并发处理聚类 |
+| 实体批量更新 | 降低 DB 往返次数 |
 | LLM缓存 | 避免重复调用 |
 | 无时间窗口 | 加载所有未分析文章 |
 
-### 6.2 成本优化
+### 7.2 成本优化
 
 | 优化项 | 节省 |
 |--------|------|
-| 冷门用 qwen-flash | 90%成本 |
-| 快速翻译(仅标题) | 减少token |
+| 聚类摘要复用 | 减少重复调用 |
+| 异步信号解释 | 降低主流程阻塞 |
 | 缓存命中 | 避免重复付费 |
 
 ---
 
 ## 部署指南
 
-### 7.1 环境要求
+### 8.1 环境要求
 
 ```bash
 # Python 3.11+
@@ -320,7 +344,7 @@ pip install -r requirements.txt
 pip install socksio
 ```
 
-### 7.2 环境变量
+### 8.2 环境变量
 
 ```bash
 # Supabase
@@ -334,7 +358,7 @@ export DASHSCOPE_API_KEY="your-api-key"
 export FRED_API_KEY="your-fred-key"
 ```
 
-### 7.3 数据库迁移
+### 8.3 数据库迁移
 
 执行 SQL:
 ```sql
@@ -350,18 +374,24 @@ CREATE TABLE entities (...);
 CREATE TABLE entity_cluster_relations (...);
 ```
 
-### 7.4 运行方式
+### 8.4 运行方式
 
 **本地分析**:
 ```bash
 # 基础分析
 python scripts/analyzer.py --limit 1000
 
+# 基础分析 + 分析后补充信号解释
+python scripts/analyzer.py --limit 1000 --enrich-signals-after-run
+
 # 增强分析（含外部数据）
 python scripts/enhanced_analyzer.py --limit 1000
 
+# 增强分析 + 分析后补充信号解释
+python scripts/enhanced_analyzer.py --limit 1000 --enrich-signals-after-run
+
 # 重置分析状态
-python scripts/reset_analysis.py --hours 24
+python scripts/reset_analysis.py --all
 ```
 
 **Web界面**:
@@ -377,7 +407,7 @@ streamlit run web/app.py
 
 ## 故障排除
 
-### 8.1 常见问题
+### 9.1 常见问题
 
 **Q: 显示 "没有未分析的文章"，但前端显示有待分析**
 
@@ -391,15 +421,15 @@ articles = self.load_unanalyzed_articles(limit=1000, hours=24)
 
 A: 已修复。现在会根据 signal_type 自动映射为中文名称。
 
-**Q: 实体都被标记为 concept**
+**Q: 实体分类明显错误（如人名进 organization）**
 
-A: 已修复。现在会根据关键词自动分类为 5 种类型。
+A: 现已改为“LLM 分类 + 规则兜底”，可通过 `scripts/entity_classification.py` 继续微调关键词和纠偏规则。
 
-**Q: JSON解析错误**
+**Q: 保存分析结果遇到 Supabase 5xx**
 
-A: 已修复。快速翻译现在使用 translate_text() 方法，不解析JSON。
+A: 建议先缩小批量（降低 `--limit`），或重试运行。当前已在核心写入路径使用重试机制，仍可能受上游瞬时故障影响。
 
-### 8.2 日志位置
+### 9.2 日志位置
 
 ```
 logs/
@@ -409,7 +439,7 @@ logs/
 └── crawler.log           # 爬虫日志
 ```
 
-### 8.3 调试技巧
+### 9.3 调试技巧
 
 ```bash
 # 查看最近日志
@@ -430,10 +460,11 @@ grep "ERROR" logs/*.log
 |------|------|------|
 | Phase 1 | 2026-02-18 | 分层并发分析系统 |
 | Phase 2 | 2026-02-18 | 按需深度分析、实体追踪、Web界面 |
+| Phase 3 (v0.3.0) | 2026-02-18 | 全量完整分析、LLM实体分类、信号解释增强、前端可读性重构 |
 
 ---
 
-## 待办事项 (Phase 3)
+## 待办事项 (Next)
 
 - [ ] 实体关系图谱可视化
 - [ ] 实体时间线追踪
@@ -447,7 +478,7 @@ grep "ERROR" logs/*.log
 
 **项目**: US-Monitor  
 **技术栈**: Python, Streamlit, Supabase, LLM (通义千问)  
-**最后更新**: 2026-02-18
+**最后更新**: 2026-02-18 (v0.3.0)
 
 ---
 

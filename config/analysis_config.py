@@ -403,14 +403,27 @@ LLM_PROMPTS = {
 要求：
 1. 用中文撰写，200-300字
 2. 概括核心事件和要点
-3. 指出涉及的关键实体（人物、组织、地点）
+3. 指出涉及的关键实体，并对每个实体进行类型分类
 4. 分析可能的影响和趋势
 5. 保持客观中立的语气
+6. 实体类型只能从以下枚举中选择：
+   person / organization / location / event / holiday
+   / metric / media / product / law_policy / other
+7. confidence 为 0-1 之间的小数，evidence_span 给出原文中触发判断的短证据
 
 必须按以下JSON格式输出，不要添加其他内容：
 {{
   "summary": "中文摘要（200-300字）",
   "key_entities": ["实体1", "实体2", "实体3"],
+  "entity_mentions": [
+    {{
+      "mention": "原文提及",
+      "canonical_name": "标准实体名",
+      "entity_type": "person",
+      "confidence": 0.92,
+      "evidence_span": "用于判断实体类型的短文本"
+    }}
+  ],
   "impact": "影响分析（50-100字）",
   "trend": "趋势判断（50-100字）"
 }}""",
@@ -425,11 +438,13 @@ LLM_PROMPTS = {
 1. 解释为什么这个信号重要
 2. 提供可执行的建议
 3. 说明置信度依据
-4. 保持中文输出
+4. 说明该信号在业务上代表什么
+5. 保持中文输出
 
 输出格式：
 {{
   "importance": "重要性说明",
+  "meaning": "业务含义说明",
   "actionable": "可执行建议",
   "confidence_reason": "置信度理由"
 }}""",

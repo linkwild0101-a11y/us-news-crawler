@@ -144,6 +144,13 @@ def cluster_news(
             "article_ids": [article_id],
             "titles": [article_tokens[article_id]["title"]],
             "token_set": article_tokens[article_id]["tokens"].copy(),
+            "article_refs": [
+                {
+                    "id": article_id,
+                    "title": article_tokens[article_id]["title"],
+                    "url": article_tokens[article_id]["article"].get("url", ""),
+                }
+            ],
             "categories": [
                 article_tokens[article_id]["article"].get("category", "unknown")
             ],
@@ -173,6 +180,13 @@ def cluster_news(
                 current_cluster["article_ids"].append(candidate_id)
                 current_cluster["titles"].append(article_tokens[candidate_id]["title"])
                 current_cluster["token_set"].update(candidate_tokens)
+                current_cluster["article_refs"].append(
+                    {
+                        "id": candidate_id,
+                        "title": article_tokens[candidate_id]["title"],
+                        "url": article_tokens[candidate_id]["article"].get("url", ""),
+                    }
+                )
                 current_cluster["categories"].append(
                     article_tokens[candidate_id]["article"].get("category", "unknown")
                 )
@@ -184,8 +198,13 @@ def cluster_news(
     # 4. 格式化输出
     result = []
     for cluster in clusters:
-        # 找出最长的标题作为主标题
-        primary_title = max(cluster["titles"], key=len)
+        # 找出最长标题对应的文章，作为聚类主标题和主链接
+        primary_article = max(
+            cluster["article_refs"],
+            key=lambda item: len(item.get("title", "")),
+        )
+        primary_title = primary_article.get("title", "")
+        primary_link = primary_article.get("url", "")
 
         # 生成聚类ID
         cluster_id = generate_cluster_hash(cluster["titles"])
@@ -202,6 +221,7 @@ def cluster_news(
                 "article_ids": cluster["article_ids"],
                 "titles": cluster["titles"],
                 "primary_title": primary_title,
+                "primary_link": primary_link,
                 "token_set": cluster["token_set"],
                 "category": main_category,
                 "article_count": len(cluster["article_ids"]),

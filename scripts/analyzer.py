@@ -12,29 +12,26 @@ import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
-from typing import List, Dict, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from supabase import create_client
 
-from config.entity_config import (
-    ENTITY_TYPES,
-    PERSON_RULES,
-    CONCEPT_RULES,
-    DETECTION_PRIORITY,
-    MIN_ENTITY_LENGTH,
-)
 from config.analysis_config import (
     MAX_ARTICLES_PER_RUN,
-    MAX_LLM_CALLS,
     LLM_PROMPTS,
     SIGNAL_TYPES,
 )
+from scripts.entity_classification import (
+    extract_entity_names,
+    merge_entity_metadata,
+    normalize_entity_mentions,
+)
 from scripts.llm_client import LLMClient
 from scripts.clustering import cluster_news
-from scripts.signal_detector import detect_all_signals, generate_dedupe_key
+from scripts.signal_detector import detect_all_signals
 
 # 配置日志 - 同时输出到控制台和文件
 logger = logging.getLogger(__name__)
@@ -98,11 +95,17 @@ class HotspotAnalyzer:
             "errors": 0,
         }
 
-        # 分层分析配置
-        self.hot_threshold = 3  # 热点阈值：文章数>=3
-        self.concurrent_workers = 5  # 并发数
-        self.cold_model = "qwen-flash"  # 冷门新闻使用轻量级模型
-        self.hot_model = "qwen-plus"  # 热点新闻使用高质量模型
+        # 分析配置
+        self.hot_threshold = 3  # 信号检测目标阈值：文章数>=3
+        self.concurrent_workers = 10  # 完整分析并发数
+        self.analysis_model = "qwen-plus"  # 统一使用完整分析模型
+        self.signal_related_events_limit = 5  # 每个信号最多关联事件数
+        self.signal_llm_explain_max = 30  # 每轮最多用LLM解释的信号数量
+        self.signal_llm_min_confidence = 0.6  # LLM解释最低置信度
+        self.cluster_reuse_hours = 24  # 聚类结果复用窗口（小时）
+        self.db_max_retries = 4  # DB瞬时故障重试次数
+        self.db_retry_base_seconds = 1.0  # DB重试基础退避
+        self.db_batch_size = 200  # 批量写库默认分片
 
     def load_unanalyzed_articles(
         self, limit: Optional[int] = None, hours: Optional[int] = None
@@ -125,23 +128,41 @@ class HotspotAnalyzer:
         )
 
         try:
-            # 构建查询
-            query = (
-                self.supabase.table("articles")
-                .select(
-                    "id, title, content, url, category, source_id, published_at, fetched_at"
+            # Supabase/PostgREST 常见单次返回上限为 1000，这里分页读取。
+            articles: List[Dict] = []
+            page_size = min(1000, limit)
+            offset = 0
+
+            while len(articles) < limit:
+                query = (
+                    self.supabase.table("articles")
+                    .select(
+                        "id, title, content, url, category, source_id, published_at, fetched_at"
+                    )
+                    .is_("analyzed_at", "null")
+                    .order("id")
+                    .range(offset, offset + page_size - 1)
                 )
-                .is_("analyzed_at", "null")
-            )
 
-            # 如果时间窗口不为None，添加时间过滤
-            if hours is not None:
-                cutoff_time = (datetime.now() - timedelta(hours=hours)).isoformat()
-                query = query.gte("fetched_at", cutoff_time)
+                # 如果时间窗口不为None，添加时间过滤
+                if hours is not None:
+                    cutoff_time = (datetime.now() - timedelta(hours=hours)).isoformat()
+                    query = query.gte("fetched_at", cutoff_time)
 
-            result = query.limit(limit).execute()
+                result = query.execute()
+                batch = result.data or []
+                if not batch:
+                    break
 
-            articles = result.data
+                articles.extend(batch)
+                if len(batch) < page_size:
+                    break
+
+                offset += page_size
+                remaining = limit - len(articles)
+                page_size = min(1000, remaining)
+
+            articles = articles[:limit]
             self.stats["articles_loaded"] = len(articles)
 
             logger.info(f"加载了 {len(articles)} 篇未分析的文章")
@@ -152,13 +173,131 @@ class HotspotAnalyzer:
             self.stats["errors"] += 1
             return []
 
-    def generate_cluster_summary(self, cluster: Dict, depth: str = "full") -> Dict:
+    def _parse_json_array_field(self, value: Any) -> List[Any]:
+        """解析 JSON 数组字段，兼容字符串/列表两种格式"""
+        if isinstance(value, list):
+            return value
+        if isinstance(value, str) and value.strip():
+            try:
+                parsed = json.loads(value)
+                return parsed if isinstance(parsed, list) else []
+            except Exception:
+                return []
+        return []
+
+    def _is_transient_db_error(self, error: Exception) -> bool:
+        """判断是否属于可重试的数据库/网关瞬时错误"""
+        message = str(error).lower()
+        transient_flags = [
+            "code': 500",
+            "code': 502",
+            "code': 503",
+            "code': 504",
+            "internal server error",
+            "cloudflare",
+            "json could not be generated",
+            "timeout",
+            "temporarily",
+        ]
+        return any(flag in message for flag in transient_flags)
+
+    def _execute_with_retry(self, operation_name: str, operation):
+        """执行数据库操作并自动重试瞬时错误"""
+        last_error: Optional[Exception] = None
+        for attempt in range(1, self.db_max_retries + 1):
+            try:
+                return operation()
+            except Exception as e:
+                last_error = e
+                is_transient = self._is_transient_db_error(e)
+                if not is_transient or attempt == self.db_max_retries:
+                    raise
+
+                delay = self.db_retry_base_seconds * (2 ** (attempt - 1))
+                logger.warning(
+                    f"[DB_RETRY] {operation_name} 失败，{delay:.1f}s后重试 "
+                    f"({attempt}/{self.db_max_retries}) | 错误: {str(e)[:120]}"
+                )
+                time.sleep(delay)
+
+        if last_error:
+            raise last_error
+        raise RuntimeError(f"{operation_name} 执行失败")
+
+    def _reuse_existing_cluster_summaries(self, clusters: List[Dict]) -> int:
+        """复用已有聚类摘要，减少重复 LLM 调用"""
+        if not clusters:
+            return 0
+
+        cluster_keys = list(
+            dict.fromkeys(
+                [
+                    cluster.get("cluster_id")
+                    for cluster in clusters
+                    if cluster.get("cluster_id")
+                ]
+            )
+        )
+        if not cluster_keys:
+            return 0
+
+        cutoff = (datetime.now() - timedelta(hours=self.cluster_reuse_hours)).isoformat()
+        existing_map: Dict[str, Dict[str, Any]] = {}
+        batch_size = 200
+
+        try:
+            for i in range(0, len(cluster_keys), batch_size):
+                batch_keys = cluster_keys[i : i + batch_size]
+                rows = (
+                    self.supabase.table("analysis_clusters")
+                    .select(
+                        "cluster_key, summary, impact, trend, confidence, key_entities, "
+                        "analysis_depth, is_hot, processing_time, primary_link, updated_at"
+                    )
+                    .in_("cluster_key", batch_keys)
+                    .gte("updated_at", cutoff)
+                    .execute()
+                )
+                for row in rows.data or []:
+                    existing_map[row["cluster_key"]] = row
+        except Exception as e:
+            logger.warning(f"复用聚类摘要失败，回退为全量分析: {e}")
+            return 0
+
+        reused_count = 0
+        for cluster in clusters:
+            cached = existing_map.get(cluster.get("cluster_id"))
+            if not cached:
+                continue
+
+            cached_key_entities = self._parse_json_array_field(cached.get("key_entities"))
+            cluster["summary"] = {
+                "summary": cached.get("summary", cluster.get("primary_title", "")),
+                "key_entities": cached_key_entities,
+                "entity_mentions": [],
+                "impact": cached.get("impact", ""),
+                "trend": cached.get("trend", ""),
+                "confidence": cached.get("confidence", 0.8),
+                "analysis_depth": cached.get("analysis_depth", "full"),
+                "is_hot": bool(cached.get("is_hot", False)),
+                "processing_time": cached.get("processing_time", 0.0),
+                "model_name": "cache_reuse",
+                "prompt_version": "cluster_summary_v2",
+            }
+
+            if not cluster.get("primary_link") and cached.get("primary_link"):
+                cluster["primary_link"] = cached.get("primary_link")
+
+            reused_count += 1
+
+        return reused_count
+
+    def generate_cluster_summary(self, cluster: Dict) -> Dict:
         """
-        为聚类生成中文摘要（支持分层处理）
+        为聚类生成中文摘要（完整分析）
 
         Args:
             cluster: 聚类数据
-            depth: 分析深度，"full"=完整分析，"shallow"=快速翻译
 
         Returns:
             摘要结果字典
@@ -167,13 +306,13 @@ class HotspotAnalyzer:
         cluster_id_short = cluster["cluster_id"][:8]
         article_count = cluster.get("article_count", 0)
 
-        # 判断是否为热点
+        # 是否属于信号检测目标聚类
         is_hot = article_count >= self.hot_threshold
 
         logger.info(
             f"[CLUSTER_START] 开始处理聚类 | cluster_id: {cluster_id_short}... | "
-            f"文章数: {article_count} | 类型: {'热点' if is_hot else '冷门'} | "
-            f"深度: {depth} | 标题: {cluster['primary_title'][:50]}..."
+            f"文章数: {article_count} | 深度: full | "
+            f"信号目标: {'是' if is_hot else '否'} | 标题: {cluster['primary_title'][:50]}..."
         )
 
         if not self.llm_client:
@@ -181,17 +320,13 @@ class HotspotAnalyzer:
             return {
                 "summary": cluster["primary_title"],
                 "key_entities": [],
+                "entity_mentions": [],
                 "impact": "",
                 "trend": "",
-                "analysis_depth": depth,
+                "analysis_depth": "full",
                 "is_hot": is_hot,
             }
 
-        # 快速翻译模式（冷门新闻）
-        if depth == "shallow":
-            return self._quick_translate(cluster, is_hot)
-
-        # 完整分析模式（热点新闻）
         try:
             # 准备提示词
             prep_start = time.time()
@@ -216,16 +351,25 @@ class HotspotAnalyzer:
             logger.info(
                 f"[CLUSTER_LLM_CALL] 调用LLM | cluster_id: {cluster_id_short}..."
             )
-            result = self.llm_client.summarize(prompt)
+            used_model = self.analysis_model
+            result = self.llm_client.summarize(prompt, model=used_model)
             llm_duration = time.time() - llm_start
 
             self.stats["llm_calls"] += 1
             total_duration = time.time() - total_start
 
+            entity_mentions = normalize_entity_mentions(
+                result.get("entity_mentions") or result.get("key_entities", [])
+            )
+
             # 添加元数据
+            result["entity_mentions"] = entity_mentions
+            result["key_entities"] = extract_entity_names(entity_mentions)
             result["analysis_depth"] = "full"
             result["is_hot"] = is_hot
             result["processing_time"] = total_duration
+            result["model_name"] = used_model
+            result["prompt_version"] = "cluster_summary_v2"
 
             # 检查结果是否成功
             if result.get("error"):
@@ -255,6 +399,7 @@ class HotspotAnalyzer:
             return {
                 "summary": cluster["primary_title"],
                 "key_entities": [],
+                "entity_mentions": [],
                 "impact": "",
                 "trend": "",
                 "analysis_depth": "full",
@@ -262,206 +407,305 @@ class HotspotAnalyzer:
                 "error": str(e),
             }
 
-    def _quick_translate(self, cluster: Dict, is_hot: bool) -> Dict:
-        """
-        快速翻译模式（仅翻译标题，低成本）
+    def _build_signal_related_events(
+        self, signal: Dict, cluster_lookup: Dict[str, Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
+        """根据信号内容提取关联事件（聚类）"""
+        cluster_keys: List[str] = []
+        affected_clusters = signal.get("affected_clusters", [])
+        if isinstance(affected_clusters, list):
+            cluster_keys.extend([str(item) for item in affected_clusters if item])
 
-        Args:
-            cluster: 聚类数据
-            is_hot: 是否为热点
+        # 兼容增强信号中直接写 cluster_id=cluster_key 的场景
+        cluster_id_value = signal.get("cluster_id")
+        if isinstance(cluster_id_value, str) and cluster_id_value:
+            cluster_keys.append(cluster_id_value)
 
-        Returns:
-            简化版结果字典
-        """
-        total_start = time.time()
-        cluster_id_short = cluster["cluster_id"][:8]
+        unique_cluster_keys = list(dict.fromkeys(cluster_keys))
+        related_events: List[Dict[str, Any]] = []
+
+        for cluster_key in unique_cluster_keys[: self.signal_related_events_limit]:
+            event = cluster_lookup.get(cluster_key)
+            if not event:
+                continue
+            related_events.append(
+                {
+                    "cluster_id": event["cluster_id"],
+                    "cluster_key": cluster_key,
+                    "title": event["primary_title"],
+                    "summary": event["summary"],
+                    "article_count": event["article_count"],
+                    "category": event["category"],
+                }
+            )
+
+        return related_events
+
+    def _build_signal_rationale_fallback(
+        self, signal: Dict, related_events: List[Dict[str, Any]]
+    ) -> Dict[str, str]:
+        """构建无 LLM 时的信号解释兜底文案"""
+        signal_type = signal.get("signal_type", "unknown")
+        confidence = float(signal.get("confidence", 0) or 0)
+        description = signal.get("description", "")
+        details = signal.get("details", {}) or {}
+
+        if signal_type == "velocity_spike":
+            cluster_count = details.get("cluster_count", "N/A")
+            threshold = details.get("threshold", "N/A")
+            importance = f"短时间聚类数量达到 {cluster_count}，超过阈值 {threshold}。"
+            meaning = "说明新闻热度上升，事件可能进入快速发酵阶段。"
+            actionable = "建议优先跟踪新增聚类并观察扩散速度。"
+        elif signal_type == "convergence":
+            source_count = details.get("source_count", "N/A")
+            source_types = details.get("source_types", [])
+            source_text = (
+                ", ".join(source_types) if isinstance(source_types, list) else "N/A"
+            )
+            importance = f"同一事件被 {source_count} 类来源报道（{source_text}）。"
+            meaning = "说明可验证性增强，单一来源偏差风险下降。"
+            actionable = "建议比对各来源差异并核实关键事实。"
+        elif signal_type == "triangulation":
+            importance = "事件出现关键来源交叉验证，可信度通常较高。"
+            meaning = "说明该事件具备更强的真实性与持续关注价值。"
+            actionable = "建议将其纳入重点预警清单。"
+        elif signal_type == "hotspot_escalation":
+            level = details.get("escalation_level", "unknown")
+            score = details.get("total_score", "N/A")
+            importance = f"热点升级等级为 {level}，综合评分 {score}。"
+            meaning = "说明事件影响面和传播势能正在抬升。"
+            actionable = "建议结合实体趋势做连续复核。"
+        else:
+            importance = description or "系统检测到异常信号。"
+            meaning = description or "说明该事件存在进一步关注价值。"
+            actionable = "建议结合上下文做人工复核。"
+
+        if related_events:
+            top_titles = [event["title"] for event in related_events[:3]]
+            importance = f"{importance} 关联事件: {'；'.join(top_titles)}"
+
+        return {
+            "importance": importance,
+            "meaning": meaning,
+            "actionable": actionable,
+            "confidence_reason": f"当前系统置信度评分为 {confidence:.2f}。",
+            "generated_by": "rule_fallback",
+        }
+
+    def _generate_signal_rationale(
+        self, signal: Dict, related_events: List[Dict[str, Any]]
+    ) -> Dict[str, str]:
+        """使用 LLM 生成信号解释"""
+        fallback = self._build_signal_rationale_fallback(signal, related_events)
+        if not self.llm_client or not related_events:
+            return fallback
 
         try:
-            # 准备简化提示词（只翻译标题）
-            title = cluster["primary_title"]
-
-            # 使用纯文本翻译方法（避免 JSON 解析错误）
-            llm_start = time.time()
-            translated_title = self.llm_client.translate_text(
-                title, model=self.cold_model
+            event_lines = []
+            for event in related_events[:3]:
+                summary = (event.get("summary") or "").replace("\n", " ").strip()
+                event_lines.append(
+                    f"- {event['title']}（{event['article_count']}篇，{event['category']}）: {summary[:180]}"
+                )
+            cluster_summary = (
+                "\n".join(event_lines) if event_lines else signal.get("description", "")
             )
-            llm_duration = time.time() - llm_start
+            article_count = sum(
+                int(event.get("article_count", 0) or 0) for event in related_events
+            )
 
+            prompt = LLM_PROMPTS["signal_rationale"].format(
+                signal_type=signal.get("signal_type", "unknown"),
+                confidence=round(float(signal.get("confidence", 0) or 0), 2),
+                article_count=article_count,
+                cluster_summary=cluster_summary[:1200],
+            )
+
+            result = self.llm_client.summarize(prompt, model=self.analysis_model)
             self.stats["llm_calls"] += 1
-            total_duration = time.time() - total_start
+            if not isinstance(result, dict) or result.get("error"):
+                return fallback
 
-            logger.info(
-                f"[CLUSTER_QUICK_DONE] 快速翻译完成 | cluster_id: {cluster_id_short}... | "
-                f"耗时: {total_duration:.2f}s | 原文: {title[:50]}... | "
-                f"译文: {translated_title[:50]}..."
+            importance = (
+                str(result.get("importance", "")).strip() or fallback["importance"]
+            )
+            meaning = str(result.get("meaning", "")).strip() or fallback["meaning"]
+            actionable = (
+                str(result.get("actionable", "")).strip() or fallback["actionable"]
+            )
+            confidence_reason = (
+                str(result.get("confidence_reason", "")).strip()
+                or fallback["confidence_reason"]
             )
 
             return {
-                "summary": translated_title,
-                "key_entities": [],
-                "impact": "",
-                "trend": "",
-                "analysis_depth": "shallow",
-                "is_hot": is_hot,
-                "processing_time": total_duration,
-                "note": "点击进行深度分析",
+                "importance": importance,
+                "meaning": meaning,
+                "actionable": actionable,
+                "confidence_reason": confidence_reason,
+                "generated_by": "llm",
             }
-
         except Exception as e:
-            logger.error(
-                f"[CLUSTER_QUICK_ERROR] 快速翻译失败 | cluster_id: {cluster_id_short}... | 错误: {str(e)}"
-            )
-            return {
-                "summary": cluster["primary_title"],
-                "key_entities": [],
-                "impact": "",
-                "trend": "",
-                "analysis_depth": "shallow",
-                "is_hot": is_hot,
-                "error": str(e),
-            }
+            logger.warning(f"[SIGNAL_RATIONALE_FALLBACK] LLM信号解释失败: {e}")
+            return fallback
 
-    def _detect_entity_type(self, entity_name: str) -> str:
-        """
-        检测实体类型
+    def _update_entities_bulk(self, entity_tasks: List[Dict[str, Any]]):
+        """批量更新实体与实体-聚类关联，减少数据库往返"""
+        if not entity_tasks:
+            return
 
-        从配置文件读取关键词进行检测
-
-        Args:
-            entity_name: 实体名称
-
-        Returns:
-            实体类型: person/organization/location/event/concept
-        """
-        name = entity_name.strip()
-
-        # 按优先级检测（event -> organization -> location -> person -> concept）
-        for entity_type in DETECTION_PRIORITY:
-            if entity_type == "concept":
-                continue
-
-            if entity_type == "person":
-                # 人名特殊处理
-                rules = PERSON_RULES
-                name_len = len(name)
-                min_len = rules["chinese_name_length"]["min"]
-                max_len = rules["chinese_name_length"]["max"]
-
-                # 中文人名长度判断
-                if min_len <= name_len <= max_len:
-                    return "person"
-
-                # 英文人名判断
-                indicators = rules["english_indicators"]
-                if "contains_space" in indicators and " " in name:
-                    return "person"
-                if "title_capitalized" in indicators and name and name[0].isupper():
-                    # 检查是否是常见英文名
-                    common_names = rules.get("common_english_names", [])
-                    name_parts = name.split()
-                    for part in name_parts:
-                        if part in common_names:
-                            return "person"
-
-                continue
-
-            # 其他类型：从配置读取关键词
-            config = ENTITY_TYPES.get(entity_type, {})
-            keywords_config = config.get("keywords", {})
-
-            # 合并中英文关键词
-            all_keywords = []
-            all_keywords.extend(keywords_config.get("zh", []))
-            all_keywords.extend(keywords_config.get("en", []))
-
-            # 检查关键词匹配
-            for keyword in all_keywords:
-                if keyword in name:
-                    return entity_type
-
-        # 默认为概念
-        return "concept"
-
-    def _update_entities(self, cluster_id: int, entities: List[str], category: str):
-        """
-        更新实体表和实体-聚类关联表
-
-        Args:
-            cluster_id: 聚类ID
-            entities: 实体名称列表
-            category: 分类
-        """
         try:
-            for entity_name in entities:
-                if not entity_name or len(entity_name) < 2:
-                    continue
+            now_iso = datetime.now().isoformat()
+            entity_agg: Dict[Tuple[str, str], Dict[str, Any]] = {}
+            relation_counts: Dict[Tuple[str, str, int], int] = {}
 
-                # 清理实体名称
-                entity_name = entity_name.strip()
+            for task in entity_tasks:
+                cluster_id = int(task["cluster_id"])
+                category = task.get("category", "unknown")
+                model_name = task.get("model_name", "")
+                prompt_version = task.get("prompt_version", "")
+                normalized_entities = normalize_entity_mentions(task.get("entities", []))
 
-                # 自动检测实体类型
-                entity_type = self._detect_entity_type(entity_name)
+                for entity in normalized_entities:
+                    key = (entity["canonical_name"], entity["entity_type"])
+                    agg = entity_agg.setdefault(
+                        key,
+                        {
+                            "count": 0,
+                            "category": category,
+                            "entity": entity,
+                            "model_name": model_name,
+                            "prompt_version": prompt_version,
+                            "metadata": {},
+                        },
+                    )
+                    agg["count"] += 1
+                    agg["entity"] = entity
+                    if category:
+                        agg["category"] = category
+                    if model_name:
+                        agg["model_name"] = model_name
+                    if prompt_version:
+                        agg["prompt_version"] = prompt_version
+                    agg["metadata"] = merge_entity_metadata(
+                        existing_metadata=agg.get("metadata"),
+                        entity=entity,
+                        model_name=agg.get("model_name", ""),
+                        prompt_version=agg.get("prompt_version", ""),
+                    )
 
-                # 检查实体是否已存在
-                existing = (
-                    self.supabase.table("entities")
-                    .select("id, mention_count_total")
-                    .eq("name", entity_name)
-                    .execute()
+                    relation_key = (key[0], key[1], cluster_id)
+                    relation_counts[relation_key] = relation_counts.get(relation_key, 0) + 1
+
+            if not entity_agg:
+                return
+
+            names_by_type: Dict[str, List[str]] = {}
+            for name, entity_type in entity_agg.keys():
+                names_by_type.setdefault(entity_type, []).append(name)
+
+            existing_map: Dict[Tuple[str, str], Dict[str, Any]] = {}
+            for entity_type, names in names_by_type.items():
+                unique_names = list(dict.fromkeys(names))
+                existing_rows = self._execute_with_retry(
+                    "load_existing_entities",
+                    lambda et=entity_type, un=unique_names: (
+                        self.supabase.table("entities")
+                        .select("id, name, entity_type, mention_count_total, metadata, category")
+                        .eq("entity_type", et)
+                        .in_("name", un)
+                        .execute()
+                    ),
+                )
+                for row in existing_rows.data or []:
+                    existing_map[(row["name"], row["entity_type"])] = row
+
+            upsert_rows: List[Dict[str, Any]] = []
+            for key, agg in entity_agg.items():
+                name, entity_type = key
+                existing = existing_map.get(key)
+                metadata = agg.get("metadata", {})
+
+                if existing:
+                    mention_total = (existing.get("mention_count_total") or 0) + agg["count"]
+                    metadata = merge_entity_metadata(
+                        existing_metadata=existing.get("metadata"),
+                        entity=agg["entity"],
+                        model_name=agg.get("model_name", ""),
+                        prompt_version=agg.get("prompt_version", ""),
+                    )
+                else:
+                    mention_total = agg["count"]
+
+                upsert_rows.append(
+                    {
+                        "name": name,
+                        "entity_type": entity_type,
+                        "category": agg.get("category", "unknown"),
+                        "last_seen": now_iso,
+                        "mention_count_total": mention_total,
+                        "metadata": metadata,
+                    }
                 )
 
-                if existing.data:
-                    # 更新现有实体
-                    entity_id = existing.data[0]["id"]
-                    new_count = existing.data[0]["mention_count_total"] + 1
-
-                    self.supabase.table("entities").update(
-                        {
-                            "last_seen": datetime.now().isoformat(),
-                            "mention_count_total": new_count,
-                            "category": category,
-                        }
-                    ).eq("id", entity_id).execute()
-                else:
-                    # 创建新实体
-                    result = (
+            for i in range(0, len(upsert_rows), self.db_batch_size):
+                batch_rows = upsert_rows[i : i + self.db_batch_size]
+                self._execute_with_retry(
+                    "upsert_entities_batch",
+                    lambda rows=batch_rows: (
                         self.supabase.table("entities")
-                        .insert(
-                            {
-                                "name": entity_name,
-                                "entity_type": entity_type,
-                                "category": category,
-                                "mention_count_total": 1,
-                            }
-                        )
+                        .upsert(rows, on_conflict="name,entity_type")
                         .execute()
-                    )
-                    entity_id = result.data[0]["id"]
+                    ),
+                )
 
-                # 创建或更新实体-聚类关联
-                try:
-                    # 检查是否已存在
-                    existing_rel = (
+            entity_id_map: Dict[Tuple[str, str], int] = {}
+            for entity_type, names in names_by_type.items():
+                unique_names = list(dict.fromkeys(names))
+                rows = self._execute_with_retry(
+                    "load_entity_ids_after_upsert",
+                    lambda et=entity_type, un=unique_names: (
+                        self.supabase.table("entities")
+                        .select("id, name, entity_type")
+                        .eq("entity_type", et)
+                        .in_("name", un)
+                        .execute()
+                    ),
+                )
+                for row in rows.data or []:
+                    entity_id_map[(row["name"], row["entity_type"])] = row["id"]
+
+            relation_rows: List[Dict[str, Any]] = []
+            for relation_key, mention_count in relation_counts.items():
+                name, entity_type, cluster_id = relation_key
+                entity_id = entity_id_map.get((name, entity_type))
+                if not entity_id:
+                    continue
+                relation_rows.append(
+                    {
+                        "entity_id": entity_id,
+                        "cluster_id": cluster_id,
+                        "mention_count": mention_count,
+                    }
+                )
+
+            for i in range(0, len(relation_rows), self.db_batch_size):
+                batch_rows = relation_rows[i : i + self.db_batch_size]
+                self._execute_with_retry(
+                    "upsert_entity_cluster_relations_batch",
+                    lambda rows=batch_rows: (
                         self.supabase.table("entity_cluster_relations")
-                        .select("id")
-                        .eq("entity_id", entity_id)
-                        .eq("cluster_id", cluster_id)
+                        .upsert(rows, on_conflict="entity_id,cluster_id")
                         .execute()
-                    )
+                    ),
+                )
 
-                    if not existing_rel.data:
-                        self.supabase.table("entity_cluster_relations").insert(
-                            {
-                                "entity_id": entity_id,
-                                "cluster_id": cluster_id,
-                                "mention_count": 1,
-                            }
-                        ).execute()
-                except Exception as e:
-                    logger.debug(f"实体关联创建失败: {e}")
-
+            logger.info(
+                f"[ENTITIES_BULK_UPDATED] 聚类: {len(entity_tasks)} | "
+                f"实体: {len(entity_agg)} | 关联: {len(relation_rows)}"
+            )
         except Exception as e:
-            logger.error(f"更新实体失败: {e}")
+            logger.error(f"批量更新实体失败: {e}")
 
     def save_analysis_results(self, clusters: List[Dict], signals: List[Dict]):
         """
@@ -474,109 +718,180 @@ class HotspotAnalyzer:
         logger.info(f"保存分析结果: {len(clusters)} 个聚类, {len(signals)} 个信号")
 
         try:
+            cluster_lookup: Dict[str, Dict[str, Any]] = {}
+            entity_tasks: List[Dict[str, Any]] = []
+
             # 保存聚类
             for cluster in clusters:
-                cluster_data = {
-                    "cluster_key": cluster["cluster_id"],
-                    "category": cluster["category"],
-                    "primary_title": cluster["primary_title"],
-                    "primary_link": "",  # 可以添加主文章链接
-                    "summary": cluster.get("summary", {}).get(
-                        "summary", cluster["primary_title"]
-                    ),
-                    "summary_en": cluster["primary_title"],
-                    "article_count": cluster["article_count"],
-                    "key_entities": json.dumps(
-                        cluster.get("summary", {}).get("key_entities", [])
-                    ),
-                    "impact": cluster.get("summary", {}).get("impact", ""),
-                    "trend": cluster.get("summary", {}).get("trend", ""),
-                    "confidence": cluster.get("summary", {}).get("confidence", 0.8),
-                    # 新增分层分析字段
-                    "analysis_depth": cluster.get("summary", {}).get(
-                        "analysis_depth", "full"
-                    ),
-                    "is_hot": cluster.get("summary", {}).get(
-                        "is_hot", cluster["article_count"] >= 3
-                    ),
-                    "full_analysis_triggered": cluster.get("summary", {}).get(
-                        "analysis_depth"
+                try:
+                    summary = cluster.get("summary", {})
+                    entity_mentions = normalize_entity_mentions(
+                        summary.get("entity_mentions") or summary.get("key_entities", [])
                     )
-                    == "full",
-                    "processing_time": cluster.get("summary", {}).get(
-                        "processing_time", 0.0
-                    ),
-                }
+                    key_entities = extract_entity_names(entity_mentions)
 
-                # 检查是否已存在
-                existing = (
-                    self.supabase.table("analysis_clusters")
-                    .select("id")
-                    .eq("cluster_key", cluster["cluster_id"])
-                    .execute()
-                )
-
-                if existing.data:
-                    # 更新
-                    cluster_id = existing.data[0]["id"]
-                    self.supabase.table("analysis_clusters").update(cluster_data).eq(
-                        "id", cluster_id
-                    ).execute()
-                    logger.debug(f"更新聚类: {cluster['cluster_id'][:8]}...")
-                else:
-                    # 插入
-                    result = (
-                        self.supabase.table("analysis_clusters")
-                        .insert(cluster_data)
-                        .execute()
+                    cluster_data = {
+                        "cluster_key": cluster["cluster_id"],
+                        "category": cluster["category"],
+                        "primary_title": cluster["primary_title"],
+                        "primary_link": cluster.get("primary_link", ""),
+                        "summary": summary.get("summary", cluster["primary_title"]),
+                        "summary_en": cluster["primary_title"],
+                        "article_count": cluster["article_count"],
+                        "key_entities": json.dumps(key_entities),
+                        "impact": summary.get("impact", ""),
+                        "trend": summary.get("trend", ""),
+                        "confidence": summary.get("confidence", 0.8),
+                        "analysis_depth": summary.get("analysis_depth", "full"),
+                        "is_hot": summary.get("is_hot", cluster["article_count"] >= 3),
+                        "full_analysis_triggered": summary.get("analysis_depth") == "full",
+                        "processing_time": summary.get("processing_time", 0.0),
+                    }
+                    result = self._execute_with_retry(
+                        "upsert_analysis_cluster",
+                        lambda payload=cluster_data: (
+                            self.supabase.table("analysis_clusters")
+                            .upsert(payload, on_conflict="cluster_key")
+                            .execute()
+                        ),
                     )
-                    cluster_id = result.data[0]["id"]
-                    logger.debug(f"插入聚类: {cluster['cluster_id'][:8]}...")
+                    cluster_id = (result.data or [{}])[0].get("id")
+                    if not cluster_id:
+                        fallback = self._execute_with_retry(
+                            "fetch_cluster_id_by_key",
+                            lambda ck=cluster["cluster_id"]: (
+                                self.supabase.table("analysis_clusters")
+                                .select("id")
+                                .eq("cluster_key", ck)
+                                .execute()
+                            ),
+                        )
+                        cluster_id = fallback.data[0]["id"] if fallback.data else None
 
-                    # 保存 article_analyses 关联
-                    for article_id in cluster["article_ids"]:
-                        try:
-                            self.supabase.table("article_analyses").insert(
-                                {"article_id": article_id, "cluster_id": cluster_id}
-                            ).execute()
-                        except Exception as e:
-                            # 可能已存在，忽略错误
-                            pass
+                    if cluster_id:
+                        cluster_lookup[cluster["cluster_id"]] = {
+                            "cluster_id": cluster_id,
+                            "primary_title": cluster["primary_title"],
+                            "summary": summary.get("summary", cluster["primary_title"]),
+                            "article_count": cluster["article_count"],
+                            "category": cluster["category"],
+                        }
 
-                # 更新实体追踪（只对完整分析的聚类）
-                if cluster.get("summary", {}).get("analysis_depth") == "full":
-                    entities = cluster.get("summary", {}).get("key_entities", [])
-                    if entities and cluster_id:
-                        self._update_entities(cluster_id, entities, cluster["category"])
+                    if cluster_id and cluster.get("article_ids"):
+                        relations = [
+                            {"article_id": article_id, "cluster_id": cluster_id}
+                            for article_id in cluster["article_ids"]
+                        ]
+                        for i in range(0, len(relations), self.db_batch_size):
+                            batch_rows = relations[i : i + self.db_batch_size]
+                            self._execute_with_retry(
+                                "upsert_article_analyses_batch",
+                                lambda rows=batch_rows: (
+                                    self.supabase.table("article_analyses")
+                                    .upsert(rows, on_conflict="article_id,cluster_id")
+                                    .execute()
+                                ),
+                            )
+
+                    if (
+                        summary.get("analysis_depth") == "full"
+                        and entity_mentions
+                        and cluster_id
+                    ):
+                        entity_tasks.append(
+                            {
+                                "cluster_id": cluster_id,
+                                "entities": entity_mentions,
+                                "category": cluster["category"],
+                                "model_name": summary.get("model_name", ""),
+                                "prompt_version": summary.get("prompt_version", ""),
+                            }
+                        )
+                except Exception as e:
+                    logger.error(
+                        f"[CLUSTER_SAVE_FAILED] cluster_key={cluster.get('cluster_id')} | "
+                        f"错误: {str(e)[:160]}"
+                    )
+                    self.stats["errors"] += 1
+                    continue
+
+            if entity_tasks:
+                self._update_entities_bulk(entity_tasks)
 
             # 保存信号
-            for signal in signals:
-                signal_data = {
-                    "signal_type": signal["signal_type"],
-                    "signal_key": signal["signal_id"],
-                    "category": signal.get("category", "unknown"),
-                    "confidence": signal["confidence"],
-                    "description": signal["description"],
-                    "description_en": signal.get("description_en", ""),
-                    "rationale": json.dumps(signal.get("details", {})),
-                    "data_source": "llm_analysis",
-                    "expires_at": signal.get("expires_at"),
-                    "created_at": signal.get("created_at"),
-                }
+            logger.info("信号解释模式: 先写规则解释，LLM增强由 signal_explainer 异步补充")
+            sorted_signals = sorted(
+                signals,
+                key=lambda item: float(item.get("confidence", 0) or 0),
+                reverse=True,
+            )
+            for signal in sorted_signals:
+                try:
+                    related_events = self._build_signal_related_events(signal, cluster_lookup)
+                    primary_cluster_id = (
+                        related_events[0]["cluster_id"] if related_events else None
+                    )
+                    signal_category = signal.get("category", "unknown")
+                    if signal_category == "unknown" and related_events:
+                        signal_category = related_events[0]["category"]
 
-                # 检查是否已存在
-                existing = (
-                    self.supabase.table("analysis_signals")
-                    .select("id")
-                    .eq("signal_key", signal["signal_id"])
-                    .execute()
-                )
+                    confidence = float(signal.get("confidence", 0) or 0)
+                    rationale_result = self._build_signal_rationale_fallback(
+                        signal, related_events
+                    )
+                    explain_status = (
+                        "pending"
+                        if related_events and confidence >= self.signal_llm_min_confidence
+                        else "rule_only"
+                    )
 
-                if not existing.data:
-                    self.supabase.table("analysis_signals").insert(
-                        signal_data
-                    ).execute()
-                    logger.debug(f"插入信号: {signal['signal_type']}")
+                    rationale_payload = {
+                        "details": signal.get("details", {}),
+                        "related_events": related_events,
+                        "importance": rationale_result.get("importance", ""),
+                        "meaning": rationale_result.get(
+                            "meaning", signal.get("description", "")
+                        ),
+                        "actionable": rationale_result.get("actionable", ""),
+                        "confidence_reason": rationale_result.get("confidence_reason", ""),
+                        "generated_by": rationale_result.get(
+                            "generated_by", "rule_fallback"
+                        ),
+                        "explain_status": explain_status,
+                    }
+
+                    signal_data = {
+                        "signal_type": signal["signal_type"],
+                        "signal_key": signal["signal_id"],
+                        "cluster_id": primary_cluster_id,
+                        "category": signal_category,
+                        "confidence": signal["confidence"],
+                        "description": signal["description"],
+                        "description_en": signal.get("description_en", ""),
+                        "rationale": json.dumps(rationale_payload, ensure_ascii=False),
+                        "actionable_insight": rationale_payload.get("actionable", ""),
+                        "data_source": signal.get("data_source", "llm_analysis"),
+                        "expires_at": signal.get("expires_at"),
+                        "created_at": (
+                            signal.get("created_at") or datetime.now().isoformat()
+                        ),
+                    }
+                    self._execute_with_retry(
+                        "upsert_analysis_signal",
+                        lambda payload=signal_data: (
+                            self.supabase.table("analysis_signals")
+                            .upsert(payload, on_conflict="signal_key")
+                            .execute()
+                        ),
+                    )
+                    logger.debug(f"写入信号: {signal['signal_type']}")
+                except Exception as e:
+                    logger.error(
+                        f"[SIGNAL_SAVE_FAILED] signal_key={signal.get('signal_id')} | "
+                        f"错误: {str(e)[:160]}"
+                    )
+                    self.stats["errors"] += 1
+                    continue
 
             logger.info("分析结果保存成功")
 
@@ -584,6 +899,139 @@ class HotspotAnalyzer:
             logger.error(f"保存分析结果失败: {e}")
             self.stats["errors"] += 1
             raise
+
+    def enrich_pending_signal_rationales(
+        self, hours: int = 24, limit: int = 30, max_workers: int = 3
+    ) -> int:
+        """异步补充信号 LLM 解释，避免阻塞主分析流程"""
+        if not self.llm_client:
+            logger.warning("LLM 客户端不可用，跳过信号解释增强")
+            return 0
+
+        cutoff = (datetime.now() - timedelta(hours=hours)).isoformat()
+        rows = self._execute_with_retry(
+            "load_pending_signal_rationales",
+            lambda: (
+                self.supabase.table("analysis_signals")
+                .select(
+                    "signal_key, signal_type, confidence, description, rationale, "
+                    "actionable_insight, created_at"
+                )
+                .gte("created_at", cutoff)
+                .order("confidence", desc=True)
+                .limit(limit * 3)
+                .execute()
+            ),
+        )
+
+        candidates: List[Dict[str, Any]] = []
+        for row in rows.data or []:
+            rationale_raw = row.get("rationale")
+            rationale = {}
+            if isinstance(rationale_raw, dict):
+                rationale = rationale_raw
+            elif isinstance(rationale_raw, str) and rationale_raw.strip():
+                try:
+                    parsed = json.loads(rationale_raw)
+                    if isinstance(parsed, dict):
+                        rationale = parsed
+                except Exception:
+                    rationale = {}
+
+            if rationale.get("generated_by") == "llm":
+                continue
+            if rationale.get("explain_status") == "rule_only":
+                continue
+
+            related_events = rationale.get("related_events", [])
+            if not isinstance(related_events, list) or not related_events:
+                continue
+
+            signal_payload = {
+                "signal_type": row.get("signal_type", "unknown"),
+                "confidence": row.get("confidence", 0),
+                "description": row.get("description", ""),
+                "details": rationale.get("details", {}),
+            }
+            candidates.append(
+                {
+                    "signal_key": row.get("signal_key"),
+                    "signal": signal_payload,
+                    "related_events": related_events,
+                    "rationale": rationale,
+                }
+            )
+            if len(candidates) >= limit:
+                break
+
+        if not candidates:
+            logger.info("没有待增强的信号解释")
+            return 0
+
+        logger.info(f"开始异步增强 {len(candidates)} 个信号解释...")
+        success_count = 0
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_item = {
+                executor.submit(
+                    self._generate_signal_rationale,
+                    item["signal"],
+                    item["related_events"],
+                ): item
+                for item in candidates
+            }
+
+            for future in as_completed(future_to_item):
+                item = future_to_item[future]
+                signal_key = item.get("signal_key")
+                try:
+                    result = future.result()
+                    if result.get("generated_by") != "llm":
+                        continue
+
+                    rationale_payload = dict(item["rationale"])
+                    rationale_payload.update(
+                        {
+                            "importance": result.get(
+                                "importance", rationale_payload.get("importance", "")
+                            ),
+                            "meaning": result.get(
+                                "meaning", rationale_payload.get("meaning", "")
+                            ),
+                            "actionable": result.get(
+                                "actionable", rationale_payload.get("actionable", "")
+                            ),
+                            "confidence_reason": result.get(
+                                "confidence_reason",
+                                rationale_payload.get("confidence_reason", ""),
+                            ),
+                            "generated_by": "llm",
+                            "explain_status": "done",
+                        }
+                    )
+
+                    self._execute_with_retry(
+                        "update_signal_rationale",
+                        lambda payload=rationale_payload, sk=signal_key: (
+                            self.supabase.table("analysis_signals")
+                            .update(
+                                {
+                                    "rationale": json.dumps(
+                                        payload, ensure_ascii=False
+                                    ),
+                                    "actionable_insight": payload.get("actionable", ""),
+                                }
+                            )
+                            .eq("signal_key", sk)
+                            .execute()
+                        ),
+                    )
+                    success_count += 1
+                except Exception as e:
+                    logger.warning(f"信号解释增强失败 {signal_key}: {e}")
+
+        logger.info(f"信号解释增强完成: {success_count}/{len(candidates)}")
+        return success_count
 
     def mark_articles_analyzed(self, article_ids: List[int]):
         """
@@ -599,11 +1047,11 @@ class HotspotAnalyzer:
 
         try:
             now = datetime.now().isoformat()
-
-            # 批量更新
-            for article_id in article_ids:
-                self.supabase.table("articles").update({"analyzed_at": now}).eq(
-                    "id", article_id
+            batch_size = 300
+            for i in range(0, len(article_ids), batch_size):
+                batch_ids = article_ids[i : i + batch_size]
+                self.supabase.table("articles").update({"analyzed_at": now}).in_(
+                    "id", batch_ids
                 ).execute()
 
             logger.info("文章标记完成")
@@ -612,18 +1060,30 @@ class HotspotAnalyzer:
             logger.error(f"标记文章失败: {e}")
             self.stats["errors"] += 1
 
-    def run_analysis(self, limit: int = None, dry_run: bool = False):
+    def run_analysis(
+        self,
+        limit: int = None,
+        dry_run: bool = False,
+        enrich_signals_after_run: bool = False,
+        enrich_hours: int = 24,
+        enrich_limit: int = 30,
+        enrich_workers: int = 3,
+    ):
         """
-        运行完整的分析流程（支持分层处理和并发）
+        运行完整的分析流程（全量完整分析 + 并发）
 
         Args:
             limit: 最大处理文章数
             dry_run: 试运行模式（不保存到数据库）
+            enrich_signals_after_run: 分析完成后是否补充信号 LLM 解释
+            enrich_hours: 信号解释回看窗口（小时）
+            enrich_limit: 本轮最多补充解释的信号数
+            enrich_workers: 信号解释并发 worker 数
         """
         logger.info("=" * 60)
-        logger.info("开始热点分析（智能分层 + 并发处理）")
+        logger.info("开始新闻分析（全量完整分析 + 并发处理）")
         logger.info(
-            f"配置: 热点阈值={self.hot_threshold}, 并发数={self.concurrent_workers}"
+            f"配置: 信号目标阈值={self.hot_threshold}, 并发数={self.concurrent_workers}"
         )
         logger.info("=" * 60)
 
@@ -634,6 +1094,12 @@ class HotspotAnalyzer:
 
         if not articles:
             logger.info("没有未分析的文章，跳过")
+            if enrich_signals_after_run and not dry_run:
+                self.enrich_pending_signal_rationales(
+                    hours=enrich_hours,
+                    limit=enrich_limit,
+                    max_workers=enrich_workers,
+                )
             return
 
         # 2. 聚类
@@ -642,7 +1108,7 @@ class HotspotAnalyzer:
         self.stats["clusters_created"] = len(clusters)
         logger.info(f"创建了 {len(clusters)} 个聚类")
 
-        # 3. 分层：分离热点和冷门
+        # 3. 统计信号检测目标聚类（用于信号检测和统计）
         hot_clusters = [
             c for c in clusters if c.get("article_count", 0) >= self.hot_threshold
         ]
@@ -651,25 +1117,24 @@ class HotspotAnalyzer:
         ]
 
         logger.info(
-            f"分层结果: 热点 {len(hot_clusters)} 个, 冷门 {len(cold_clusters)} 个"
+            f"聚类统计: 信号目标 {len(hot_clusters)} 个, 其他 {len(cold_clusters)} 个"
         )
 
-        # 4. 并发处理热点（完整分析）
-        logger.info(f"开始并发处理 {len(hot_clusters)} 个热点聚类...")
-        self._process_clusters_concurrent(hot_clusters, depth="full", dry_run=dry_run)
-
-        # 5. 快速处理冷门（仅翻译）
-        logger.info(f"开始快速处理 {len(cold_clusters)} 个冷门聚类...")
-        self._process_clusters_concurrent(
-            cold_clusters, depth="shallow", dry_run=dry_run
-        )
-
+        # 4. 复用近期聚类结果，减少重复 LLM 调用
+        reused_clusters = self._reuse_existing_cluster_summaries(clusters)
+        clusters_to_analyze = [cluster for cluster in clusters if not cluster.get("summary")]
         logger.info(
-            f"成功处理 {len(hot_clusters) + len(cold_clusters)}/{len(clusters)} 个聚类"
+            f"摘要复用: {reused_clusters} 个 | 待新增分析: {len(clusters_to_analyze)} 个"
         )
 
-        # 6. 信号检测（只对热点聚类）
-        logger.info("检测信号（仅热点聚类）...")
+        # 5. 并发完整分析剩余聚类
+        if clusters_to_analyze:
+            logger.info(f"开始并发完整分析 {len(clusters_to_analyze)} 个聚类...")
+            self._process_clusters_concurrent(clusters_to_analyze, dry_run=dry_run)
+        logger.info(f"聚类处理完成: 总计 {len(clusters)} 个")
+
+        # 6. 信号检测（只对信号目标聚类）
+        logger.info("检测信号（仅信号目标聚类）...")
         signals = detect_all_signals(hot_clusters)
         self.stats["signals_detected"] = len(signals)
 
@@ -692,6 +1157,13 @@ class HotspotAnalyzer:
             # 8. 标记文章
             article_ids = [a["id"] for a in articles]
             self.mark_articles_analyzed(article_ids)
+
+            if enrich_signals_after_run:
+                self.enrich_pending_signal_rationales(
+                    hours=enrich_hours,
+                    limit=enrich_limit,
+                    max_workers=enrich_workers,
+                )
         else:
             logger.info("试运行模式: 跳过保存")
 
@@ -704,8 +1176,8 @@ class HotspotAnalyzer:
         logger.info(f"耗时: {duration:.1f} 秒")
         logger.info(f"处理文章: {self.stats['articles_loaded']}")
         logger.info(f"创建聚类: {self.stats['clusters_created']}")
-        logger.info(f"热点聚类: {len(hot_clusters)} (完整分析)")
-        logger.info(f"冷门聚类: {len(cold_clusters)} (快速翻译)")
+        logger.info(f"信号目标聚类: {len(hot_clusters)} (完整分析)")
+        logger.info(f"其他聚类: {len(cold_clusters)} (完整分析)")
         logger.info(f"检测信号: {self.stats['signals_detected']}")
         logger.info(f"LLM调用: {self.stats['llm_calls']}")
         if self.llm_client:
@@ -713,15 +1185,12 @@ class HotspotAnalyzer:
             logger.info(f"预估成本: ${llm_stats['estimated_cost']:.4f}")
         logger.info("=" * 60)
 
-    def _process_clusters_concurrent(
-        self, clusters: List[Dict], depth: str = "full", dry_run: bool = False
-    ):
+    def _process_clusters_concurrent(self, clusters: List[Dict], dry_run: bool = False):
         """
         并发处理聚类列表
 
         Args:
             clusters: 聚类列表
-            depth: 分析深度，"full" 或 "shallow"
             dry_run: 试运行模式
         """
         if not clusters:
@@ -738,7 +1207,7 @@ class HotspotAnalyzer:
         with ThreadPoolExecutor(max_workers=self.concurrent_workers) as executor:
             # 提交所有任务
             future_to_cluster = {
-                executor.submit(self.generate_cluster_summary, cluster, depth): cluster
+                executor.submit(self.generate_cluster_summary, cluster): cluster
                 for cluster in clusters
             }
 
@@ -765,7 +1234,7 @@ class HotspotAnalyzer:
                     cluster["summary"] = {
                         "summary": cluster["primary_title"],
                         "error": str(e),
-                        "analysis_depth": depth,
+                        "analysis_depth": "full",
                     }
                     errors += 1
 
@@ -779,13 +1248,56 @@ def main():
     parser.add_argument(
         "--dry-run", action="store_true", help="试运行模式（不保存到数据库）"
     )
-    parser.add_argument("--hours", type=int, default=24, help="时间窗口（小时）")
+    parser.add_argument("--hours", type=int, default=24, help="兼容参数（已不用于主分析）")
+    parser.add_argument(
+        "--enrich-signals-only",
+        action="store_true",
+        help="仅执行信号解释增强，不跑主分析",
+    )
+    parser.add_argument(
+        "--enrich-signals-after-run",
+        action="store_true",
+        help="主分析完成后自动补充信号解释",
+    )
+    parser.add_argument(
+        "--enrich-hours",
+        type=int,
+        default=24,
+        help="信号解释增强回看窗口（小时）",
+    )
+    parser.add_argument(
+        "--enrich-limit",
+        type=int,
+        default=30,
+        help="本次最多增强的信号数量",
+    )
+    parser.add_argument(
+        "--enrich-workers",
+        type=int,
+        default=3,
+        help="信号解释增强并发 worker 数",
+    )
 
     args = parser.parse_args()
 
     try:
         analyzer = HotspotAnalyzer()
-        analyzer.run_analysis(limit=args.limit, dry_run=args.dry_run)
+        if args.enrich_signals_only:
+            analyzer.enrich_pending_signal_rationales(
+                hours=args.enrich_hours,
+                limit=args.enrich_limit,
+                max_workers=args.enrich_workers,
+            )
+            return
+
+        analyzer.run_analysis(
+            limit=args.limit,
+            dry_run=args.dry_run,
+            enrich_signals_after_run=args.enrich_signals_after_run,
+            enrich_hours=args.enrich_hours,
+            enrich_limit=args.enrich_limit,
+            enrich_workers=args.enrich_workers,
+        )
     except Exception as e:
         logger.error(f"分析器运行失败: {e}")
         raise

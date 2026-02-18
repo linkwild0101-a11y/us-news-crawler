@@ -16,7 +16,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from scripts.analyzer import HotspotAnalyzer
 from scripts.datasources.free_data_sources import fetch_all_data_sources
-from scripts.signal_detector import generate_signal_id
+from scripts.signal_detector import generate_dedupe_key
+from config.analysis_config import SIGNAL_COOLDOWN_HOURS
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -94,58 +95,133 @@ class EnhancedAnalyzer(HotspotAnalyzer):
         )
 
         enhanced_signals = []
+        now = datetime.now()
+        expires_at = (now + timedelta(hours=SIGNAL_COOLDOWN_HOURS)).isoformat()
+        created_at = now.isoformat()
+
+        hour_bucket = int(now.timestamp() // 3600)
+        max_affected_clusters = 20
+
+        def _collect_clusters(keywords: List[str]) -> List[Dict[str, Any]]:
+            matched = []
+            for cluster in clusters:
+                title_lower = cluster.get("primary_title", "").lower()
+                if any(keyword in title_lower for keyword in keywords):
+                    matched.append(cluster)
+            return matched
+
+        def _build_aggregated_signal(
+            *,
+            signal_type: str,
+            subtype: str,
+            name: str,
+            description: str,
+            related_clusters: List[Dict[str, Any]],
+            data_source: str,
+            details: Dict[str, Any],
+            confidence: float,
+            category: str = "unknown",
+        ) -> Dict[str, Any]:
+            unique_ids = list(
+                dict.fromkeys(
+                    [
+                        cluster.get("cluster_id", "")
+                        for cluster in related_clusters
+                        if cluster.get("cluster_id")
+                    ]
+                )
+            )[:max_affected_clusters]
+            top_titles = [
+                cluster.get("primary_title", "")[:80]
+                for cluster in related_clusters[:3]
+                if cluster.get("primary_title")
+            ]
+            merged_details = dict(details)
+            merged_details.update(
+                {
+                    "cluster_count": len(unique_ids),
+                    "top_titles": top_titles,
+                    "hour_bucket": hour_bucket,
+                    "subtype": subtype,
+                }
+            )
+
+            return {
+                "signal_id": generate_dedupe_key(signal_type, subtype, hour_bucket),
+                "signal_type": signal_type,
+                "name": name,
+                "confidence": confidence,
+                "description": description,
+                "cluster_id": unique_ids[0] if unique_ids else None,
+                "affected_clusters": unique_ids,
+                "category": category,
+                "details": merged_details,
+                "data_source": data_source,
+                "expires_at": expires_at,
+                "created_at": created_at,
+            }
 
         fred_start = time.time()
         fred_data = external_data.get("fred", {})
         fred_signals = 0
 
-        for cluster in clusters:
-            title_lower = cluster.get("primary_title", "").lower()
-            cluster_id_short = cluster.get("cluster_id", "")[:8]
+        fed_rate = fred_data.get("fed_funds_rate", {})
+        fed_clusters = _collect_clusters(["fed", "interest rate", "federal reserve"])
+        if fed_rate and fed_clusters:
+            fed_ids = list(
+                dict.fromkeys(
+                    [c.get("cluster_id") for c in fed_clusters if c.get("cluster_id")]
+                )
+            )
+            confidence = min(0.92, 0.72 + 0.03 * min(len(fed_ids), 6))
+            top_titles = "；".join(
+                [c.get("primary_title", "")[:36] for c in fed_clusters[:3]]
+            )
+            signal = _build_aggregated_signal(
+                signal_type="economic_indicator_alert",
+                subtype="fed_funds_rate",
+                name="经济指标异常 - 利率变动",
+                description=(
+                    f"联邦基金利率当前值 {fed_rate.get('value', 'N/A')}，"
+                    f"关联 {len(fed_ids)} 个聚类。重点: {top_titles}"
+                ),
+                related_clusters=fed_clusters,
+                data_source="FRED",
+                details={"indicator": "fed_funds_rate", "value": fed_rate.get("value")},
+                confidence=confidence,
+                category="economy",
+            )
+            enhanced_signals.append(signal)
+            fred_signals += 1
 
-            if any(
-                kw in title_lower for kw in ["fed", "interest rate", "federal reserve"]
-            ):
-                fed_rate = fred_data.get("fed_funds_rate", {})
-                if fed_rate:
-                    signal = {
-                        "signal_id": generate_signal_id(
-                            "economic_indicator_alert", [cluster["cluster_id"]]
-                        ),
-                        "signal_type": "economic_indicator_alert",
-                        "name": "经济指标异常 - 利率变动",
-                        "confidence": 0.85,
-                        "description": f"检测到Fed相关新闻，当前联邦基金利率: {fed_rate.get('value', 'N/A')}",
-                        "cluster_id": cluster["cluster_id"],
-                        "data_source": "FRED",
-                    }
-                    enhanced_signals.append(signal)
-                    fred_signals += 1
-                    logger.info(
-                        f"[FRED_SIGNAL] 检测到利率信号 | cluster: {cluster_id_short}... | "
-                        f"利率: {fed_rate.get('value', 'N/A')}"
-                    )
-
-            if any(kw in title_lower for kw in ["inflation", "cpi", "consumer price"]):
-                cpi = fred_data.get("cpi", {})
-                if cpi:
-                    signal = {
-                        "signal_id": generate_signal_id(
-                            "economic_indicator_alert", [cluster["cluster_id"]]
-                        ),
-                        "signal_type": "economic_indicator_alert",
-                        "name": "经济指标异常 - CPI变动",
-                        "confidence": 0.85,
-                        "description": f"检测到通胀相关新闻，当前CPI: {cpi.get('value', 'N/A')}",
-                        "cluster_id": cluster["cluster_id"],
-                        "data_source": "FRED",
-                    }
-                    enhanced_signals.append(signal)
-                    fred_signals += 1
-                    logger.info(
-                        f"[FRED_SIGNAL] 检测到CPI信号 | cluster: {cluster_id_short}... | "
-                        f"CPI: {cpi.get('value', 'N/A')}"
-                    )
+        cpi = fred_data.get("cpi", {})
+        cpi_clusters = _collect_clusters(["inflation", "cpi", "consumer price"])
+        if cpi and cpi_clusters:
+            cpi_ids = list(
+                dict.fromkeys(
+                    [c.get("cluster_id") for c in cpi_clusters if c.get("cluster_id")]
+                )
+            )
+            confidence = min(0.92, 0.72 + 0.03 * min(len(cpi_ids), 6))
+            top_titles = "；".join(
+                [c.get("primary_title", "")[:36] for c in cpi_clusters[:3]]
+            )
+            signal = _build_aggregated_signal(
+                signal_type="economic_indicator_alert",
+                subtype="cpi",
+                name="经济指标异常 - CPI变动",
+                description=(
+                    f"CPI当前值 {cpi.get('value', 'N/A')}，关联 {len(cpi_ids)} 个聚类。"
+                    f"重点: {top_titles}"
+                ),
+                related_clusters=cpi_clusters,
+                data_source="FRED",
+                details={"indicator": "cpi", "value": cpi.get("value")},
+                confidence=confidence,
+                category="economy",
+            )
+            enhanced_signals.append(signal)
+            fred_signals += 1
 
         fred_duration = time.time() - fred_start
         logger.info(
@@ -156,34 +232,33 @@ class EnhancedAnalyzer(HotspotAnalyzer):
         usgs_data = external_data.get("usgs", [])
         usgs_signals = 0
 
-        for cluster in clusters:
-            title_lower = cluster.get("primary_title", "").lower()
-            cluster_id_short = cluster.get("cluster_id", "")[:8]
-
-            if any(kw in title_lower for kw in ["earthquake", "disaster", "tsunami"]):
-                if usgs_data:
-                    latest = usgs_data[0]
-                    signal = {
-                        "signal_id": generate_signal_id(
-                            "natural_disaster_signal", [cluster["cluster_id"]]
-                        ),
-                        "signal_type": "natural_disaster_signal",
-                        "name": "自然灾害信号",
-                        "confidence": 0.9,
-                        "description": f"检测到灾害新闻，最新地震: {latest.get('place')} - 震级 {latest.get('magnitude')}",
-                        "cluster_id": cluster["cluster_id"],
-                        "data_source": "USGS",
-                        "details": {
-                            "magnitude": latest.get("magnitude"),
-                            "location": latest.get("place"),
-                        },
-                    }
-                    enhanced_signals.append(signal)
-                    usgs_signals += 1
-                    logger.info(
-                        f"[USGS_SIGNAL] 检测到灾害信号 | cluster: {cluster_id_short}... | "
-                        f"地震: {latest.get('place')} 震级{latest.get('magnitude')}"
-                    )
+        disaster_clusters = _collect_clusters(["earthquake", "disaster", "tsunami"])
+        if usgs_data and disaster_clusters:
+            latest = usgs_data[0]
+            disaster_ids = list(
+                dict.fromkeys(
+                    [c.get("cluster_id") for c in disaster_clusters if c.get("cluster_id")]
+                )
+            )
+            signal = _build_aggregated_signal(
+                signal_type="natural_disaster_signal",
+                subtype="usgs",
+                name="自然灾害信号",
+                description=(
+                    f"最新地震: {latest.get('place')} (M{latest.get('magnitude')})，"
+                    f"关联 {len(disaster_ids)} 个灾害相关聚类。"
+                ),
+                related_clusters=disaster_clusters,
+                data_source="USGS",
+                details={
+                    "magnitude": latest.get("magnitude"),
+                    "location": latest.get("place"),
+                },
+                confidence=min(0.93, 0.78 + 0.03 * min(len(disaster_ids), 5)),
+                category=disaster_clusters[0].get("category", "unknown"),
+            )
+            enhanced_signals.append(signal)
+            usgs_signals += 1
 
         usgs_duration = time.time() - usgs_start
         logger.info(
@@ -194,27 +269,29 @@ class EnhancedAnalyzer(HotspotAnalyzer):
         gdelt_data = external_data.get("gdelt", [])
         gdelt_signals = 0
 
-        if len(gdelt_data) > 10:
-            for cluster in clusters:
-                if cluster.get("category") == "politics":
-                    cluster_id_short = cluster.get("cluster_id", "")[:8]
-                    signal = {
-                        "signal_id": generate_signal_id(
-                            "geopolitical_intensity", [cluster["cluster_id"]]
-                        ),
-                        "signal_type": "geopolitical_intensity",
-                        "name": "地缘政治紧张",
-                        "confidence": min(0.9, 0.5 + len(gdelt_data) * 0.01),
-                        "description": f"过去24小时检测到 {len(gdelt_data)} 起全球冲突/抗议事件",
-                        "cluster_id": cluster["cluster_id"],
-                        "data_source": "GDELT",
-                    }
-                    enhanced_signals.append(signal)
-                    gdelt_signals += 1
-                    logger.info(
-                        f"[GDELT_SIGNAL] 检测到地缘政治信号 | cluster: {cluster_id_short}... | "
-                        f"GDELT事件数: {len(gdelt_data)} | 置信度: {signal['confidence']:.2f}"
-                    )
+        geopolitical_clusters = [c for c in clusters if c.get("category") == "politics"]
+        if len(gdelt_data) > 10 and geopolitical_clusters:
+            geo_ids = list(
+                dict.fromkeys(
+                    [c.get("cluster_id") for c in geopolitical_clusters if c.get("cluster_id")]
+                )
+            )
+            signal = _build_aggregated_signal(
+                signal_type="geopolitical_intensity",
+                subtype="gdelt",
+                name="地缘政治紧张",
+                description=(
+                    f"过去24小时检测到 {len(gdelt_data)} 起全球冲突/抗议事件，"
+                    f"关联 {len(geo_ids)} 个政治类聚类。"
+                ),
+                related_clusters=geopolitical_clusters,
+                data_source="GDELT",
+                details={"gdelt_event_count": len(gdelt_data)},
+                confidence=min(0.9, 0.58 + len(gdelt_data) * 0.008),
+                category="politics",
+            )
+            enhanced_signals.append(signal)
+            gdelt_signals += 1
 
         gdelt_duration = time.time() - gdelt_start
         logger.info(
@@ -233,12 +310,25 @@ class EnhancedAnalyzer(HotspotAnalyzer):
 
         return enhanced_signals
 
-    async def run_enhanced_analysis(self, limit=None, dry_run=False):
-        """运行增强版分析（适配分层并发处理）"""
+    async def run_enhanced_analysis(
+        self,
+        limit: int = None,
+        dry_run: bool = False,
+        enrich_signals_after_run: bool = False,
+        enrich_hours: int = 24,
+        enrich_limit: int = 30,
+        enrich_workers: int = 3,
+    ):
+        """运行增强版分析（全量完整分析并发）"""
         total_start = time.time()
         logger.info("=" * 80)
-        logger.info("[ENHANCED_ANALYSIS_START] 开始增强版热点分析")
-        logger.info(f"参数: limit={limit}, dry_run={dry_run}")
+        logger.info("[ENHANCED_ANALYSIS_START] 开始增强版新闻分析")
+        logger.info(
+            f"参数: limit={limit}, dry_run={dry_run}, "
+            f"enrich_signals_after_run={enrich_signals_after_run}, "
+            f"enrich_hours={enrich_hours}, enrich_limit={enrich_limit}, "
+            f"enrich_workers={enrich_workers}"
+        )
         logger.info("=" * 80)
 
         try:
@@ -251,13 +341,20 @@ class EnhancedAnalyzer(HotspotAnalyzer):
             )
 
             step2_start = time.time()
-            logger.info("[STEP_2] 开始运行基础分析（分层并发）...")
+            logger.info("[STEP_2] 开始运行基础分析（全量完整分析并发）...")
 
             articles = self.load_unanalyzed_articles(
                 limit=limit if limit else 500, hours=None
             )
             if not articles:
                 logger.warning("[STEP_2_SKIP] 没有未分析的文章，结束分析")
+                if enrich_signals_after_run and not dry_run:
+                    logger.info("[SIGNAL_ENRICH] 开始补充待处理信号解释（无新文章场景）")
+                    self.enrich_pending_signal_rationales(
+                        hours=enrich_hours,
+                        limit=enrich_limit,
+                        max_workers=enrich_workers,
+                    )
                 return
 
             from scripts.clustering import cluster_news
@@ -268,25 +365,23 @@ class EnhancedAnalyzer(HotspotAnalyzer):
             hot_clusters = [
                 c for c in clusters if c.get("article_count", 0) >= self.hot_threshold
             ]
-            cold_clusters = [
-                c for c in clusters if c.get("article_count", 0) < self.hot_threshold
-            ]
 
             logger.info(
-                f"[TIERED_ANALYSIS] 分层结果: 热点 {len(hot_clusters)} 个, 冷门 {len(cold_clusters)} 个"
+                f"[FULL_ANALYSIS] 聚类统计: 总计 {len(clusters)} 个, 信号目标 {len(hot_clusters)} 个"
             )
 
-            if hot_clusters:
-                logger.info(f"[CONCURRENT] 开始并发处理 {len(hot_clusters)} 个热点...")
-                self._process_clusters_concurrent(
-                    hot_clusters, depth="full", dry_run=dry_run
-                )
+            reused_clusters = self._reuse_existing_cluster_summaries(clusters)
+            clusters_to_analyze = [c for c in clusters if not c.get("summary")]
+            logger.info(
+                f"[CACHE_REUSE] 复用 {reused_clusters} 个聚类摘要 | "
+                f"待分析 {len(clusters_to_analyze)} 个"
+            )
 
-            if cold_clusters:
-                logger.info(f"[CONCURRENT] 开始并发处理 {len(cold_clusters)} 个冷门...")
-                self._process_clusters_concurrent(
-                    cold_clusters, depth="shallow", dry_run=dry_run
+            if clusters_to_analyze:
+                logger.info(
+                    f"[CONCURRENT] 开始并发处理 {len(clusters_to_analyze)} 个聚类..."
                 )
+                self._process_clusters_concurrent(clusters_to_analyze, dry_run=dry_run)
 
             step2_duration = time.time() - step2_start
             logger.info(
@@ -341,6 +436,14 @@ class EnhancedAnalyzer(HotspotAnalyzer):
                 article_ids = [a["id"] for a in articles]
                 self.mark_articles_analyzed(article_ids)
 
+                if enrich_signals_after_run:
+                    logger.info("[SIGNAL_ENRICH] 开始补充待处理信号解释")
+                    self.enrich_pending_signal_rationales(
+                        hours=enrich_hours,
+                        limit=enrich_limit,
+                        max_workers=enrich_workers,
+                    )
+
                 step5_duration = time.time() - step5_start
                 logger.info(f"[STEP_5_COMPLETE] 保存完成 | 耗时: {step5_duration:.2f}s")
             else:
@@ -375,11 +478,41 @@ async def main():
     parser = argparse.ArgumentParser(description="US-Monitor 增强分析器")
     parser.add_argument("--limit", type=int, default=None, help="最大处理文章数")
     parser.add_argument("--dry-run", action="store_true", help="试运行模式")
+    parser.add_argument(
+        "--enrich-signals-after-run",
+        action="store_true",
+        help="分析完成后补充信号 LLM 解释",
+    )
+    parser.add_argument(
+        "--enrich-hours",
+        type=int,
+        default=24,
+        help="信号解释回看窗口（小时）",
+    )
+    parser.add_argument(
+        "--enrich-limit",
+        type=int,
+        default=30,
+        help="本轮最多补充解释的信号数",
+    )
+    parser.add_argument(
+        "--enrich-workers",
+        type=int,
+        default=3,
+        help="信号解释并发 worker 数",
+    )
 
     args = parser.parse_args()
 
     analyzer = EnhancedAnalyzer()
-    await analyzer.run_enhanced_analysis(limit=args.limit, dry_run=args.dry_run)
+    await analyzer.run_enhanced_analysis(
+        limit=args.limit,
+        dry_run=args.dry_run,
+        enrich_signals_after_run=args.enrich_signals_after_run,
+        enrich_hours=args.enrich_hours,
+        enrich_limit=args.enrich_limit,
+        enrich_workers=args.enrich_workers,
+    )
 
 
 if __name__ == "__main__":
