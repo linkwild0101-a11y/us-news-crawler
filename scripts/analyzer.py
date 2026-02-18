@@ -19,6 +19,13 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from supabase import create_client
 
+from config.entity_config import (
+    ENTITY_TYPES,
+    PERSON_RULES,
+    CONCEPT_RULES,
+    DETECTION_PRIORITY,
+    MIN_ENTITY_LENGTH,
+)
 from config.analysis_config import (
     MAX_ARTICLES_PER_RUN,
     MAX_LLM_CALLS,
@@ -98,14 +105,14 @@ class HotspotAnalyzer:
         self.hot_model = "qwen-plus"  # 热点新闻使用高质量模型
 
     def load_unanalyzed_articles(
-        self, limit: int = None, hours: int = 24
+        self, limit: Optional[int] = None, hours: Optional[int] = None
     ) -> List[Dict]:
         """
         加载未分析的文章
 
         Args:
             limit: 最大加载数量
-            hours: 时间窗口（小时）
+            hours: 时间窗口（小时），None表示不限制时间
 
         Returns:
             文章列表
@@ -113,23 +120,26 @@ class HotspotAnalyzer:
         if limit is None:
             limit = MAX_ARTICLES_PER_RUN
 
-        # 计算时间窗口
-        cutoff_time = (datetime.now() - timedelta(hours=hours)).isoformat()
-
-        logger.info(f"加载未分析的文章 (限制: {limit}, 时间窗口: {hours}小时)")
+        logger.info(
+            f"加载未分析的文章 (限制: {limit}, 时间窗口: {'不限制' if hours is None else f'{hours}小时'})"
+        )
 
         try:
-            # 查询未分析的文章
-            result = (
+            # 构建查询
+            query = (
                 self.supabase.table("articles")
                 .select(
                     "id, title, content, url, category, source_id, published_at, fetched_at"
                 )
                 .is_("analyzed_at", "null")
-                .gte("fetched_at", cutoff_time)
-                .limit(limit)
-                .execute()
             )
+
+            # 如果时间窗口不为None，添加时间过滤
+            if hours is not None:
+                cutoff_time = (datetime.now() - timedelta(hours=hours)).isoformat()
+                query = query.gte("fetched_at", cutoff_time)
+
+            result = query.limit(limit).execute()
 
             articles = result.data
             self.stats["articles_loaded"] = len(articles)
@@ -269,20 +279,16 @@ class HotspotAnalyzer:
         try:
             # 准备简化提示词（只翻译标题）
             title = cluster["primary_title"]
-            prompt = f"请将以下英文新闻标题翻译成中文（只返回翻译结果，不要解释）：\n\n{title}"
 
-            # 使用轻量级模型（qwen-flash）
+            # 使用纯文本翻译方法（避免 JSON 解析错误）
             llm_start = time.time()
-            result = self.llm_client.summarize(prompt, model=self.cold_model)
+            translated_title = self.llm_client.translate_text(
+                title, model=self.cold_model
+            )
             llm_duration = time.time() - llm_start
 
             self.stats["llm_calls"] += 1
             total_duration = time.time() - total_start
-
-            # 提取翻译结果
-            translated_title = result.get("summary", title)
-            if isinstance(translated_title, dict):
-                translated_title = translated_title.get("summary", title)
 
             logger.info(
                 f"[CLUSTER_QUICK_DONE] 快速翻译完成 | cluster_id: {cluster_id_short}... | "
@@ -314,6 +320,148 @@ class HotspotAnalyzer:
                 "is_hot": is_hot,
                 "error": str(e),
             }
+
+    def _detect_entity_type(self, entity_name: str) -> str:
+        """
+        检测实体类型
+
+        从配置文件读取关键词进行检测
+
+        Args:
+            entity_name: 实体名称
+
+        Returns:
+            实体类型: person/organization/location/event/concept
+        """
+        name = entity_name.strip()
+
+        # 按优先级检测（event -> organization -> location -> person -> concept）
+        for entity_type in DETECTION_PRIORITY:
+            if entity_type == "concept":
+                continue
+
+            if entity_type == "person":
+                # 人名特殊处理
+                rules = PERSON_RULES
+                name_len = len(name)
+                min_len = rules["chinese_name_length"]["min"]
+                max_len = rules["chinese_name_length"]["max"]
+
+                # 中文人名长度判断
+                if min_len <= name_len <= max_len:
+                    return "person"
+
+                # 英文人名判断
+                indicators = rules["english_indicators"]
+                if "contains_space" in indicators and " " in name:
+                    return "person"
+                if "title_capitalized" in indicators and name and name[0].isupper():
+                    # 检查是否是常见英文名
+                    common_names = rules.get("common_english_names", [])
+                    name_parts = name.split()
+                    for part in name_parts:
+                        if part in common_names:
+                            return "person"
+
+                continue
+
+            # 其他类型：从配置读取关键词
+            config = ENTITY_TYPES.get(entity_type, {})
+            keywords_config = config.get("keywords", {})
+
+            # 合并中英文关键词
+            all_keywords = []
+            all_keywords.extend(keywords_config.get("zh", []))
+            all_keywords.extend(keywords_config.get("en", []))
+
+            # 检查关键词匹配
+            for keyword in all_keywords:
+                if keyword in name:
+                    return entity_type
+
+        # 默认为概念
+        return "concept"
+
+    def _update_entities(self, cluster_id: int, entities: List[str], category: str):
+        """
+        更新实体表和实体-聚类关联表
+
+        Args:
+            cluster_id: 聚类ID
+            entities: 实体名称列表
+            category: 分类
+        """
+        try:
+            for entity_name in entities:
+                if not entity_name or len(entity_name) < 2:
+                    continue
+
+                # 清理实体名称
+                entity_name = entity_name.strip()
+
+                # 自动检测实体类型
+                entity_type = self._detect_entity_type(entity_name)
+
+                # 检查实体是否已存在
+                existing = (
+                    self.supabase.table("entities")
+                    .select("id, mention_count_total")
+                    .eq("name", entity_name)
+                    .execute()
+                )
+
+                if existing.data:
+                    # 更新现有实体
+                    entity_id = existing.data[0]["id"]
+                    new_count = existing.data[0]["mention_count_total"] + 1
+
+                    self.supabase.table("entities").update(
+                        {
+                            "last_seen": datetime.now().isoformat(),
+                            "mention_count_total": new_count,
+                            "category": category,
+                        }
+                    ).eq("id", entity_id).execute()
+                else:
+                    # 创建新实体
+                    result = (
+                        self.supabase.table("entities")
+                        .insert(
+                            {
+                                "name": entity_name,
+                                "entity_type": entity_type,
+                                "category": category,
+                                "mention_count_total": 1,
+                            }
+                        )
+                        .execute()
+                    )
+                    entity_id = result.data[0]["id"]
+
+                # 创建或更新实体-聚类关联
+                try:
+                    # 检查是否已存在
+                    existing_rel = (
+                        self.supabase.table("entity_cluster_relations")
+                        .select("id")
+                        .eq("entity_id", entity_id)
+                        .eq("cluster_id", cluster_id)
+                        .execute()
+                    )
+
+                    if not existing_rel.data:
+                        self.supabase.table("entity_cluster_relations").insert(
+                            {
+                                "entity_id": entity_id,
+                                "cluster_id": cluster_id,
+                                "mention_count": 1,
+                            }
+                        ).execute()
+                except Exception as e:
+                    logger.debug(f"实体关联创建失败: {e}")
+
+        except Exception as e:
+            logger.error(f"更新实体失败: {e}")
 
     def save_analysis_results(self, clusters: List[Dict], signals: List[Dict]):
         """
@@ -394,6 +542,12 @@ class HotspotAnalyzer:
                         except Exception as e:
                             # 可能已存在，忽略错误
                             pass
+
+                # 更新实体追踪（只对完整分析的聚类）
+                if cluster.get("summary", {}).get("analysis_depth") == "full":
+                    entities = cluster.get("summary", {}).get("key_entities", [])
+                    if entities and cluster_id:
+                        self._update_entities(cluster_id, entities, cluster["category"])
 
             # 保存信号
             for signal in signals:
@@ -476,7 +630,7 @@ class HotspotAnalyzer:
         start_time = datetime.now()
 
         # 1. 加载文章
-        articles = self.load_unanalyzed_articles(limit)
+        articles = self.load_unanalyzed_articles(limit=limit, hours=None)
 
         if not articles:
             logger.info("没有未分析的文章，跳过")

@@ -327,6 +327,61 @@ class LLMClient:
 
         return fixed
 
+    def translate_text(
+        self, text: str, model: str = None, use_cache: bool = True
+    ) -> str:
+        """
+        纯文本翻译（不解析 JSON，用于快速翻译模式）
+
+        Args:
+            text: 需要翻译的文本
+            model: 模型名称
+            use_cache: 是否使用缓存
+
+        Returns:
+            翻译后的纯文本
+        """
+        total_start = time.time()
+        prompt = f"请将以下英文翻译成中文，只返回翻译结果，不要任何解释：\n\n{text}"
+        cache_key = self._generate_cache_key(f"translate_{text}_{model or MODEL_NAME}")
+
+        logger.debug(f"[TRANSLATE_START] 开始翻译 | cache_key: {cache_key[:8]}...")
+
+        # 检查缓存
+        if use_cache:
+            cached = self._get_from_cache(cache_key)
+            if cached and "translation" in cached:
+                total_duration = time.time() - total_start
+                logger.debug(
+                    f"[TRANSLATE_CACHE_HIT] 翻译缓存命中 | 耗时: {total_duration:.3f}s"
+                )
+                return cached["translation"]
+
+        # 调用 API
+        try:
+            content = self._call_api(prompt, model=model or MODEL_NAME)
+            translation = content.strip()
+
+            # 保存到缓存
+            if use_cache:
+                self._save_to_cache(cache_key, {"translation": translation})
+
+            total_duration = time.time() - total_start
+            logger.debug(
+                f"[TRANSLATE_SUCCESS] 翻译成功 | "
+                f"耗时: {total_duration:.2f}s | "
+                f"原文长度: {len(text)} | 译文长度: {len(translation)}"
+            )
+            return translation
+
+        except Exception as e:
+            total_duration = time.time() - total_start
+            logger.error(
+                f"[TRANSLATE_FAILED] 翻译失败 | "
+                f"耗时: {total_duration:.2f}s | 错误: {str(e)[:100]}"
+            )
+            return text  # 失败时返回原文
+
     def chat(self, messages: list, use_cache: bool = True) -> str:
         """
         对话式 API (同步)

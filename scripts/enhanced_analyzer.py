@@ -16,27 +16,23 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from scripts.analyzer import HotspotAnalyzer
 from scripts.datasources.free_data_sources import fetch_all_data_sources
+from scripts.signal_detector import generate_signal_id
 
-# 配置日志 - 同时输出到控制台和文件
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-# 清除现有的处理器
 if logger.handlers:
     logger.handlers.clear()
 
-# 创建格式器 - 包含时间戳
 formatter = logging.Formatter(
     "%(asctime)s [%(levelname)s] %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
 )
 
-# 控制台处理器
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.INFO)
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
-# 文件处理器 - 记录到日志文件
 log_dir = os.path.dirname(os.path.abspath(__file__))
 log_file = os.path.join(log_dir, "..", "logs", "enhanced_analyzer.log")
 os.makedirs(os.path.dirname(log_file), exist_ok=True)
@@ -64,7 +60,6 @@ class EnhancedAnalyzer(HotspotAnalyzer):
             result = await fetch_all_data_sources(self.fred_api_key)
             duration = time.time() - start_time
 
-            # 统计各数据源结果
             fred_count = len(result.get("fred", {}))
             usgs_count = len(result.get("usgs", []))
             gdelt_count = len(result.get("gdelt", []))
@@ -88,16 +83,7 @@ class EnhancedAnalyzer(HotspotAnalyzer):
             return {}
 
     async def detect_enhanced_signals(self, clusters, external_data):
-        """
-        使用外部数据增强信号检测
-
-        Args:
-            clusters: 聚类列表
-            external_data: 外部数据源数据
-
-        Returns:
-            增强信号列表
-        """
+        """使用外部数据增强信号检测"""
         start_time = time.time()
         cluster_count = len(clusters)
 
@@ -109,7 +95,6 @@ class EnhancedAnalyzer(HotspotAnalyzer):
 
         enhanced_signals = []
 
-        # 1. 经济指标异常检测
         fred_start = time.time()
         fred_data = external_data.get("fred", {})
         fred_signals = 0
@@ -118,13 +103,15 @@ class EnhancedAnalyzer(HotspotAnalyzer):
             title_lower = cluster.get("primary_title", "").lower()
             cluster_id_short = cluster.get("cluster_id", "")[:8]
 
-            # 检测 Fed/利率相关新闻
             if any(
                 kw in title_lower for kw in ["fed", "interest rate", "federal reserve"]
             ):
                 fed_rate = fred_data.get("fed_funds_rate", {})
                 if fed_rate:
                     signal = {
+                        "signal_id": generate_signal_id(
+                            "economic_indicator_alert", [cluster["cluster_id"]]
+                        ),
                         "signal_type": "economic_indicator_alert",
                         "name": "经济指标异常 - 利率变动",
                         "confidence": 0.85,
@@ -139,11 +126,13 @@ class EnhancedAnalyzer(HotspotAnalyzer):
                         f"利率: {fed_rate.get('value', 'N/A')}"
                     )
 
-            # 检测通胀相关新闻
             if any(kw in title_lower for kw in ["inflation", "cpi", "consumer price"]):
                 cpi = fred_data.get("cpi", {})
                 if cpi:
                     signal = {
+                        "signal_id": generate_signal_id(
+                            "economic_indicator_alert", [cluster["cluster_id"]]
+                        ),
                         "signal_type": "economic_indicator_alert",
                         "name": "经济指标异常 - CPI变动",
                         "confidence": 0.85,
@@ -163,7 +152,6 @@ class EnhancedAnalyzer(HotspotAnalyzer):
             f"[FRED_COMPLETE] FRED信号检测完成 | 耗时: {fred_duration:.3f}s | 信号数: {fred_signals}"
         )
 
-        # 2. 自然灾害信号
         usgs_start = time.time()
         usgs_data = external_data.get("usgs", [])
         usgs_signals = 0
@@ -176,6 +164,9 @@ class EnhancedAnalyzer(HotspotAnalyzer):
                 if usgs_data:
                     latest = usgs_data[0]
                     signal = {
+                        "signal_id": generate_signal_id(
+                            "natural_disaster_signal", [cluster["cluster_id"]]
+                        ),
                         "signal_type": "natural_disaster_signal",
                         "name": "自然灾害信号",
                         "confidence": 0.9,
@@ -199,16 +190,18 @@ class EnhancedAnalyzer(HotspotAnalyzer):
             f"[USGS_COMPLETE] USGS信号检测完成 | 耗时: {usgs_duration:.3f}s | 信号数: {usgs_signals}"
         )
 
-        # 3. 地缘政治强度
         gdelt_start = time.time()
         gdelt_data = external_data.get("gdelt", [])
         gdelt_signals = 0
 
-        if len(gdelt_data) > 10:  # 如果GDELT事件多，说明地缘政治活跃
+        if len(gdelt_data) > 10:
             for cluster in clusters:
                 if cluster.get("category") == "politics":
                     cluster_id_short = cluster.get("cluster_id", "")[:8]
                     signal = {
+                        "signal_id": generate_signal_id(
+                            "geopolitical_intensity", [cluster["cluster_id"]]
+                        ),
                         "signal_type": "geopolitical_intensity",
                         "name": "地缘政治紧张",
                         "confidence": min(0.9, 0.5 + len(gdelt_data) * 0.01),
@@ -241,13 +234,7 @@ class EnhancedAnalyzer(HotspotAnalyzer):
         return enhanced_signals
 
     async def run_enhanced_analysis(self, limit=None, dry_run=False):
-        """
-        运行增强版分析
-
-        Args:
-            limit: 最大处理文章数
-            dry_run: 试运行模式
-        """
+        """运行增强版分析（适配分层并发处理）"""
         total_start = time.time()
         logger.info("=" * 80)
         logger.info("[ENHANCED_ANALYSIS_START] 开始增强版热点分析")
@@ -255,7 +242,6 @@ class EnhancedAnalyzer(HotspotAnalyzer):
         logger.info("=" * 80)
 
         try:
-            # 1. 获取外部数据
             step1_start = time.time()
             logger.info("[STEP_1] 开始获取外部数据...")
             external_data = await self.fetch_external_data()
@@ -264,34 +250,62 @@ class EnhancedAnalyzer(HotspotAnalyzer):
                 f"[STEP_1_COMPLETE] 外部数据获取完成 | 耗时: {step1_duration:.2f}s"
             )
 
-            # 2. 运行基础分析
             step2_start = time.time()
-            logger.info("[STEP_2] 开始运行基础分析...")
-            await self.run_analysis(limit=limit, dry_run=True)
-            step2_duration = time.time() - step2_start
-            logger.info(f"[STEP_2_COMPLETE] 基础分析完成 | 耗时: {step2_duration:.2f}s")
+            logger.info("[STEP_2] 开始运行基础分析（分层并发）...")
 
-            # 3. 获取聚类
-            step3_start = time.time()
-            logger.info("[STEP_3] 开始获取聚类...")
-            articles = self.load_unanalyzed_articles(limit)
+            articles = self.load_unanalyzed_articles(
+                limit=limit if limit else 500, hours=None
+            )
             if not articles:
-                logger.warning("[STEP_3_SKIP] 没有未分析的文章，结束分析")
+                logger.warning("[STEP_2_SKIP] 没有未分析的文章，结束分析")
                 return
 
             from scripts.clustering import cluster_news
 
             clusters = cluster_news(articles)
-            cluster_count = len(clusters)
-            step3_duration = time.time() - step3_start
+            self.stats["clusters_created"] = len(clusters)
+
+            hot_clusters = [
+                c for c in clusters if c.get("article_count", 0) >= self.hot_threshold
+            ]
+            cold_clusters = [
+                c for c in clusters if c.get("article_count", 0) < self.hot_threshold
+            ]
+
             logger.info(
-                f"[STEP_3_COMPLETE] 聚类完成 | "
-                f"耗时: {step3_duration:.2f}s | "
-                f"文章数: {len(articles)} | "
-                f"聚类数: {cluster_count}"
+                f"[TIERED_ANALYSIS] 分层结果: 热点 {len(hot_clusters)} 个, 冷门 {len(cold_clusters)} 个"
             )
 
-            # 4. 检测增强信号
+            if hot_clusters:
+                logger.info(f"[CONCURRENT] 开始并发处理 {len(hot_clusters)} 个热点...")
+                self._process_clusters_concurrent(
+                    hot_clusters, depth="full", dry_run=dry_run
+                )
+
+            if cold_clusters:
+                logger.info(f"[CONCURRENT] 开始并发处理 {len(cold_clusters)} 个冷门...")
+                self._process_clusters_concurrent(
+                    cold_clusters, depth="shallow", dry_run=dry_run
+                )
+
+            step2_duration = time.time() - step2_start
+            logger.info(
+                f"[STEP_2_COMPLETE] 基础分析完成 | "
+                f"耗时: {step2_duration:.2f}s | "
+                f"LLM调用: {self.stats['llm_calls']}次"
+            )
+
+            step3_start = time.time()
+            logger.info("[STEP_3] 开始基础信号检测...")
+            from scripts.signal_detector import detect_all_signals
+
+            base_signals = detect_all_signals(hot_clusters)
+            step3_duration = time.time() - step3_start
+            logger.info(
+                f"[STEP_3_COMPLETE] 基础信号检测完成 | "
+                f"耗时: {step3_duration:.2f}s | 信号数: {len(base_signals)}"
+            )
+
             step4_start = time.time()
             logger.info("[STEP_4] 开始检测增强信号...")
             enhanced_signals = await self.detect_enhanced_signals(
@@ -302,8 +316,7 @@ class EnhancedAnalyzer(HotspotAnalyzer):
             if enhanced_signals:
                 logger.info(
                     f"[STEP_4_COMPLETE] 增强信号检测完成 | "
-                    f"耗时: {step4_duration:.2f}s | "
-                    f"检测到 {len(enhanced_signals)} 个信号"
+                    f"耗时: {step4_duration:.2f}s | 检测到 {len(enhanced_signals)} 个信号"
                 )
                 for i, s in enumerate(enhanced_signals[:5], 1):
                     logger.info(
@@ -317,48 +330,38 @@ class EnhancedAnalyzer(HotspotAnalyzer):
                     f"[STEP_4_COMPLETE] 未检测到增强信号 | 耗时: {step4_duration:.2f}s"
                 )
 
-            # 5. 如果不是试运行，保存结果
+            all_signals = base_signals + enhanced_signals
+
             if not dry_run:
                 step5_start = time.time()
                 logger.info("[STEP_5] 开始保存分析结果...")
-                # 保存增强信号到数据库
-                saved_count = 0
-                for signal in enhanced_signals:
-                    try:
-                        # 这里可以添加保存到数据库的逻辑
-                        saved_count += 1
-                    except Exception as e:
-                        logger.error(f"[SAVE_ERROR] 保存信号失败: {str(e)[:100]}")
+
+                self.save_analysis_results(clusters, all_signals)
+
+                article_ids = [a["id"] for a in articles]
+                self.mark_articles_analyzed(article_ids)
 
                 step5_duration = time.time() - step5_start
-                logger.info(
-                    f"[STEP_5_COMPLETE] 保存完成 | "
-                    f"耗时: {step5_duration:.2f}s | "
-                    f"已保存: {saved_count}/{len(enhanced_signals)}"
-                )
+                logger.info(f"[STEP_5_COMPLETE] 保存完成 | 耗时: {step5_duration:.2f}s")
             else:
                 logger.info("[STEP_5_SKIP] 试运行模式，跳过保存")
 
-            # 总结
             total_duration = time.time() - total_start
             logger.info("=" * 80)
             logger.info("[ENHANCED_ANALYSIS_COMPLETE] 增强分析完成!")
             logger.info(
                 f"总耗时: {total_duration:.2f}s | "
-                f"外部数据: {step1_duration:.2f}s | "
-                f"基础分析: {step2_duration:.2f}s | "
-                f"聚类: {step3_duration:.2f}s | "
-                f"信号检测: {step4_duration:.2f}s | "
                 f"文章: {len(articles)}篇 | "
-                f"聚类: {cluster_count}个 | "
-                f"信号: {len(enhanced_signals)}个"
+                f"聚类: {len(clusters)}个 | "
+                f"信号: {len(all_signals)}个 | "
+                f"LLM调用: {self.stats['llm_calls']}次"
             )
             logger.info("=" * 80)
 
         except Exception as e:
             total_duration = time.time() - total_start
             logger.error("=" * 80)
-            logger.error(f"[ENHANCED_ANALYSIS_ERROR] 增强分析失败!")
+            logger.error("[ENHANCED_ANALYSIS_ERROR] 增强分析失败!")
             logger.error(f"总耗时: {total_duration:.2f}s")
             logger.error(f"错误: {str(e)}")
             logger.error("=" * 80)
