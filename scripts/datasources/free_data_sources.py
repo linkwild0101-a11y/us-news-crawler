@@ -4,10 +4,13 @@
 FRED, GDELT, USGS, World Bank
 """
 
+import asyncio
 import aiohttp
-import json
+import os
 from typing import List, Dict, Optional
 from datetime import datetime, timedelta
+
+from scripts.datasources.signal_endpoint_sources import get_worldmonitor_no_auth_sources
 
 
 class FREDClient:
@@ -195,10 +198,150 @@ class WorldBankClient:
                         data = await resp.json()
                         # 返回第二个元素（第一个是分页信息）
                         return data[1] if len(data) > 1 else []
-                    except:
+                    except Exception:
                         return []
                 else:
                     return []
+
+
+class WorldMonitorClient:
+    """worldmonitor 无鉴权信号端点客户端"""
+
+    def __init__(self, base_url: str):
+        self.base_url = (base_url or "").rstrip("/")
+        self.request_timeout = aiohttp.ClientTimeout(total=12)
+
+    @staticmethod
+    def _estimate_record_count(payload: object) -> int:
+        """估算返回结果中的记录条数。"""
+        if isinstance(payload, list):
+            return len(payload)
+        if not isinstance(payload, dict):
+            return 0
+
+        for key in (
+            "data",
+            "results",
+            "items",
+            "events",
+            "articles",
+            "features",
+            "rows",
+            "records",
+            "series",
+        ):
+            value = payload.get(key)
+            if isinstance(value, list):
+                return len(value)
+            if isinstance(value, dict):
+                return len(value)
+
+        return len(payload)
+
+    @staticmethod
+    def _build_sample(payload: object) -> str:
+        """提取简要样本，便于日志和信号描述。"""
+        if isinstance(payload, list) and payload:
+            first = payload[0]
+        elif isinstance(payload, dict):
+            if isinstance(payload.get("data"), list) and payload["data"]:
+                first = payload["data"][0]
+            elif isinstance(payload.get("events"), list) and payload["events"]:
+                first = payload["events"][0]
+            elif isinstance(payload.get("articles"), list) and payload["articles"]:
+                first = payload["articles"][0]
+            elif isinstance(payload.get("features"), list) and payload["features"]:
+                first = payload["features"][0]
+            else:
+                first = payload
+        else:
+            return ""
+
+        if isinstance(first, dict):
+            for key in ("title", "name", "event_name", "place", "country", "symbol"):
+                value = first.get(key)
+                if value:
+                    return str(value)[:80]
+            return str(first)[:80]
+        return str(first)[:80]
+
+    async def _fetch_endpoint(
+        self, endpoint: str, session: aiohttp.ClientSession
+    ) -> Dict[str, object]:
+        """请求单个 worldmonitor 端点。"""
+        url = f"{self.base_url}{endpoint}"
+        now_iso = datetime.now().isoformat()
+        output: Dict[str, object] = {
+            "endpoint": endpoint,
+            "ok": False,
+            "status": None,
+            "record_count": 0,
+            "sample": "",
+            "fetched_at": now_iso,
+            "error": "",
+        }
+
+        try:
+            async with session.get(url, timeout=self.request_timeout) as resp:
+                output["status"] = resp.status
+                if resp.status != 200:
+                    output["error"] = f"HTTP {resp.status}"
+                    return output
+
+                content_type = resp.headers.get("Content-Type", "")
+                if "application/json" in content_type.lower():
+                    payload = await resp.json()
+                else:
+                    text = await resp.text()
+                    output["error"] = f"non_json:{text[:80]}"
+                    return output
+
+                output["ok"] = True
+                output["record_count"] = self._estimate_record_count(payload)
+                output["sample"] = self._build_sample(payload)
+                return output
+        except Exception as e:
+            output["error"] = str(e)[:120]
+            return output
+
+    async def fetch_no_auth_endpoints(self, max_priority: int = 2) -> Dict[str, Dict]:
+        """抓取 worldmonitor 无鉴权优先端点。"""
+        catalog = get_worldmonitor_no_auth_sources()
+        enabled_endpoints = {
+            "/api/earthquakes",
+            "/api/ucdp-events",
+            "/api/ucdp",
+            "/api/unhcr-population",
+            "/api/hapi",
+            "/api/macro-signals",
+            "/api/yahoo-finance",
+            "/api/etf-flows",
+            "/api/worldbank",
+            "/api/faa-status",
+            "/api/service-status",
+            "/api/climate-anomalies",
+            "/api/nga-warnings",
+        }
+        endpoints = []
+        for item in catalog:
+            if int(item.get("priority", 9)) <= max_priority:
+                endpoint = str(item.get("endpoint", "")).strip()
+                if endpoint and endpoint in enabled_endpoints:
+                    endpoints.append(endpoint)
+
+        results: Dict[str, Dict] = {}
+        if not endpoints:
+            return results
+
+        semaphore = asyncio.Semaphore(6)
+        async with aiohttp.ClientSession() as session:
+            async def _job(endpoint: str) -> None:
+                async with semaphore:
+                    results[endpoint] = await self._fetch_endpoint(endpoint, session)
+
+            await asyncio.gather(*[_job(endpoint) for endpoint in endpoints])
+
+        return results
 
 
 # 便捷函数
@@ -215,6 +358,7 @@ async def fetch_all_data_sources(fred_api_key: Optional[str] = None) -> Dict:
         "gdelt": [],
         "usgs": [],
         "worldbank": {},
+        "worldmonitor": {},
     }
 
     # FRED (需要API key)
@@ -247,6 +391,19 @@ async def fetch_all_data_sources(fred_api_key: Optional[str] = None) -> Dict:
         results["worldbank"]["gdp"] = await wb.get_indicator("NY.GDP.MKTP.CD", limit=1)
     except Exception as e:
         print(f"World Bank数据获取失败: {e}")
+
+    # worldmonitor 无鉴权端点（优先级可配置）
+    worldmonitor_base_url = os.getenv("WORLDMONITOR_BASE_URL", "https://worldmonitor.app")
+    enable_worldmonitor = os.getenv("ENABLE_WORLDMONITOR_ENDPOINTS", "true").lower() == "true"
+    worldmonitor_max_priority = int(os.getenv("WORLDMONITOR_MAX_PRIORITY", "2"))
+    if enable_worldmonitor and worldmonitor_base_url:
+        wm = WorldMonitorClient(worldmonitor_base_url)
+        try:
+            results["worldmonitor"] = await wm.fetch_no_auth_endpoints(
+                max_priority=worldmonitor_max_priority
+            )
+        except Exception as e:
+            print(f"worldmonitor端点获取失败: {e}")
 
     return results
 

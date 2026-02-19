@@ -75,6 +75,10 @@ class EnhancedAnalyzer(HotspotAnalyzer):
             usgs_count = len(result.get("usgs", []))
             gdelt_count = len(result.get("gdelt", []))
             worldbank_count = len(result.get("worldbank", {}))
+            worldmonitor_rows = result.get("worldmonitor", {})
+            worldmonitor_ok = len(
+                [row for row in worldmonitor_rows.values() if row.get("ok")]
+            )
 
             logger.info(
                 f"[EXTERNAL_DATA_SUCCESS] 外部数据获取完成 | "
@@ -82,7 +86,8 @@ class EnhancedAnalyzer(HotspotAnalyzer):
                 f"FRED指标: {fred_count}个 | "
                 f"USGS地震: {usgs_count}条 | "
                 f"GDELT事件: {gdelt_count}条 | "
-                f"世界银行: {worldbank_count}个"
+                f"世界银行: {worldbank_count}个 | "
+                f"worldmonitor: {worldmonitor_ok}/{len(worldmonitor_rows)}"
             )
             return result
         except Exception as e:
@@ -308,6 +313,103 @@ class EnhancedAnalyzer(HotspotAnalyzer):
             f"[GDELT_COMPLETE] GDELT信号检测完成 | 耗时: {gdelt_duration:.3f}s | 信号数: {gdelt_signals}"
         )
 
+        wm_start = time.time()
+        worldmonitor_data = external_data.get("worldmonitor", {})
+        wm_signals = 0
+
+        def _wm_count(endpoint: str) -> int:
+            row = worldmonitor_data.get(endpoint, {})
+            if not row or not row.get("ok"):
+                return 0
+            return int(row.get("record_count") or 0)
+
+        wm_ucdp_count = _wm_count("/api/ucdp-events")
+        if wm_ucdp_count > 0 and geopolitical_clusters:
+            geo_ids = list(
+                dict.fromkeys(
+                    [c.get("cluster_id") for c in geopolitical_clusters if c.get("cluster_id")]
+                )
+            )
+            signal = _build_aggregated_signal(
+                signal_type="geopolitical_intensity",
+                subtype="worldmonitor_ucdp",
+                name="地缘政治紧张 - 冲突库事件",
+                description=(
+                    f"worldmonitor/UCDP 返回 {wm_ucdp_count} 条冲突事件，"
+                    f"关联 {len(geo_ids)} 个政治类聚类。"
+                ),
+                related_clusters=geopolitical_clusters,
+                data_source="worldmonitor:ucdp-events",
+                details={"ucdp_event_count": wm_ucdp_count},
+                confidence=min(0.88, 0.58 + 0.02 * min(wm_ucdp_count, 12)),
+                category="politics",
+            )
+            enhanced_signals.append(signal)
+            wm_signals += 1
+
+        wm_quake_count = _wm_count("/api/earthquakes")
+        if wm_quake_count > 0 and disaster_clusters:
+            signal = _build_aggregated_signal(
+                signal_type="natural_disaster_signal",
+                subtype="worldmonitor_earthquakes",
+                name="自然灾害信号 - worldmonitor 地震",
+                description=(
+                    f"worldmonitor 地震端点返回 {wm_quake_count} 条事件，"
+                    f"关联 {len(disaster_clusters)} 个灾害相关聚类。"
+                ),
+                related_clusters=disaster_clusters,
+                data_source="worldmonitor:earthquakes",
+                details={"worldmonitor_earthquake_count": wm_quake_count},
+                confidence=min(0.9, 0.62 + 0.02 * min(wm_quake_count, 12)),
+                category=disaster_clusters[0].get("category", "unknown"),
+            )
+            enhanced_signals.append(signal)
+            wm_signals += 1
+
+        wm_econ_count = sum(
+            [
+                _wm_count("/api/macro-signals"),
+                _wm_count("/api/yahoo-finance"),
+                _wm_count("/api/etf-flows"),
+                _wm_count("/api/worldbank"),
+            ]
+        )
+        economy_clusters = [c for c in clusters if c.get("category") in ("economy", "tech")]
+        if wm_econ_count > 0 and economy_clusters:
+            economy_ids = list(
+                dict.fromkeys(
+                    [c.get("cluster_id") for c in economy_clusters if c.get("cluster_id")]
+                )
+            )
+            signal = _build_aggregated_signal(
+                signal_type="economic_indicator_alert",
+                subtype="worldmonitor_macro_mix",
+                name="经济指标异常 - worldmonitor 市场面板",
+                description=(
+                    "worldmonitor 宏观/市场端点返回 "
+                    f"{wm_econ_count} 条数据，关联 {len(economy_ids)} 个经济/科技聚类。"
+                ),
+                related_clusters=economy_clusters,
+                data_source="worldmonitor:macro-mix",
+                details={
+                    "macro_signals": _wm_count("/api/macro-signals"),
+                    "yahoo_finance": _wm_count("/api/yahoo-finance"),
+                    "etf_flows": _wm_count("/api/etf-flows"),
+                    "worldbank": _wm_count("/api/worldbank"),
+                    "total": wm_econ_count,
+                },
+                confidence=min(0.89, 0.6 + 0.015 * min(wm_econ_count, 16)),
+                category="economy",
+            )
+            enhanced_signals.append(signal)
+            wm_signals += 1
+
+        wm_duration = time.time() - wm_start
+        logger.info(
+            f"[WORLDMONITOR_COMPLETE] worldmonitor信号检测完成 | "
+            f"耗时: {wm_duration:.3f}s | 信号数: {wm_signals}"
+        )
+
         total_duration = time.time() - start_time
         logger.info(
             f"[SIGNAL_DETECTION_COMPLETE] 增强信号检测完成 | "
@@ -315,6 +417,7 @@ class EnhancedAnalyzer(HotspotAnalyzer):
             f"FRED: {fred_duration:.2f}s ({fred_signals}个) | "
             f"USGS: {usgs_duration:.2f}s ({usgs_signals}个) | "
             f"GDELT: {gdelt_duration:.2f}s ({gdelt_signals}个) | "
+            f"WORLDMONITOR: {wm_duration:.2f}s ({wm_signals}个) | "
             f"总计: {len(enhanced_signals)}个信号"
         )
 

@@ -61,6 +61,9 @@ cp .env.example .env
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your-service-role-key
 WORKER_URL=https://your-worker.your-name.workers.dev
+WORLDMONITOR_BASE_URL=https://worldmonitor.app
+ENABLE_WORLDMONITOR_ENDPOINTS=true
+WORLDMONITOR_MAX_PRIORITY=2
 ```
 
 ### 2. 安装依赖
@@ -94,6 +97,7 @@ python scripts/crawler.py
 - `SUPABASE_URL`: Supabase 项目 URL
 - `SUPABASE_KEY`: Supabase Service Role Key
 - `WORKER_URL`: Cloudflare Worker URL（部署后获得）
+- `WORLDMONITOR_BASE_URL`: worldmonitor API 基础地址（可选）
 
 ## Cloudflare Worker 部署
 

@@ -356,6 +356,9 @@ export DASHSCOPE_API_KEY="your-api-key"
 
 # 增强分析（可选）
 export FRED_API_KEY="your-fred-key"
+export WORLDMONITOR_BASE_URL="https://worldmonitor.app"
+export ENABLE_WORLDMONITOR_ENDPOINTS="true"
+export WORLDMONITOR_MAX_PRIORITY="2"
 ```
 
 ### 8.3 数据库迁移
