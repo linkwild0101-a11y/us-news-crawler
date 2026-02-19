@@ -16,6 +16,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from scripts.analyzer import HotspotAnalyzer
 from scripts.datasources.free_data_sources import fetch_all_data_sources
+from scripts.datasources.signal_endpoint_sources import (
+    get_enhanced_analyzer_sources,
+    get_worldmonitor_no_auth_sources,
+)
 from scripts.signal_detector import generate_dedupe_key
 from config.analysis_config import SIGNAL_COOLDOWN_HOURS
 
@@ -50,7 +54,13 @@ class EnhancedAnalyzer(HotspotAnalyzer):
     def __init__(self):
         super().__init__()
         self.fred_api_key = os.getenv("FRED_API_KEY")
+        self.enhanced_signal_sources = get_enhanced_analyzer_sources()
+        self.no_auth_candidate_sources = get_worldmonitor_no_auth_sources()
         logger.info("[ENHANCED_INIT] 增强分析器初始化完成")
+        logger.info(
+            f"[SIGNAL_ENDPOINTS] 在用端点: {len(self.enhanced_signal_sources)} | "
+            f"无鉴权候选: {len(self.no_auth_candidate_sources)}"
+        )
 
     async def fetch_external_data(self) -> dict:
         """获取外部数据源"""
