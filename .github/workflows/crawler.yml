@@ -34,12 +34,14 @@ jobs:
         SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         WORKER_URL: ${{ secrets.WORKER_URL }}
         RAILWAY_URL: ${{ secrets.RAILWAY_URL }}
+        PYTHONUNBUFFERED: "1"
       run: |
-        python scripts/crawler.py
+        python -u scripts/crawler.py
     
     - name: Cleanup old data
       env:
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        PYTHONUNBUFFERED: "1"
       run: |
-        python scripts/cleanup.py
+        python -u scripts/cleanup.py

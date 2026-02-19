@@ -100,6 +100,7 @@ python scripts/crawler.py
 - `SUPABASE_URL`: Supabase 项目 URL
 - `SUPABASE_KEY`: Supabase Service Role Key
 - `WORKER_URL`: Cloudflare Worker URL（部署后获得）
+- `RAILWAY_URL`: Railway RSS 代理地址（可选，建议配置）
 - `WORLDMONITOR_BASE_URL`: worldmonitor API 基础地址（可选）
 
 ## Cloudflare Worker 部署
@@ -185,6 +186,7 @@ python scripts/import_sources.py     # 重新导入
 ### 爬虫运行超时
 - GitHub Actions 单次运行上限6小时
 - 如果超时，减少每批处理的源数量
+- 若日志长期无输出，确认 workflow 使用 `python -u` 与 `PYTHONUNBUFFERED=1`
 
 ### 数据库存储满了
 - 减少数据保留天数（90→60→30天）

@@ -33,6 +33,11 @@ class RSSCrawler:
             "errors": 0,
         }
 
+    def _log(self, message: str):
+        """统一日志输出，确保CI环境实时刷新"""
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        print(f"[{timestamp}] {message}", flush=True)
+
     async def __aenter__(self):
         timeout = aiohttp.ClientTimeout(total=30)
         self.session = aiohttp.ClientSession(timeout=timeout)
@@ -70,6 +75,17 @@ class RSSCrawler:
                 if not feed.entries:
                     raise Exception("RSS无有效条目")
 
+                fetch_method = "direct"
+                if anti_scraping == "railway" and WORKER_URL and RAILWAY_URL:
+                    fetch_method = "railway/worker-fallback"
+                elif anti_scraping in ["Cloudflare", "Paywall", "Partial Paywall"]:
+                    fetch_method = "worker/railway-fallback"
+
+                self._log(
+                    f"✅ RSS抓取成功 {source['name']} | 条目: {len(feed.entries[:10])} | "
+                    f"策略: {fetch_method}"
+                )
+
                 return {
                     "source_id": source["id"],
                     "category": source["category"],
@@ -77,7 +93,7 @@ class RSSCrawler:
                     "entries": feed.entries[:10],  # 只取前10条
                 }
             except Exception as e:
-                print(f"  ⚠️  RSS抓取失败 {source['name']}: {e}")
+                self._log(f"⚠️  RSS抓取失败 {source['name']}: {e}")
                 self.stats["errors"] += 1
                 return None
 
@@ -232,7 +248,7 @@ class RSSCrawler:
 
             return False
         except Exception as e:
-            print(f"  ⚠️  去重检查失败: {e}")
+            self._log(f"⚠️  去重检查失败: {e}")
             return False
 
     def _hamming_distance(self, hash1: str, hash2: str) -> int:
@@ -273,7 +289,7 @@ class RSSCrawler:
 
             return bool(result.data)
         except Exception as e:
-            print(f"  ⚠️  保存文章失败: {e}")
+            self._log(f"⚠️  保存文章失败: {e}")
             return False
 
     async def process_entry(self, entry, source_info: Dict) -> Optional[Dict]:
@@ -334,7 +350,7 @@ class RSSCrawler:
 
     async def crawl_sources(self, limit: Optional[int] = None):
         """主爬取流程"""
-        print("🚀 开始爬取RSS源...")
+        self._log("🚀 开始爬取RSS源...")
 
         # 获取所有active的sources
         sources = (
@@ -348,7 +364,7 @@ class RSSCrawler:
         if limit:
             sources = sources[:limit]
 
-        print(f"📊 共 {len(sources)} 个RSS源")
+        self._log(f"📊 共 {len(sources)} 个RSS源")
 
         # 创建日志记录
         log_result = (
@@ -385,14 +401,31 @@ class RSSCrawler:
                         )
                     )
 
-        print(f"📰 获取到 {len(all_entries)} 个条目，开始处理...")
+        total_entries = len(all_entries)
+        self._log(f"📰 获取到 {total_entries} 个条目，开始处理...")
 
         # 处理条目（限制并发）
         semaphore = asyncio.Semaphore(10)
+        progress_lock = asyncio.Lock()
+        processed_entries = 0
+        start_time = datetime.now()
 
         async def process_with_limit(entry, source_info):
+            nonlocal processed_entries
             async with semaphore:
-                return await self.process_entry(entry, source_info)
+                result = await self.process_entry(entry, source_info)
+            async with progress_lock:
+                processed_entries += 1
+                if processed_entries % 50 == 0 or processed_entries == total_entries:
+                    elapsed = (datetime.now() - start_time).total_seconds()
+                    rate = processed_entries / elapsed if elapsed > 0 else 0
+                    self._log(
+                        f"⏳ 条目处理进度: {processed_entries}/{total_entries} | "
+                        f"新增: {self.stats['articles_new']} | "
+                        f"去重: {self.stats['articles_deduped']} | "
+                        f"速率: {rate:.2f} 条/s"
+                    )
+            return result
 
         entry_tasks = [process_with_limit(e, s) for e, s in all_entries]
         await asyncio.gather(*entry_tasks)
@@ -411,14 +444,14 @@ class RSSCrawler:
             ).eq("id", log_id).execute()
 
         # 打印统计
-        print("\n" + "=" * 60)
-        print("📊 爬取完成统计")
-        print("=" * 60)
-        print(f"处理的源: {self.stats['sources_processed']}")
-        print(f"获取条目: {len(all_entries)}")
-        print(f"新增文章: {self.stats['articles_new']}")
-        print(f"去重跳过: {self.stats['articles_deduped']}")
-        print(f"错误数: {self.stats['errors']}")
+        self._log("=" * 60)
+        self._log("📊 爬取完成统计")
+        self._log("=" * 60)
+        self._log(f"处理的源: {self.stats['sources_processed']}")
+        self._log(f"获取条目: {len(all_entries)}")
+        self._log(f"新增文章: {self.stats['articles_new']}")
+        self._log(f"去重跳过: {self.stats['articles_deduped']}")
+        self._log(f"错误数: {self.stats['errors']}")
 
 
 async def main():
