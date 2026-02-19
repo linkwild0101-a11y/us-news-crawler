@@ -14,7 +14,6 @@ ROOT = Path(__file__).resolve().parents[1]
 RECOMMENDED_FILE = ROOT / "data" / "worldmonitor_recommended_sources.json"
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://lwigqxyfxevldfjdeokp.supabase.co")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-BATCH_SIZE = 50
 
 
 def _to_db_row(source: Dict) -> Dict:
