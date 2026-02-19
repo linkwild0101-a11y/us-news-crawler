@@ -93,44 +93,31 @@ class RSSValidator:
             result["status"] = "error"
             result["error"] = str(e)[:100]
 
-        # 2. 直接访问失败，检查是否标记为反爬源，尝试通过 Worker/Railway 访问
+        # 2. 首次验证失败后，统一再尝试 Worker + Railway 各一次
         anti_scraping = source.get("anti_scraping", "None")
+        prefer_railway_first = anti_scraping == "railway"
 
-        # 对于标记为 railway 的源，跳过直接访问和 Worker，直接使用 Railway
-        if anti_scraping == "railway" and RAILWAY_URL:
+        retry_chain = []
+        if prefer_railway_first:
+            if RAILWAY_URL:
+                retry_chain.append(("railway", self._test_via_railway))
+            if WORKER_URL:
+                retry_chain.append(("worker", self._test_via_worker))
+        else:
+            if WORKER_URL:
+                retry_chain.append(("worker", self._test_via_worker))
+            if RAILWAY_URL:
+                retry_chain.append(("railway", self._test_via_railway))
+
+        for method, retry_func in retry_chain:
+            icon = "🌐" if method == "worker" else "🚂"
             print(
-                f"  🚂 {source['name'][:40]:<40} | 标记为 railway，直接使用 Railway..."
+                f"  {icon} {source['name'][:40]:<40} | 首次失败，尝试 {method}..."
             )
-            railway_result = await self._test_via_railway(source)
-            if railway_result["status"] == "working":
-                return railway_result
-            else:
-                result["railway_error"] = railway_result.get("error", "Railway failed")
-
-        # 对于 Cloudflare/Paywall，先尝试 Worker，再尝试 Railway
-        elif anti_scraping in ["Cloudflare", "Paywall"] and WORKER_URL:
-            print(f"  🔄 {source['name'][:40]:<40} | 直接访问失败，尝试 Worker...")
-            worker_result = await self._test_via_worker(source)
-            if worker_result["status"] == "working":
-                return worker_result
-            else:
-                # Worker 也失败，尝试 Railway
-                if RAILWAY_URL:
-                    print(
-                        f"  🚂 {source['name'][:40]:<40} | Worker 失败，尝试 Railway..."
-                    )
-                    railway_result = await self._test_via_railway(source)
-                    if railway_result["status"] == "working":
-                        return railway_result
-                    else:
-                        result["worker_error"] = worker_result.get(
-                            "error", "Worker failed"
-                        )
-                        result["railway_error"] = railway_result.get(
-                            "error", "Railway failed"
-                        )
-                else:
-                    result["worker_error"] = worker_result.get("error", "Worker failed")
+            retry_result = await retry_func(source)
+            if retry_result["status"] == "working":
+                return retry_result
+            result[f"{method}_error"] = retry_result.get("error", f"{method} failed")
 
         return result
 

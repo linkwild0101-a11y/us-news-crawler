@@ -1,0 +1,984 @@
+[
+  {
+    "domain": "news.google.com",
+    "sample_names": [
+      "AP News",
+      "Reuters World",
+      "Politico",
+      "Al Arabiya"
+    ],
+    "sample_sections": [
+      "politics",
+      "middleeast",
+      "ai",
+      "finance"
+    ],
+    "sample_urls": [
+      "https://news.google.com/rss/search?q=site:apnews.com&hl=en-US&gl=US&ceid=US:en",
+      "https://news.google.com/rss/search?q=site:reuters.com+world&hl=en-US&gl=US&ceid=US:en",
+      "https://news.google.com/rss/search?q=site:politico.com+when:1d&hl=en-US&gl=US&ceid=US:en"
+    ],
+    "count": 189
+  },
+  {
+    "domain": "techcrunch.com",
+    "sample_names": [
+      "TechCrunch Layoffs",
+      "TechCrunch",
+      "TechCrunch Startups",
+      "TechCrunch Venture"
+    ],
+    "sample_sections": [
+      "layoffs",
+      "tech",
+      "startups"
+    ],
+    "sample_urls": [
+      "https://techcrunch.com/tag/layoffs/feed/",
+      "https://techcrunch.com/feed/",
+      "https://techcrunch.com/category/startups/feed/"
+    ],
+    "count": 5
+  },
+  {
+    "domain": "technologyreview.com",
+    "sample_names": [
+      "MIT Tech Review",
+      "MIT Tech Review AI"
+    ],
+    "sample_sections": [
+      "tech",
+      "ai"
+    ],
+    "sample_urls": [
+      "https://www.technologyreview.com/feed/",
+      "https://www.technologyreview.com/topic/artificial-intelligence/feed"
+    ],
+    "count": 4
+  },
+  {
+    "domain": "theverge.com",
+    "sample_names": [
+      "The Verge",
+      "The Verge AI"
+    ],
+    "sample_sections": [
+      "tech",
+      "ai"
+    ],
+    "sample_urls": [
+      "https://www.theverge.com/rss/index.xml",
+      "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"
+    ],
+    "count": 4
+  },
+  {
+    "domain": "export.arxiv.org",
+    "sample_names": [
+      "ArXiv AI",
+      "ArXiv ML"
+    ],
+    "sample_sections": [
+      "ai"
+    ],
+    "sample_urls": [
+      "https://export.arxiv.org/rss/cs.AI",
+      "https://export.arxiv.org/rss/cs.LG"
+    ],
+    "count": 3
+  },
+  {
+    "domain": "hnrss.org",
+    "sample_names": [
+      "Hacker News",
+      "Show HN"
+    ],
+    "sample_sections": [
+      "tech",
+      "github"
+    ],
+    "sample_urls": [
+      "https://hnrss.org/frontpage",
+      "https://hnrss.org/show"
+    ],
+    "count": 3
+  },
+  {
+    "domain": "rsshub.app",
+    "sample_names": [
+      "NHK World",
+      "MIIT (China)",
+      "MOFCOM (China)"
+    ],
+    "sample_sections": [
+      "asia"
+    ],
+    "sample_urls": [
+      "https://rsshub.app/nhk/news/en",
+      "https://rsshub.app/gov/miit/zcjd",
+      "https://rsshub.app/gov/mofcom/article/xwfb"
+    ],
+    "count": 3
+  },
+  {
+    "domain": "venturebeat.com",
+    "sample_names": [
+      "VentureBeat AI",
+      "VentureBeat"
+    ],
+    "sample_sections": [
+      "ai",
+      "startups"
+    ],
+    "sample_urls": [
+      "https://venturebeat.com/category/ai/feed/",
+      "https://venturebeat.com/feed/"
+    ],
+    "count": 3
+  },
+  {
+    "domain": "feeds.arstechnica.com",
+    "sample_names": [
+      "Ars Technica"
+    ],
+    "sample_sections": [
+      "tech"
+    ],
+    "sample_urls": [
+      "https://feeds.arstechnica.com/arstechnica/technology-lab"
+    ],
+    "count": 2
+  },
+  {
+    "domain": "ansa.it",
+    "sample_names": [
+      "ANSA"
+    ],
+    "sample_sections": [
+      "politics"
+    ],
+    "sample_urls": [
+      "https://www.ansa.it/sito/notizie/topnews/topnews_rss.xml"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "arabnews.com",
+    "sample_names": [
+      "Arab News"
+    ],
+    "sample_sections": [
+      "middleeast"
+    ],
+    "sample_urls": [
+      "https://www.arabnews.com/cat/1/rss.xml"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "asahi.com",
+    "sample_names": [
+      "Asahi Shimbun"
+    ],
+    "sample_sections": [
+      "asia"
+    ],
+    "sample_urls": [
+      "https://www.asahi.com/rss/asahi/newsheadlines.rdf"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "cbinsights.com",
+    "sample_names": [
+      "CB Insights"
+    ],
+    "sample_sections": [
+      "startups"
+    ],
+    "sample_urls": [
+      "https://www.cbinsights.com/research/feed/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "changelog.com",
+    "sample_names": [
+      "Changelog"
+    ],
+    "sample_sections": [
+      "dev"
+    ],
+    "sample_urls": [
+      "https://changelog.com/feed"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "channelnewsasia.com",
+    "sample_names": [
+      "CNA"
+    ],
+    "sample_sections": [
+      "asia"
+    ],
+    "sample_urls": [
+      "https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "cisa.gov",
+    "sample_names": [
+      "CISA"
+    ],
+    "sample_sections": [
+      "gov"
+    ],
+    "sample_urls": [
+      "https://www.cisa.gov/cybersecurity-advisories/all.xml"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "clarin.com",
+    "sample_names": [
+      "Clarín"
+    ],
+    "sample_sections": [
+      "latam"
+    ],
+    "sample_urls": [
+      "https://www.clarin.com/rss/lo-ultimo/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "coindesk.com",
+    "sample_names": [
+      "CoinDesk"
+    ],
+    "sample_sections": [
+      "crypto"
+    ],
+    "sample_urls": [
+      "https://www.coindesk.com/arc/outboundfeeds/rss/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "crisisgroup.org",
+    "sample_names": [
+      "CrisisWatch"
+    ],
+    "sample_sections": [
+      "crisis"
+    ],
+    "sample_urls": [
+      "https://www.crisisgroup.org/rss"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "darkreading.com",
+    "sample_names": [
+      "Dark Reading"
+    ],
+    "sample_sections": [
+      "security"
+    ],
+    "sample_urls": [
+      "https://www.darkreading.com/rss.xml"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "dev.to",
+    "sample_names": [
+      "Dev.to"
+    ],
+    "sample_sections": [
+      "dev"
+    ],
+    "sample_urls": [
+      "https://dev.to/feed"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "devops.com",
+    "sample_names": [
+      "DevOps.com"
+    ],
+    "sample_sections": [
+      "cloud"
+    ],
+    "sample_urls": [
+      "https://devops.com/feed/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "dn.se",
+    "sample_names": [
+      "Dagens Nyheter"
+    ],
+    "sample_sections": [
+      "politics"
+    ],
+    "sample_urls": [
+      "https://www.dn.se/rss/senaste-nytt/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "e00-elmundo.uecdn.es",
+    "sample_names": [
+      "El Mundo"
+    ],
+    "sample_sections": [
+      "politics"
+    ],
+    "sample_urls": [
+      "https://e00-elmundo.uecdn.es/elmundo/rss/portada.xml"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "eltiempo.com",
+    "sample_names": [
+      "El Tiempo"
+    ],
+    "sample_sections": [
+      "latam"
+    ],
+    "sample_urls": [
+      "https://www.eltiempo.com/rss/mundo_latinoamerica.xml"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "eluniversal.com.mx",
+    "sample_names": [
+      "El Universal"
+    ],
+    "sample_sections": [
+      "latam"
+    ],
+    "sample_urls": [
+      "https://www.eluniversal.com.mx/rss.xml"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "engadget.com",
+    "sample_names": [
+      "Engadget"
+    ],
+    "sample_sections": [
+      "tech"
+    ],
+    "sample_urls": [
+      "https://www.engadget.com/rss.xml"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "feed.infoq.com",
+    "sample_names": [
+      "InfoQ"
+    ],
+    "sample_sections": [
+      "cloud"
+    ],
+    "sample_urls": [
+      "https://feed.infoq.com/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "feeds.capi24.com",
+    "sample_names": [
+      "News24"
+    ],
+    "sample_sections": [
+      "africa"
+    ],
+    "sample_urls": [
+      "https://feeds.capi24.com/v1/Search/articles/news24/Africa/rss"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "feeds.elpais.com",
+    "sample_names": [
+      "El País"
+    ],
+    "sample_sections": [
+      "politics"
+    ],
+    "sample_urls": [
+      "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "feeds.folha.uol.com.br",
+    "sample_names": [
+      "Folha de S.Paulo"
+    ],
+    "sample_sections": [
+      "latam"
+    ],
+    "sample_urls": [
+      "https://feeds.folha.uol.com.br/emcimadahora/rss091.xml"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "feeds.nos.nl",
+    "sample_names": [
+      "NOS Nieuws"
+    ],
+    "sample_sections": [
+      "politics"
+    ],
+    "sample_urls": [
+      "https://feeds.nos.nl/nosnieuwsalgemeen"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "foreignaffairs.com",
+    "sample_names": [
+      "Foreign Affairs"
+    ],
+    "sample_sections": [
+      "thinktanks"
+    ],
+    "sample_urls": [
+      "https://www.foreignaffairs.com/rss.xml"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "foreignpolicy.com",
+    "sample_names": [
+      "Foreign Policy"
+    ],
+    "sample_sections": [
+      "thinktanks"
+    ],
+    "sample_urls": [
+      "https://foreignpolicy.com/feed/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "fpri.org",
+    "sample_names": [
+      "FPRI"
+    ],
+    "sample_sections": [
+      "thinktanks"
+    ],
+    "sample_urls": [
+      "https://www.fpri.org/feed/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "github.blog",
+    "sample_names": [
+      "GitHub Blog"
+    ],
+    "sample_sections": [
+      "github"
+    ],
+    "sample_urls": [
+      "https://github.blog/feed/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "haaretz.com",
+    "sample_names": [
+      "Haaretz"
+    ],
+    "sample_sections": [
+      "middleeast"
+    ],
+    "sample_urls": [
+      "https://www.haaretz.com/cmlink/1.4608793"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "iaea.org",
+    "sample_names": [
+      "IAEA"
+    ],
+    "sample_sections": [
+      "crisis"
+    ],
+    "sample_urls": [
+      "https://www.iaea.org/feeds/topnews"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "inc42.com",
+    "sample_names": [
+      "Inc42 (India)"
+    ],
+    "sample_sections": [
+      "regionalStartups"
+    ],
+    "sample_urls": [
+      "https://inc42.com/feed/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "jeuneafrique.com",
+    "sample_names": [
+      "Jeune Afrique"
+    ],
+    "sample_sections": [
+      "africa"
+    ],
+    "sample_urls": [
+      "https://www.jeuneafrique.com/feed/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "krebsonsecurity.com",
+    "sample_names": [
+      "Krebs Security"
+    ],
+    "sample_sections": [
+      "security"
+    ],
+    "sample_urls": [
+      "https://krebsonsecurity.com/feed/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "lasillavacia.com",
+    "sample_names": [
+      "La Silla Vacía"
+    ],
+    "sample_sections": [
+      "latam"
+    ],
+    "sample_urls": [
+      "https://www.lasillavacia.com/rss"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "layoffs.fyi",
+    "sample_names": [
+      "Layoffs.fyi"
+    ],
+    "sample_sections": [
+      "layoffs"
+    ],
+    "sample_urls": [
+      "https://layoffs.fyi/feed/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "lobste.rs",
+    "sample_names": [
+      "Lobsters"
+    ],
+    "sample_sections": [
+      "dev"
+    ],
+    "sample_urls": [
+      "https://lobste.rs/rss"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "mshibanami.github.io",
+    "sample_names": [
+      "GitHub Trending"
+    ],
+    "sample_sections": [
+      "github"
+    ],
+    "sample_urls": [
+      "https://mshibanami.github.io/GitHubTrendingRSS/daily/all.xml"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "news.crunchbase.com",
+    "sample_names": [
+      "Crunchbase News"
+    ],
+    "sample_sections": [
+      "startups"
+    ],
+    "sample_urls": [
+      "https://news.crunchbase.com/feed/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "news.mit.edu",
+    "sample_names": [
+      "MIT Research"
+    ],
+    "sample_sections": [
+      "ai"
+    ],
+    "sample_urls": [
+      "https://news.mit.edu/rss/research"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "news.un.org",
+    "sample_names": [
+      "UN News"
+    ],
+    "sample_sections": [
+      "gov"
+    ],
+    "sample_urls": [
+      "https://news.un.org/feed/subscribe/en/news/all/rss.xml"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "newsfeed.zeit.de",
+    "sample_names": [
+      "Die Zeit"
+    ],
+    "sample_sections": [
+      "politics"
+    ],
+    "sample_urls": [
+      "https://newsfeed.zeit.de/index"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "nrc.nl",
+    "sample_names": [
+      "NRC"
+    ],
+    "sample_sections": [
+      "politics"
+    ],
+    "sample_urls": [
+      "https://www.nrc.nl/rss/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "oglobo.globo.com",
+    "sample_names": [
+      "O Globo"
+    ],
+    "sample_sections": [
+      "latam"
+    ],
+    "sample_urls": [
+      "https://oglobo.globo.com/rss/top_noticias/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "producthunt.com",
+    "sample_names": [
+      "Product Hunt"
+    ],
+    "sample_sections": [
+      "producthunt"
+    ],
+    "sample_urls": [
+      "https://www.producthunt.com/feed"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "repubblica.it",
+    "sample_names": [
+      "Repubblica"
+    ],
+    "sample_sections": [
+      "politics"
+    ],
+    "sample_urls": [
+      "https://www.repubblica.it/rss/homepage/rss2.0.xml"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "responsiblestatecraft.org",
+    "sample_names": [
+      "Responsible Statecraft"
+    ],
+    "sample_sections": [
+      "thinktanks"
+    ],
+    "sample_urls": [
+      "https://responsiblestatecraft.org/feed/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "saastr.com",
+    "sample_names": [
+      "SaaStr"
+    ],
+    "sample_sections": [
+      "startups"
+    ],
+    "sample_urls": [
+      "https://www.saastr.com/feed/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "scmp.com",
+    "sample_names": [
+      "South China Morning Post"
+    ],
+    "sample_sections": [
+      "asia"
+    ],
+    "sample_urls": [
+      "https://www.scmp.com/rss/91/feed/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "sifted.eu",
+    "sample_names": [
+      "Sifted (Europe)"
+    ],
+    "sample_sections": [
+      "regionalStartups"
+    ],
+    "sample_urls": [
+      "https://sifted.eu/feed"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "stratechery.com",
+    "sample_names": [
+      "Stratechery"
+    ],
+    "sample_sections": [
+      "vcblogs"
+    ],
+    "sample_urls": [
+      "https://stratechery.com/feed/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "svd.se",
+    "sample_names": [
+      "Svenska Dagbladet"
+    ],
+    "sample_sections": [
+      "politics"
+    ],
+    "sample_urls": [
+      "https://www.svd.se/feed/articles.rss"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "svt.se",
+    "sample_names": [
+      "SVT Nyheter"
+    ],
+    "sample_sections": [
+      "politics"
+    ],
+    "sample_urls": [
+      "https://www.svt.se/nyheter/rss.xml"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "tagesschau.de",
+    "sample_names": [
+      "Tagesschau"
+    ],
+    "sample_sections": [
+      "politics"
+    ],
+    "sample_urls": [
+      "https://www.tagesschau.de/xml/rss2/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "tech.eu",
+    "sample_names": [
+      "Tech.eu"
+    ],
+    "sample_sections": [
+      "regionalStartups"
+    ],
+    "sample_urls": [
+      "https://tech.eu/feed/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "techcabal.com",
+    "sample_names": [
+      "TechCabal (Africa)"
+    ],
+    "sample_sections": [
+      "regionalStartups"
+    ],
+    "sample_urls": [
+      "https://techcabal.com/feed/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "techmeme.com",
+    "sample_names": [
+      "TechMeme"
+    ],
+    "sample_sections": [
+      "tech"
+    ],
+    "sample_urls": [
+      "https://www.techmeme.com/feed.xml"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "telegraaf.nl",
+    "sample_names": [
+      "De Telegraaf"
+    ],
+    "sample_sections": [
+      "politics"
+    ],
+    "sample_urls": [
+      "https://www.telegraaf.nl/rss"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "thehindu.com",
+    "sample_names": [
+      "The Hindu"
+    ],
+    "sample_sections": [
+      "asia"
+    ],
+    "sample_urls": [
+      "https://www.thehindu.com/news/national/feeder/default.rss"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "themoscowtimes.com",
+    "sample_names": [
+      "Moscow Times"
+    ],
+    "sample_sections": [
+      "regional"
+    ],
+    "sample_urls": [
+      "https://www.themoscowtimes.com/rss/news"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "thenewstack.io",
+    "sample_names": [
+      "The New Stack"
+    ],
+    "sample_sections": [
+      "cloud"
+    ],
+    "sample_urls": [
+      "https://thenewstack.io/feed/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "who.int",
+    "sample_names": [
+      "WHO"
+    ],
+    "sample_sections": [
+      "crisis"
+    ],
+    "sample_urls": [
+      "https://www.who.int/rss-feeds/news-english.xml"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "xml2.corriereobjects.it",
+    "sample_names": [
+      "Corriere della Sera"
+    ],
+    "sample_sections": [
+      "politics"
+    ],
+    "sample_urls": [
+      "https://xml2.corriereobjects.it/rss/incipit.xml"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "ycombinator.com",
+    "sample_names": [
+      "Y Combinator Blog"
+    ],
+    "sample_sections": [
+      "vcblogs"
+    ],
+    "sample_urls": [
+      "https://www.ycombinator.com/blog/rss/"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "yourstory.com",
+    "sample_names": [
+      "YourStory"
+    ],
+    "sample_sections": [
+      "regionalStartups"
+    ],
+    "sample_urls": [
+      "https://yourstory.com/feed"
+    ],
+    "count": 1
+  },
+  {
+    "domain": "zdnet.com",
+    "sample_names": [
+      "ZDNet"
+    ],
+    "sample_sections": [
+      "tech"
+    ],
+    "sample_urls": [
+      "https://www.zdnet.com/news/rss.xml"
+    ],
+    "count": 1
+  }
+]

@@ -1,0 +1,3634 @@
+[
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "BBC World",
+    "wrapper": "rss",
+    "source_url": "https://feeds.bbci.co.uk/news/world/rss.xml",
+    "domain": "feeds.bbci.co.uk",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "NPR News",
+    "wrapper": "rss",
+    "source_url": "https://feeds.npr.org/1001/rss.xml",
+    "domain": "feeds.npr.org",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "Guardian World",
+    "wrapper": "rss",
+    "source_url": "https://www.theguardian.com/world/rss",
+    "domain": "theguardian.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "AP News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:apnews.com&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "apnews.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "Reuters World",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:reuters.com+world&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "reuters.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "Politico",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:politico.com+when:1d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "politico.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "The Diplomat",
+    "wrapper": "rss",
+    "source_url": "https://thediplomat.com/feed/",
+    "domain": "thediplomat.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "El País",
+    "wrapper": "rss",
+    "source_url": "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada",
+    "domain": "feeds.elpais.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "El Mundo",
+    "wrapper": "rss",
+    "source_url": "https://e00-elmundo.uecdn.es/elmundo/rss/portada.xml",
+    "domain": "e00-elmundo.uecdn.es",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "BBC Mundo",
+    "wrapper": "rss",
+    "source_url": "https://www.bbc.com/mundo/index.xml",
+    "domain": "bbc.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "Tagesschau",
+    "wrapper": "rss",
+    "source_url": "https://www.tagesschau.de/xml/rss2/",
+    "domain": "tagesschau.de",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "Der Spiegel",
+    "wrapper": "rss",
+    "source_url": "https://www.spiegel.de/schlagzeilen/tops/index.rss",
+    "domain": "spiegel.de",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "Die Zeit",
+    "wrapper": "rss",
+    "source_url": "https://newsfeed.zeit.de/index",
+    "domain": "newsfeed.zeit.de",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "ANSA",
+    "wrapper": "rss",
+    "source_url": "https://www.ansa.it/sito/notizie/topnews/topnews_rss.xml",
+    "domain": "ansa.it",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "Corriere della Sera",
+    "wrapper": "rss",
+    "source_url": "https://xml2.corriereobjects.it/rss/incipit.xml",
+    "domain": "xml2.corriereobjects.it",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "Repubblica",
+    "wrapper": "rss",
+    "source_url": "https://www.repubblica.it/rss/homepage/rss2.0.xml",
+    "domain": "repubblica.it",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "NOS Nieuws",
+    "wrapper": "rss",
+    "source_url": "https://feeds.nos.nl/nosnieuwsalgemeen",
+    "domain": "feeds.nos.nl",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "NRC",
+    "wrapper": "rss",
+    "source_url": "https://www.nrc.nl/rss/",
+    "domain": "nrc.nl",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "De Telegraaf",
+    "wrapper": "rss",
+    "source_url": "https://www.telegraaf.nl/rss",
+    "domain": "telegraaf.nl",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "SVT Nyheter",
+    "wrapper": "rss",
+    "source_url": "https://www.svt.se/nyheter/rss.xml",
+    "domain": "svt.se",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "Dagens Nyheter",
+    "wrapper": "rss",
+    "source_url": "https://www.dn.se/rss/senaste-nytt/",
+    "domain": "dn.se",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "politics",
+    "name": "Svenska Dagbladet",
+    "wrapper": "rss",
+    "source_url": "https://www.svd.se/feed/articles.rss",
+    "domain": "svd.se",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "middleeast",
+    "name": "BBC Middle East",
+    "wrapper": "rss",
+    "source_url": "https://feeds.bbci.co.uk/news/world/middle_east/rss.xml",
+    "domain": "feeds.bbci.co.uk",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "middleeast",
+    "name": "Al Arabiya",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:english.alarabiya.net+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "english.alarabiya.net"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "middleeast",
+    "name": "Guardian ME",
+    "wrapper": "rss",
+    "source_url": "https://www.theguardian.com/world/middleeast/rss",
+    "domain": "theguardian.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "middleeast",
+    "name": "CNN World",
+    "wrapper": "rss",
+    "source_url": "http://rss.cnn.com/rss/cnn_world.rss",
+    "domain": "rss.cnn.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "middleeast",
+    "name": "BBC Persian",
+    "wrapper": "rss",
+    "source_url": "http://feeds.bbci.co.uk/persian/tv-and-radio-37434376/rss.xml",
+    "domain": "feeds.bbci.co.uk",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "middleeast",
+    "name": "Iran International",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:iranintl.com+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "iranintl.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "middleeast",
+    "name": "Fars News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:farsnews.ir+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "farsnews.ir"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "middleeast",
+    "name": "Haaretz",
+    "wrapper": "rss",
+    "source_url": "https://www.haaretz.com/cmlink/1.4608793",
+    "domain": "haaretz.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "middleeast",
+    "name": "Arab News",
+    "wrapper": "rss",
+    "source_url": "https://www.arabnews.com/cat/1/rss.xml",
+    "domain": "arabnews.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "tech",
+    "name": "Hacker News",
+    "wrapper": "rss",
+    "source_url": "https://hnrss.org/frontpage",
+    "domain": "hnrss.org",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "tech",
+    "name": "Ars Technica",
+    "wrapper": "rss",
+    "source_url": "https://feeds.arstechnica.com/arstechnica/technology-lab",
+    "domain": "feeds.arstechnica.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "tech",
+    "name": "The Verge",
+    "wrapper": "rss",
+    "source_url": "https://www.theverge.com/rss/index.xml",
+    "domain": "theverge.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "tech",
+    "name": "MIT Tech Review",
+    "wrapper": "rss",
+    "source_url": "https://www.technologyreview.com/feed/",
+    "domain": "technologyreview.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "ai",
+    "name": "AI News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(OpenAI+OR+Anthropic+OR+Google+AI+OR+\"large+language+model\"+OR+ChatGPT)+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "ai",
+    "name": "VentureBeat AI",
+    "wrapper": "rss",
+    "source_url": "https://venturebeat.com/category/ai/feed/",
+    "domain": "venturebeat.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "ai",
+    "name": "The Verge AI",
+    "wrapper": "rss",
+    "source_url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+    "domain": "theverge.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "ai",
+    "name": "MIT Tech Review",
+    "wrapper": "rss",
+    "source_url": "https://www.technologyreview.com/topic/artificial-intelligence/feed",
+    "domain": "technologyreview.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "ai",
+    "name": "ArXiv AI",
+    "wrapper": "rss",
+    "source_url": "https://export.arxiv.org/rss/cs.AI",
+    "domain": "export.arxiv.org",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "finance",
+    "name": "CNBC",
+    "wrapper": "rss",
+    "source_url": "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+    "domain": "cnbc.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "finance",
+    "name": "MarketWatch",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:marketwatch.com+markets+when:1d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "marketwatch.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "finance",
+    "name": "Yahoo Finance",
+    "wrapper": "rss",
+    "source_url": "https://finance.yahoo.com/news/rssindex",
+    "domain": "finance.yahoo.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "finance",
+    "name": "Financial Times",
+    "wrapper": "rss",
+    "source_url": "https://www.ft.com/rss/home",
+    "domain": "ft.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "finance",
+    "name": "Reuters Business",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:reuters.com+business+markets&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "reuters.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "gov",
+    "name": "White House",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:whitehouse.gov&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "whitehouse.gov"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "gov",
+    "name": "State Dept",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:state.gov+OR+\"State+Department\"&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "state.gov"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "gov",
+    "name": "Pentagon",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:defense.gov+OR+Pentagon&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "defense.gov"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "gov",
+    "name": "Treasury",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:treasury.gov+OR+\"Treasury+Department\"&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "treasury.gov"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "gov",
+    "name": "DOJ",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:justice.gov+OR+\"Justice+Department\"+DOJ&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "justice.gov"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "gov",
+    "name": "Federal Reserve",
+    "wrapper": "rss",
+    "source_url": "https://www.federalreserve.gov/feeds/press_all.xml",
+    "domain": "federalreserve.gov",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "gov",
+    "name": "SEC",
+    "wrapper": "rss",
+    "source_url": "https://www.sec.gov/news/pressreleases.rss",
+    "domain": "sec.gov",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "gov",
+    "name": "CDC",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:cdc.gov+OR+CDC+health&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "cdc.gov"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "gov",
+    "name": "FEMA",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:fema.gov+OR+FEMA+emergency&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "fema.gov"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "gov",
+    "name": "DHS",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:dhs.gov+OR+\"Homeland+Security\"&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "dhs.gov"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "gov",
+    "name": "UN News",
+    "wrapper": "railwayRss",
+    "source_url": "https://news.un.org/feed/subscribe/en/news/all/rss.xml",
+    "domain": "news.un.org",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "gov",
+    "name": "CISA",
+    "wrapper": "railwayRss",
+    "source_url": "https://www.cisa.gov/cybersecurity-advisories/all.xml",
+    "domain": "cisa.gov",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "layoffs",
+    "name": "Layoffs.fyi",
+    "wrapper": "rss",
+    "source_url": "https://layoffs.fyi/feed/",
+    "domain": "layoffs.fyi",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "layoffs",
+    "name": "TechCrunch Layoffs",
+    "wrapper": "rss",
+    "source_url": "https://techcrunch.com/tag/layoffs/feed/",
+    "domain": "techcrunch.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "layoffs",
+    "name": "Layoffs News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(layoffs+OR+\"job+cuts\"+OR+\"workforce+reduction\")+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "thinktanks",
+    "name": "Foreign Policy",
+    "wrapper": "rss",
+    "source_url": "https://foreignpolicy.com/feed/",
+    "domain": "foreignpolicy.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "thinktanks",
+    "name": "Atlantic Council",
+    "wrapper": "railwayRss",
+    "source_url": "https://www.atlanticcouncil.org/feed/",
+    "domain": "atlanticcouncil.org",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "thinktanks",
+    "name": "Foreign Affairs",
+    "wrapper": "rss",
+    "source_url": "https://www.foreignaffairs.com/rss.xml",
+    "domain": "foreignaffairs.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "thinktanks",
+    "name": "CSIS",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:csis.org+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "csis.org"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "thinktanks",
+    "name": "RAND",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:rand.org+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "rand.org"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "thinktanks",
+    "name": "Brookings",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:brookings.edu+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "brookings.edu"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "thinktanks",
+    "name": "Carnegie",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:carnegieendowment.org+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "carnegieendowment.org"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "thinktanks",
+    "name": "War on the Rocks",
+    "wrapper": "rss",
+    "source_url": "https://warontherocks.com/feed",
+    "domain": "warontherocks.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "thinktanks",
+    "name": "AEI",
+    "wrapper": "rss",
+    "source_url": "https://www.aei.org/feed/",
+    "domain": "aei.org",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "thinktanks",
+    "name": "Responsible Statecraft",
+    "wrapper": "rss",
+    "source_url": "https://responsiblestatecraft.org/feed/",
+    "domain": "responsiblestatecraft.org",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "thinktanks",
+    "name": "RUSI",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:rusi.org+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "rusi.org"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "thinktanks",
+    "name": "FPRI",
+    "wrapper": "rss",
+    "source_url": "https://www.fpri.org/feed/",
+    "domain": "fpri.org",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "thinktanks",
+    "name": "Jamestown",
+    "wrapper": "rss",
+    "source_url": "https://jamestown.org/feed/",
+    "domain": "jamestown.org",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "crisis",
+    "name": "CrisisWatch",
+    "wrapper": "rss",
+    "source_url": "https://www.crisisgroup.org/rss",
+    "domain": "crisisgroup.org",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "crisis",
+    "name": "IAEA",
+    "wrapper": "rss",
+    "source_url": "https://www.iaea.org/feeds/topnews",
+    "domain": "iaea.org",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "crisis",
+    "name": "WHO",
+    "wrapper": "rss",
+    "source_url": "https://www.who.int/rss-feeds/news-english.xml",
+    "domain": "who.int",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "crisis",
+    "name": "UNHCR",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:unhcr.org+OR+UNHCR+refugees+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "unhcr.org"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "regional",
+    "name": "Xinhua",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:xinhuanet.com+OR+Xinhua+when:1d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "xinhuanet.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "regional",
+    "name": "TASS",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:tass.com+OR+TASS+Russia+when:1d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "tass.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "regional",
+    "name": "Kyiv Independent",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:kyivindependent.com+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "kyivindependent.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "regional",
+    "name": "Moscow Times",
+    "wrapper": "rss",
+    "source_url": "https://www.themoscowtimes.com/rss/news",
+    "domain": "themoscowtimes.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "africa",
+    "name": "Africa News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(Africa+OR+Nigeria+OR+Kenya+OR+\"South+Africa\"+OR+Ethiopia)+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "africa",
+    "name": "Sahel Crisis",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(Sahel+OR+Mali+OR+Niger+OR+\"Burkina+Faso\"+OR+Wagner)+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "africa",
+    "name": "News24",
+    "wrapper": "railwayRss",
+    "source_url": "https://feeds.capi24.com/v1/Search/articles/news24/Africa/rss",
+    "domain": "feeds.capi24.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "africa",
+    "name": "BBC Africa",
+    "wrapper": "rss",
+    "source_url": "https://feeds.bbci.co.uk/news/world/africa/rss.xml",
+    "domain": "feeds.bbci.co.uk",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "africa",
+    "name": "Jeune Afrique",
+    "wrapper": "rss",
+    "source_url": "https://www.jeuneafrique.com/feed/",
+    "domain": "jeuneafrique.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "africa",
+    "name": "BBC Afrique",
+    "wrapper": "rss",
+    "source_url": "https://www.bbc.com/afrique/index.xml",
+    "domain": "bbc.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "latam",
+    "name": "Latin America",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(Brazil+OR+Mexico+OR+Argentina+OR+Venezuela+OR+Colombia)+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "latam",
+    "name": "BBC Latin America",
+    "wrapper": "rss",
+    "source_url": "https://feeds.bbci.co.uk/news/world/latin_america/rss.xml",
+    "domain": "feeds.bbci.co.uk",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "latam",
+    "name": "Reuters LatAm",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:reuters.com+(Brazil+OR+Mexico+OR+Argentina)+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "reuters.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "latam",
+    "name": "Guardian Americas",
+    "wrapper": "rss",
+    "source_url": "https://www.theguardian.com/world/americas/rss",
+    "domain": "theguardian.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "latam",
+    "name": "Clarín",
+    "wrapper": "rss",
+    "source_url": "https://www.clarin.com/rss/lo-ultimo/",
+    "domain": "clarin.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "latam",
+    "name": "O Globo",
+    "wrapper": "rss",
+    "source_url": "https://oglobo.globo.com/rss/top_noticias/",
+    "domain": "oglobo.globo.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "latam",
+    "name": "Folha de S.Paulo",
+    "wrapper": "rss",
+    "source_url": "https://feeds.folha.uol.com.br/emcimadahora/rss091.xml",
+    "domain": "feeds.folha.uol.com.br",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "latam",
+    "name": "El Tiempo",
+    "wrapper": "rss",
+    "source_url": "https://www.eltiempo.com/rss/mundo_latinoamerica.xml",
+    "domain": "eltiempo.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "latam",
+    "name": "El Universal",
+    "wrapper": "rss",
+    "source_url": "https://www.eluniversal.com.mx/rss.xml",
+    "domain": "eluniversal.com.mx",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "latam",
+    "name": "La Silla Vacía",
+    "wrapper": "rss",
+    "source_url": "https://www.lasillavacia.com/rss",
+    "domain": "lasillavacia.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "asia",
+    "name": "Asia News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(China+OR+Japan+OR+Korea+OR+India+OR+ASEAN)+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "asia",
+    "name": "BBC Asia",
+    "wrapper": "rss",
+    "source_url": "https://feeds.bbci.co.uk/news/world/asia/rss.xml",
+    "domain": "feeds.bbci.co.uk",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "full",
+    "section": "asia",
+    "name": "South China Morning Post",
+    "wrapper": "railwayRss",
+    "source_url": "https://www.scmp.com/rss/91/feed/",
+    "domain": "scmp.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "asia",
+    "name": "Reuters Asia",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:reuters.com+(China+OR+Japan+OR+Taiwan+OR+Korea)+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "reuters.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "asia",
+    "name": "NHK World",
+    "wrapper": "railwayRss",
+    "source_url": "https://rsshub.app/nhk/news/en",
+    "domain": "rsshub.app",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "asia",
+    "name": "Nikkei Asia",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:asia.nikkei.com+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "asia.nikkei.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "asia",
+    "name": "Asahi Shimbun",
+    "wrapper": "rss",
+    "source_url": "https://www.asahi.com/rss/asahi/newsheadlines.rdf",
+    "domain": "asahi.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "asia",
+    "name": "The Hindu",
+    "wrapper": "rss",
+    "source_url": "https://www.thehindu.com/news/national/feeder/default.rss",
+    "domain": "thehindu.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "asia",
+    "name": "CNA",
+    "wrapper": "rss",
+    "source_url": "https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml",
+    "domain": "channelnewsasia.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "asia",
+    "name": "MIIT (China)",
+    "wrapper": "railwayRss",
+    "source_url": "https://rsshub.app/gov/miit/zcjd",
+    "domain": "rsshub.app",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "asia",
+    "name": "MOFCOM (China)",
+    "wrapper": "railwayRss",
+    "source_url": "https://rsshub.app/gov/mofcom/article/xwfb",
+    "domain": "rsshub.app",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "energy",
+    "name": "Oil & Gas",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(oil+price+OR+OPEC+OR+\"natural+gas\"+OR+pipeline+OR+LNG)+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "energy",
+    "name": "Nuclear Energy",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"nuclear+energy\"+OR+\"nuclear+power\"+OR+uranium+OR+IAEA)+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "energy",
+    "name": "Reuters Energy",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:reuters.com+(oil+OR+gas+OR+energy+OR+OPEC)+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "reuters.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "full",
+    "section": "energy",
+    "name": "Mining & Resources",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(lithium+OR+\"rare+earth\"+OR+cobalt+OR+mining)+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "tech",
+    "name": "TechCrunch",
+    "wrapper": "rss",
+    "source_url": "https://techcrunch.com/feed/",
+    "domain": "techcrunch.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "tech",
+    "name": "The Verge",
+    "wrapper": "rss",
+    "source_url": "https://www.theverge.com/rss/index.xml",
+    "domain": "theverge.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "tech",
+    "name": "Ars Technica",
+    "wrapper": "rss",
+    "source_url": "https://feeds.arstechnica.com/arstechnica/technology-lab",
+    "domain": "feeds.arstechnica.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "tech",
+    "name": "Hacker News",
+    "wrapper": "rss",
+    "source_url": "https://hnrss.org/frontpage",
+    "domain": "hnrss.org",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "tech",
+    "name": "MIT Tech Review",
+    "wrapper": "rss",
+    "source_url": "https://www.technologyreview.com/feed/",
+    "domain": "technologyreview.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "tech",
+    "name": "ZDNet",
+    "wrapper": "rss",
+    "source_url": "https://www.zdnet.com/news/rss.xml",
+    "domain": "zdnet.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "tech",
+    "name": "TechMeme",
+    "wrapper": "rss",
+    "source_url": "https://www.techmeme.com/feed.xml",
+    "domain": "techmeme.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "tech",
+    "name": "Engadget",
+    "wrapper": "rss",
+    "source_url": "https://www.engadget.com/rss.xml",
+    "domain": "engadget.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "tech",
+    "name": "Fast Company",
+    "wrapper": "rss",
+    "source_url": "https://feeds.feedburner.com/fastcompany/headlines",
+    "domain": "feeds.feedburner.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "tech",
+    "section": "ai",
+    "name": "AI News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(OpenAI+OR+Anthropic+OR+Google+AI+OR+\"large+language+model\"+OR+ChatGPT+OR+Claude+OR+\"AI+model\")+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "ai",
+    "name": "VentureBeat AI",
+    "wrapper": "rss",
+    "source_url": "https://venturebeat.com/category/ai/feed/",
+    "domain": "venturebeat.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "ai",
+    "name": "The Verge AI",
+    "wrapper": "rss",
+    "source_url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+    "domain": "theverge.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "ai",
+    "name": "MIT Tech Review AI",
+    "wrapper": "rss",
+    "source_url": "https://www.technologyreview.com/topic/artificial-intelligence/feed",
+    "domain": "technologyreview.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "ai",
+    "name": "MIT Research",
+    "wrapper": "rss",
+    "source_url": "https://news.mit.edu/rss/research",
+    "domain": "news.mit.edu",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "ai",
+    "name": "ArXiv AI",
+    "wrapper": "rss",
+    "source_url": "https://export.arxiv.org/rss/cs.AI",
+    "domain": "export.arxiv.org",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "ai",
+    "name": "ArXiv ML",
+    "wrapper": "rss",
+    "source_url": "https://export.arxiv.org/rss/cs.LG",
+    "domain": "export.arxiv.org",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "ai",
+    "name": "AI Weekly",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=\"artificial+intelligence\"+OR+\"machine+learning\"+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "ai",
+    "name": "Anthropic News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=Anthropic+Claude+AI+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "ai",
+    "name": "OpenAI News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=OpenAI+ChatGPT+GPT-4+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "startups",
+    "name": "TechCrunch Startups",
+    "wrapper": "rss",
+    "source_url": "https://techcrunch.com/category/startups/feed/",
+    "domain": "techcrunch.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "startups",
+    "name": "VentureBeat",
+    "wrapper": "rss",
+    "source_url": "https://venturebeat.com/feed/",
+    "domain": "venturebeat.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "startups",
+    "name": "Crunchbase News",
+    "wrapper": "rss",
+    "source_url": "https://news.crunchbase.com/feed/",
+    "domain": "news.crunchbase.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "startups",
+    "name": "SaaStr",
+    "wrapper": "rss",
+    "source_url": "https://www.saastr.com/feed/",
+    "domain": "saastr.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "startups",
+    "name": "AngelList News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:angellist.com+OR+\"AngelList\"+funding+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "angellist.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "startups",
+    "name": "TechCrunch Venture",
+    "wrapper": "rss",
+    "source_url": "https://techcrunch.com/category/venture/feed/",
+    "domain": "techcrunch.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "startups",
+    "name": "The Information",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:theinformation.com+startup+OR+funding+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "theinformation.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "startups",
+    "name": "Fortune Term Sheet",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=\"Term+Sheet\"+venture+capital+OR+startup+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "startups",
+    "name": "PitchBook News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:pitchbook.com+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "pitchbook.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "startups",
+    "name": "CB Insights",
+    "wrapper": "rss",
+    "source_url": "https://www.cbinsights.com/research/feed/",
+    "domain": "cbinsights.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "vcblogs",
+    "name": "Y Combinator Blog",
+    "wrapper": "rss",
+    "source_url": "https://www.ycombinator.com/blog/rss/",
+    "domain": "ycombinator.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "vcblogs",
+    "name": "a16z Blog",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:a16z.com+OR+\"Andreessen+Horowitz\"+blog+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "a16z.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "vcblogs",
+    "name": "Sequoia Blog",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:sequoiacap.com+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "sequoiacap.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "vcblogs",
+    "name": "Paul Graham Essays",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=\"Paul+Graham\"+essay+OR+blog+when:30d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "vcblogs",
+    "name": "VC Insights",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"venture+capital\"+insights+OR+\"VC+trends\"+OR+\"startup+advice\")+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "vcblogs",
+    "name": "Stratechery",
+    "wrapper": "rss",
+    "source_url": "https://stratechery.com/feed/",
+    "domain": "stratechery.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "vcblogs",
+    "name": "FwdStart Newsletter",
+    "wrapper": "direct",
+    "source_url": "/api/fwdstart",
+    "domain": "",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "EU Startups",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:eu-startups.com+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "eu-startups.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "Tech.eu",
+    "wrapper": "rss",
+    "source_url": "https://tech.eu/feed/",
+    "domain": "tech.eu",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "Sifted (Europe)",
+    "wrapper": "rss",
+    "source_url": "https://sifted.eu/feed",
+    "domain": "sifted.eu",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "The Next Web",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:thenextweb.com+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "thenextweb.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "Tech in Asia",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:techinasia.com+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "techinasia.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "KrASIA",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:kr-asia.com+OR+KrASIA+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "kr-asia.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "SEA Startups",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(Singapore+OR+Indonesia+OR+Vietnam+OR+Thailand+OR+Malaysia)+startup+funding+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "Asia VC News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"Southeast+Asia\"+OR+ASEAN)+venture+capital+OR+funding+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "China Startups",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=China+startup+funding+OR+\"Chinese+startup\"+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "36Kr English",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:36kr.com+OR+\"36Kr\"+startup+china+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "36kr.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "China Tech Giants",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(Alibaba+OR+Tencent+OR+ByteDance+OR+Baidu+OR+JD.com+OR+Xiaomi+OR+Huawei)+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "Japan Startups",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=Japan+startup+funding+OR+\"Japanese+startup\"+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "Japan Tech News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(Japan+startup+OR+Japan+tech+OR+SoftBank+OR+Rakuten+OR+Sony)+funding+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "Nikkei Tech",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:asia.nikkei.com+technology+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "asia.nikkei.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "Korea Tech News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(Korea+startup+OR+Korean+tech+OR+Samsung+OR+Kakao+OR+Naver+OR+Coupang)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "Korea Startups",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=Korea+startup+funding+OR+\"Korean+unicorn\"+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "Inc42 (India)",
+    "wrapper": "rss",
+    "source_url": "https://inc42.com/feed/",
+    "domain": "inc42.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "YourStory",
+    "wrapper": "rss",
+    "source_url": "https://yourstory.com/feed",
+    "domain": "yourstory.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "India Startups",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=India+startup+funding+OR+\"Indian+startup\"+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "India Tech News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(Flipkart+OR+Razorpay+OR+Zerodha+OR+Zomato+OR+Paytm+OR+PhonePe)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "SEA Tech News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(Grab+OR+GoTo+OR+Sea+Limited+OR+Shopee+OR+Tokopedia)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "Vietnam Tech",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=Vietnam+startup+OR+Vietnam+tech+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "Indonesia Tech",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=Indonesia+startup+OR+Indonesia+tech+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "Taiwan Tech",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(Taiwan+startup+OR+TSMC+OR+MediaTek+OR+Foxconn)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "LAVCA (LATAM)",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:lavca.org+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "lavca.org"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "LATAM Startups",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"Latin+America\"+startup+OR+LATAM+funding)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "Startups LATAM",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(startup+Brazil+OR+startup+Mexico+OR+startup+Argentina+OR+startup+Colombia+OR+startup+Chile)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "Brazil Tech",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(Nubank+OR+iFood+OR+Mercado+Libre+OR+Rappi+OR+VTEX)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "FinTech LATAM",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=fintech+(Brazil+OR+Mexico+OR+Argentina+OR+\"Latin+America\")+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "TechCabal (Africa)",
+    "wrapper": "rss",
+    "source_url": "https://techcabal.com/feed/",
+    "domain": "techcabal.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "Disrupt Africa",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:disrupt-africa.com+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "disrupt-africa.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "Africa Startups",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=Africa+startup+funding+OR+\"African+startup\"+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "Africa Tech News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(Flutterwave+OR+Paystack+OR+Jumia+OR+Andela+OR+\"Africa+startup\")+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "MENA Startups",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(MENA+startup+OR+\"Middle+East\"+funding+OR+Gulf+startup)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regionalStartups",
+    "name": "MENA Tech News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(UAE+startup+OR+Saudi+tech+OR+Dubai+startup+OR+NEOM+tech)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "github",
+    "name": "GitHub Blog",
+    "wrapper": "rss",
+    "source_url": "https://github.blog/feed/",
+    "domain": "github.blog",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "github",
+    "name": "GitHub Trending",
+    "wrapper": "rss",
+    "source_url": "https://mshibanami.github.io/GitHubTrendingRSS/daily/all.xml",
+    "domain": "mshibanami.github.io",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "github",
+    "name": "Show HN",
+    "wrapper": "rss",
+    "source_url": "https://hnrss.org/show",
+    "domain": "hnrss.org",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "github",
+    "name": "YC Launches",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"Y+Combinator\"+OR+\"YC+launch\"+OR+\"YC+W25\"+OR+\"YC+S25\")+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "github",
+    "name": "Dev Events",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"developer+conference\"+OR+\"tech+summit\"+OR+\"devcon\"+OR+\"developer+event\")+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "github",
+    "name": "Open Source News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=\"open+source\"+project+release+OR+launch+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "ipo",
+    "name": "IPO News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(IPO+OR+\"initial+public+offering\"+OR+SPAC)+tech+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "ipo",
+    "name": "Renaissance IPO",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:renaissancecapital.com+IPO+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "renaissancecapital.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "ipo",
+    "name": "Tech IPO News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=tech+IPO+OR+\"tech+company\"+IPO+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "funding",
+    "name": "SEC Filings",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(S-1+OR+\"IPO+filing\"+OR+\"SEC+filing\")+startup+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "funding",
+    "name": "VC News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"Series+A\"+OR+\"Series+B\"+OR+\"Series+C\"+OR+\"funding+round\"+OR+\"venture+capital\")+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "funding",
+    "name": "Seed & Pre-Seed",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"seed+round\"+OR+\"pre-seed\"+OR+\"angel+round\"+OR+\"seed+funding\")+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "funding",
+    "name": "Startup Funding",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"startup+funding\"+OR+\"raised+funding\"+OR+\"raised+$\"+OR+\"funding+announced\")+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "producthunt",
+    "name": "Product Hunt",
+    "wrapper": "rss",
+    "source_url": "https://www.producthunt.com/feed",
+    "domain": "producthunt.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "outages",
+    "name": "AWS Status",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=AWS+outage+OR+\"Amazon+Web+Services\"+down+when:1d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "outages",
+    "name": "Cloud Outages",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(Azure+OR+GCP+OR+Cloudflare+OR+Slack+OR+GitHub)+outage+OR+down+when:1d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "security",
+    "name": "Krebs Security",
+    "wrapper": "rss",
+    "source_url": "https://krebsonsecurity.com/feed/",
+    "domain": "krebsonsecurity.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "security",
+    "name": "The Hacker News",
+    "wrapper": "rss",
+    "source_url": "https://feeds.feedburner.com/TheHackersNews",
+    "domain": "feeds.feedburner.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "tech",
+    "section": "security",
+    "name": "Dark Reading",
+    "wrapper": "rss",
+    "source_url": "https://www.darkreading.com/rss.xml",
+    "domain": "darkreading.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "security",
+    "name": "Schneier",
+    "wrapper": "rss",
+    "source_url": "https://www.schneier.com/feed/",
+    "domain": "schneier.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "tech",
+    "section": "policy",
+    "name": "Politico Tech",
+    "wrapper": "rss",
+    "source_url": "https://rss.politico.com/technology.xml",
+    "domain": "rss.politico.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "tech",
+    "section": "policy",
+    "name": "AI Regulation",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=AI+regulation+OR+\"artificial+intelligence\"+law+OR+policy+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "policy",
+    "name": "Tech Antitrust",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=tech+antitrust+OR+FTC+Google+OR+FTC+Apple+OR+FTC+Amazon+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "policy",
+    "name": "EFF News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:eff.org+OR+\"Electronic+Frontier+Foundation\"+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "eff.org"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "policy",
+    "name": "EU Digital Policy",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"Digital+Services+Act\"+OR+\"Digital+Markets+Act\"+OR+\"EU+AI+Act\"+OR+\"GDPR\")+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "policy",
+    "name": "Euractiv Digital",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:euractiv.com+digital+OR+tech+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "euractiv.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "policy",
+    "name": "EU Commission Digital",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:ec.europa.eu+digital+OR+technology+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "ec.europa.eu"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "policy",
+    "name": "China Tech Policy",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(China+tech+regulation+OR+China+AI+policy+OR+MIIT+technology)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "policy",
+    "name": "UK Tech Policy",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(UK+AI+safety+OR+\"Online+Safety+Bill\"+OR+UK+tech+regulation)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "policy",
+    "name": "India Tech Policy",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(India+tech+regulation+OR+India+data+protection+OR+India+AI+policy)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "thinktanks",
+    "name": "Brookings Tech",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:brookings.edu+technology+OR+AI+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "brookings.edu"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "thinktanks",
+    "name": "CSIS Tech",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:csis.org+technology+OR+AI+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "csis.org"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "thinktanks",
+    "name": "MIT Tech Policy",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:techpolicypress.org+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "techpolicypress.org"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "thinktanks",
+    "name": "Stanford HAI",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:hai.stanford.edu+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "hai.stanford.edu"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "thinktanks",
+    "name": "AI Now Institute",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:ainowinstitute.org+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "ainowinstitute.org"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "thinktanks",
+    "name": "OECD Digital",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:oecd.org+digital+OR+AI+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "oecd.org"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "thinktanks",
+    "name": "EU Tech Policy",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"EU+tech+policy\"+OR+\"European+digital\"+OR+Bruegel+tech)+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "thinktanks",
+    "name": "Chatham House Tech",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:chathamhouse.org+technology+OR+AI+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "chathamhouse.org"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "thinktanks",
+    "name": "ISEAS (Singapore)",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:iseas.edu.sg+technology+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "iseas.edu.sg"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "thinktanks",
+    "name": "ORF Tech (India)",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(India+tech+policy+OR+ORF+technology+OR+\"Observer+Research+Foundation\"+tech)+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "thinktanks",
+    "name": "RIETI (Japan)",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:rieti.go.jp+technology+when:30d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "rieti.go.jp"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "thinktanks",
+    "name": "Asia Pacific Tech",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"Asia+Pacific\"+tech+policy+OR+\"Lowy+Institute\"+technology)+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "thinktanks",
+    "name": "China Tech Analysis",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"China+tech+strategy\"+OR+\"Chinese+AI\"+OR+\"China+semiconductor\")+analysis+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "thinktanks",
+    "name": "DigiChina",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:digichina.stanford.edu+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "digichina.stanford.edu"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "finance",
+    "name": "CNBC Tech",
+    "wrapper": "rss",
+    "source_url": "https://www.cnbc.com/id/19854910/device/rss/rss.html",
+    "domain": "cnbc.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "tech",
+    "section": "finance",
+    "name": "MarketWatch Tech",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:marketwatch.com+technology+markets+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "marketwatch.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "finance",
+    "name": "Yahoo Finance",
+    "wrapper": "rss",
+    "source_url": "https://finance.yahoo.com/rss/topstories",
+    "domain": "finance.yahoo.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "tech",
+    "section": "finance",
+    "name": "Seeking Alpha Tech",
+    "wrapper": "rss",
+    "source_url": "https://seekingalpha.com/market_currents.xml",
+    "domain": "seekingalpha.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "tech",
+    "section": "hardware",
+    "name": "SemiAnalysis",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:semianalysis.com+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "semianalysis.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "hardware",
+    "name": "Semiconductor News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=semiconductor+OR+chip+OR+TSMC+OR+NVIDIA+OR+Intel+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "cloud",
+    "name": "InfoQ",
+    "wrapper": "rss",
+    "source_url": "https://feed.infoq.com/",
+    "domain": "feed.infoq.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "cloud",
+    "name": "The New Stack",
+    "wrapper": "rss",
+    "source_url": "https://thenewstack.io/feed/",
+    "domain": "thenewstack.io",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "cloud",
+    "name": "DevOps.com",
+    "wrapper": "rss",
+    "source_url": "https://devops.com/feed/",
+    "domain": "devops.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "dev",
+    "name": "Dev.to",
+    "wrapper": "rss",
+    "source_url": "https://dev.to/feed",
+    "domain": "dev.to",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "dev",
+    "name": "Lobsters",
+    "wrapper": "rss",
+    "source_url": "https://lobste.rs/rss",
+    "domain": "lobste.rs",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "dev",
+    "name": "Changelog",
+    "wrapper": "rss",
+    "source_url": "https://changelog.com/feed",
+    "domain": "changelog.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "layoffs",
+    "name": "Layoffs.fyi",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=tech+layoffs+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "layoffs",
+    "name": "TechCrunch Layoffs",
+    "wrapper": "rss",
+    "source_url": "https://techcrunch.com/tag/layoffs/feed/",
+    "domain": "techcrunch.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "unicorns",
+    "name": "Unicorn News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"unicorn+startup\"+OR+\"unicorn+valuation\"+OR+\"$1+billion+valuation\")+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "unicorns",
+    "name": "CB Insights Unicorn",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:cbinsights.com+unicorn+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "cbinsights.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "unicorns",
+    "name": "Decacorn News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"decacorn\"+OR+\"$10+billion+valuation\"+OR+\"$10B+valuation\")+startup+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "unicorns",
+    "name": "New Unicorns",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"becomes+unicorn\"+OR+\"joins+unicorn\"+OR+\"reaches+unicorn\"+OR+\"achieved+unicorn\")+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "accelerators",
+    "name": "Techstars News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=Techstars+accelerator+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "accelerators",
+    "name": "500 Global News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=\"500+Global\"+OR+\"500+Startups\"+accelerator+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "accelerators",
+    "name": "Demo Day News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"demo+day\"+OR+\"YC+batch\"+OR+\"accelerator+batch\")+startup+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "accelerators",
+    "name": "Startup School",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=\"Startup+School\"+OR+\"YC+Startup+School\"+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "podcasts",
+    "name": "Acquired Episodes",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=\"Acquired+podcast\"+episode+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "podcasts",
+    "name": "All-In Podcast",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=\"All-In+podcast\"+(Chamath+OR+Sacks+OR+Friedberg)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "podcasts",
+    "name": "a16z Insights",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"a16z\"+OR+\"Andreessen+Horowitz\")+podcast+OR+interview+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "podcasts",
+    "name": "TWIST Episodes",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=\"This+Week+in+Startups\"+Jason+Calacanis+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "podcasts",
+    "name": "20VC Episodes",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=\"20+Minute+VC\"+Harry+Stebbings+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "podcasts",
+    "name": "Lex Fridman Tech",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"Lex+Fridman\"+interview)+(AI+OR+tech+OR+startup+OR+CEO)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "podcasts",
+    "name": "Verge Shows",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"Vergecast\"+OR+\"Decoder+podcast\"+Verge)+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "podcasts",
+    "name": "Hard Fork (NYT)",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=\"Hard+Fork\"+podcast+NYT+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "podcasts",
+    "name": "Pivot Podcast",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=\"Pivot+podcast\"+(Kara+Swisher+OR+Scott+Galloway)+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "podcasts",
+    "name": "Tech Newsletters",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"Benedict+Evans\"+OR+\"Pragmatic+Engineer\"+OR+Stratechery)+tech+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "podcasts",
+    "name": "AI Podcasts",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"AI+podcast\"+OR+\"artificial+intelligence+podcast\")+episode+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "podcasts",
+    "name": "AI Interviews",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(NVIDIA+OR+OpenAI+OR+Anthropic+OR+DeepMind)+interview+OR+podcast+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "podcasts",
+    "name": "How I Built This",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=\"How+I+Built+This\"+Guy+Raz+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "podcasts",
+    "name": "Startup Podcasts",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"Masters+of+Scale\"+OR+\"The+Pitch+podcast\"+OR+\"startup+podcast\")+episode+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "markets",
+    "name": "CNBC",
+    "wrapper": "rss",
+    "source_url": "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+    "domain": "cnbc.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "tech",
+    "section": "markets",
+    "name": "MarketWatch",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:marketwatch.com+markets+when:1d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "marketwatch.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "markets",
+    "name": "Yahoo Finance",
+    "wrapper": "rss",
+    "source_url": "https://finance.yahoo.com/rss/topstories",
+    "domain": "finance.yahoo.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "tech",
+    "section": "markets",
+    "name": "Seeking Alpha",
+    "wrapper": "rss",
+    "source_url": "https://seekingalpha.com/market_currents.xml",
+    "domain": "seekingalpha.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "tech",
+    "section": "markets",
+    "name": "Reuters Markets",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:reuters.com+markets+stocks+when:1d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "reuters.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "markets",
+    "name": "Bloomberg Markets",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:bloomberg.com+markets+when:1d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "bloomberg.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "markets",
+    "name": "Investing.com News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:investing.com+markets+when:1d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "investing.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "forex",
+    "name": "Forex News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"forex\"+OR+\"currency\"+OR+\"FX+market\")+trading+when:1d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "forex",
+    "name": "Dollar Watch",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"dollar+index\"+OR+DXY+OR+\"US+dollar\"+OR+\"euro+dollar\")+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "forex",
+    "name": "Central Bank Rates",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"central+bank\"+OR+\"interest+rate\"+OR+\"rate+decision\"+OR+\"monetary+policy\")+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "bonds",
+    "name": "Bond Market",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"bond+market\"+OR+\"treasury+yields\"+OR+\"bond+yields\"+OR+\"fixed+income\")+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "bonds",
+    "name": "Treasury Watch",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"US+Treasury\"+OR+\"Treasury+auction\"+OR+\"10-year+yield\"+OR+\"2-year+yield\")+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "bonds",
+    "name": "Corporate Bonds",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"corporate+bond\"+OR+\"high+yield\"+OR+\"investment+grade\"+OR+\"credit+spread\")+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "commodities",
+    "name": "Oil & Gas",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(oil+price+OR+OPEC+OR+\"natural+gas\"+OR+\"crude+oil\"+OR+WTI+OR+Brent)+when:1d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "commodities",
+    "name": "Gold & Metals",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(gold+price+OR+silver+price+OR+copper+OR+platinum+OR+\"precious+metals\")+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "commodities",
+    "name": "Agriculture",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(wheat+OR+corn+OR+soybeans+OR+coffee+OR+sugar)+price+OR+commodity+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "commodities",
+    "name": "Commodity Trading",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"commodity+trading\"+OR+\"futures+market\"+OR+CME+OR+NYMEX+OR+COMEX)+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "crypto",
+    "name": "CoinDesk",
+    "wrapper": "rss",
+    "source_url": "https://www.coindesk.com/arc/outboundfeeds/rss/",
+    "domain": "coindesk.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "crypto",
+    "name": "Cointelegraph",
+    "wrapper": "rss",
+    "source_url": "https://cointelegraph.com/rss",
+    "domain": "cointelegraph.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "tech",
+    "section": "crypto",
+    "name": "The Block",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:theblock.co+when:1d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "theblock.co"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "crypto",
+    "name": "Crypto News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(bitcoin+OR+ethereum+OR+crypto+OR+\"digital+assets\")+when:1d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "crypto",
+    "name": "DeFi News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(DeFi+OR+\"decentralized+finance\"+OR+DEX+OR+\"yield+farming\")+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "centralbanks",
+    "name": "Federal Reserve",
+    "wrapper": "rss",
+    "source_url": "https://www.federalreserve.gov/feeds/press_all.xml",
+    "domain": "federalreserve.gov",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "tech",
+    "section": "centralbanks",
+    "name": "ECB Watch",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"European+Central+Bank\"+OR+ECB+OR+Lagarde)+monetary+policy+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "centralbanks",
+    "name": "BoJ Watch",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"Bank+of+Japan\"+OR+BoJ)+monetary+policy+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "centralbanks",
+    "name": "BoE Watch",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"Bank+of+England\"+OR+BoE)+monetary+policy+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "centralbanks",
+    "name": "PBoC Watch",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"People%27s+Bank+of+China\"+OR+PBoC+OR+PBOC)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "centralbanks",
+    "name": "Global Central Banks",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"rate+hike\"+OR+\"rate+cut\"+OR+\"interest+rate+decision\")+central+bank+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "economic",
+    "name": "Economic Data",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(CPI+OR+inflation+OR+GDP+OR+\"jobs+report\"+OR+\"nonfarm+payrolls\"+OR+PMI)+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "economic",
+    "name": "Trade & Tariffs",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(tariff+OR+\"trade+war\"+OR+\"trade+deficit\"+OR+sanctions)+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "economic",
+    "name": "Housing Market",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"housing+market\"+OR+\"home+prices\"+OR+\"mortgage+rates\"+OR+REIT)+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "ipo",
+    "name": "IPO News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(IPO+OR+\"initial+public+offering\"+OR+SPAC+OR+\"direct+listing\")+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "ipo",
+    "name": "Earnings Reports",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"earnings+report\"+OR+\"quarterly+earnings\"+OR+\"revenue+beat\"+OR+\"earnings+miss\")+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "ipo",
+    "name": "M&A News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"merger\"+OR+\"acquisition\"+OR+\"takeover+bid\"+OR+\"buyout\")+billion+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "derivatives",
+    "name": "Options Market",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"options+market\"+OR+\"options+trading\"+OR+\"put+call+ratio\"+OR+VIX)+when:2d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "derivatives",
+    "name": "Futures Trading",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"futures+trading\"+OR+\"S%26P+500+futures\"+OR+\"Nasdaq+futures\")+when:1d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "fintech",
+    "name": "Fintech News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(fintech+OR+\"payment+technology\"+OR+\"neobank\"+OR+\"digital+banking\")+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "fintech",
+    "name": "Trading Tech",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"algorithmic+trading\"+OR+\"trading+platform\"+OR+\"quantitative+finance\")+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "fintech",
+    "name": "Blockchain Finance",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"blockchain+finance\"+OR+\"tokenization\"+OR+\"digital+securities\"+OR+CBDC)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regulation",
+    "name": "SEC",
+    "wrapper": "rss",
+    "source_url": "https://www.sec.gov/news/pressreleases.rss",
+    "domain": "sec.gov",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": true
+  },
+  {
+    "variant": "tech",
+    "section": "regulation",
+    "name": "Financial Regulation",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(SEC+OR+CFTC+OR+FINRA+OR+FCA)+regulation+OR+enforcement+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regulation",
+    "name": "Banking Rules",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(Basel+OR+\"capital+requirements\"+OR+\"banking+regulation\")+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "regulation",
+    "name": "Crypto Regulation",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(crypto+regulation+OR+\"digital+asset\"+regulation+OR+\"stablecoin\"+regulation)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "institutional",
+    "name": "Hedge Fund News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"hedge+fund\"+OR+\"Bridgewater\"+OR+\"Citadel\"+OR+\"Renaissance\")+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "institutional",
+    "name": "Private Equity",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"private+equity\"+OR+Blackstone+OR+KKR+OR+Apollo+OR+Carlyle)+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "institutional",
+    "name": "Sovereign Wealth",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"sovereign+wealth+fund\"+OR+\"pension+fund\"+OR+\"institutional+investor\")+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "analysis",
+    "name": "Market Outlook",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"market+outlook\"+OR+\"stock+market+forecast\"+OR+\"bull+market\"+OR+\"bear+market\")+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "analysis",
+    "name": "Risk & Volatility",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(VIX+OR+\"market+volatility\"+OR+\"risk+off\"+OR+\"market+correction\")+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "analysis",
+    "name": "Bank Research",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"Goldman+Sachs\"+OR+\"JPMorgan\"+OR+\"Morgan+Stanley\")+forecast+OR+outlook+when:3d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "gccNews",
+    "name": "Arabian Business",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:arabianbusiness.com+(Saudi+Arabia+OR+UAE+OR+GCC)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "arabianbusiness.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "gccNews",
+    "name": "The National",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:thenationalnews.com+(Abu+Dhabi+OR+UAE+OR+Saudi)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "thenationalnews.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "gccNews",
+    "name": "Arab News",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=site:arabnews.com+(Saudi+Arabia+OR+investment+OR+infrastructure)+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [
+      "arabnews.com"
+    ],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "gccNews",
+    "name": "Gulf FDI",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(PIF+OR+\"DP+World\"+OR+Mubadala+OR+ADNOC+OR+Masdar+OR+\"ACWA+Power\")+infrastructure+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "gccNews",
+    "name": "Gulf Investments",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=(\"Saudi+Arabia\"+OR+\"UAE\"+OR+\"Abu+Dhabi\")+investment+infrastructure+when:7d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  },
+  {
+    "variant": "tech",
+    "section": "gccNews",
+    "name": "Vision 2030",
+    "wrapper": "rss",
+    "source_url": "https://news.google.com/rss/search?q=\"Vision+2030\"+(project+OR+investment+OR+announced)+when:14d&hl=en-US&gl=US&ceid=US:en",
+    "domain": "news.google.com",
+    "tag_type": "",
+    "google_query_domains": [],
+    "already_in_us_newslist_domain": false
+  }
+]

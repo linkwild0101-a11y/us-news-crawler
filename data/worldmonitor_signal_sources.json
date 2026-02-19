@@ -1,0 +1,619 @@
+[
+  {
+    "endpoint": "/api/acled-conflict",
+    "file": "acled-conflict.js",
+    "upstream_domains": [
+      "acleddata.com"
+    ],
+    "required_env_keys": [
+      "ACLED_ACCESS_TOKEN"
+    ],
+    "auth_required": true,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/acled",
+    "file": "acled.js",
+    "upstream_domains": [
+      "acleddata.com"
+    ],
+    "required_env_keys": [
+      "ACLED_ACCESS_TOKEN"
+    ],
+    "auth_required": true,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/arxiv",
+    "file": "arxiv.js",
+    "upstream_domains": [
+      "export.arxiv.org"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": false
+  },
+  {
+    "endpoint": "/api/classify-batch",
+    "file": "classify-batch.js",
+    "upstream_domains": [
+      "api.groq.com"
+    ],
+    "required_env_keys": [
+      "GROQ_API_KEY"
+    ],
+    "auth_required": true,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/classify-event",
+    "file": "classify-event.js",
+    "upstream_domains": [
+      "api.groq.com"
+    ],
+    "required_env_keys": [
+      "GROQ_API_KEY"
+    ],
+    "auth_required": true,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/climate-anomalies",
+    "file": "climate-anomalies.js",
+    "upstream_domains": [
+      "archive-api.open-meteo.com"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/cloudflare-outages",
+    "file": "cloudflare-outages.js",
+    "upstream_domains": [
+      "api.cloudflare.com"
+    ],
+    "required_env_keys": [
+      "CLOUDFLARE_API_TOKEN"
+    ],
+    "auth_required": true,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/coingecko",
+    "file": "coingecko.js",
+    "upstream_domains": [
+      "api.coingecko.com"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/country-intel",
+    "file": "country-intel.js",
+    "upstream_domains": [
+      "api.groq.com"
+    ],
+    "required_env_keys": [
+      "GROQ_API_KEY"
+    ],
+    "auth_required": true,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/cyber-threats",
+    "file": "cyber-threats.js",
+    "upstream_domains": [
+      "api.abuseipdb.com",
+      "feodotracker.abuse.ch",
+      "freeipapi.com",
+      "ipinfo.io",
+      "otx.alienvault.com",
+      "raw.githubusercontent.com",
+      "urlhaus-api.abuse.ch"
+    ],
+    "required_env_keys": [
+      "ABUSEIPDB_API_KEY",
+      "OTX_API_KEY",
+      "URLHAUS_AUTH_KEY"
+    ],
+    "auth_required": true,
+    "signal_or_macro_relevant": false
+  },
+  {
+    "endpoint": "/api/data/military-hex-db",
+    "file": "data/military-hex-db.js",
+    "upstream_domains": [],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/download",
+    "file": "download.js",
+    "upstream_domains": [
+      "api.github.com",
+      "github.com"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": false
+  },
+  {
+    "endpoint": "/api/earthquakes",
+    "file": "earthquakes.js",
+    "upstream_domains": [
+      "earthquake.usgs.gov"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/eia/[[...path]]",
+    "file": "eia/[[...path]].js",
+    "upstream_domains": [
+      "api.eia.gov"
+    ],
+    "required_env_keys": [
+      "EIA_API_KEY"
+    ],
+    "auth_required": true,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/etf-flows",
+    "file": "etf-flows.js",
+    "upstream_domains": [
+      "query1.finance.yahoo.com"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/faa-status",
+    "file": "faa-status.js",
+    "upstream_domains": [
+      "nasstatus.faa.gov"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/finnhub",
+    "file": "finnhub.js",
+    "upstream_domains": [
+      "finnhub.io"
+    ],
+    "required_env_keys": [
+      "FINNHUB_API_KEY"
+    ],
+    "auth_required": true,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/firms-fires",
+    "file": "firms-fires.js",
+    "upstream_domains": [
+      "firms.modaps.eosdis.nasa.gov"
+    ],
+    "required_env_keys": [
+      "FIRMS_API_KEY",
+      "NASA_FIRMS_API_KEY"
+    ],
+    "auth_required": true,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/fred-data",
+    "file": "fred-data.js",
+    "upstream_domains": [
+      "api.stlouisfed.org"
+    ],
+    "required_env_keys": [
+      "FRED_API_KEY"
+    ],
+    "auth_required": true,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/fwdstart",
+    "file": "fwdstart.js",
+    "upstream_domains": [
+      "worldmonitor.app",
+      "www.fwdstart.me",
+      "www.w3.org"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": false
+  },
+  {
+    "endpoint": "/api/gdelt-doc",
+    "file": "gdelt-doc.js",
+    "upstream_domains": [
+      "api.gdeltproject.org"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/gdelt-geo",
+    "file": "gdelt-geo.js",
+    "upstream_domains": [
+      "api.gdeltproject.org"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/github-trending",
+    "file": "github-trending.js",
+    "upstream_domains": [
+      "api.gitterapp.com",
+      "gh-trending-api.herokuapp.com"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": false
+  },
+  {
+    "endpoint": "/api/groq-summarize",
+    "file": "groq-summarize.js",
+    "upstream_domains": [
+      "api.groq.com"
+    ],
+    "required_env_keys": [
+      "GROQ_API_KEY"
+    ],
+    "auth_required": true,
+    "signal_or_macro_relevant": false
+  },
+  {
+    "endpoint": "/api/hackernews",
+    "file": "hackernews.js",
+    "upstream_domains": [
+      "hacker-news.firebaseio.com"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": false
+  },
+  {
+    "endpoint": "/api/hapi",
+    "file": "hapi.js",
+    "upstream_domains": [
+      "hapi.humdata.org"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/macro-signals",
+    "file": "macro-signals.js",
+    "upstream_domains": [
+      "api.alternative.me",
+      "mempool.space",
+      "query1.finance.yahoo.com"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/nga-warnings",
+    "file": "nga-warnings.js",
+    "upstream_domains": [
+      "msi.nga.mil"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/og-story",
+    "file": "og-story.js",
+    "upstream_domains": [
+      "www.w3.org"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/openrouter-summarize",
+    "file": "openrouter-summarize.js",
+    "upstream_domains": [
+      "openrouter.ai",
+      "worldmonitor.app"
+    ],
+    "required_env_keys": [
+      "OPENROUTER_API_KEY"
+    ],
+    "auth_required": true,
+    "signal_or_macro_relevant": false
+  },
+  {
+    "endpoint": "/api/opensky",
+    "file": "opensky.js",
+    "upstream_domains": [
+      "opensky-network.org"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": false
+  },
+  {
+    "endpoint": "/api/pizzint/dashboard-data",
+    "file": "pizzint/dashboard-data.js",
+    "upstream_domains": [
+      "www.pizzint.watch"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": false
+  },
+  {
+    "endpoint": "/api/pizzint/gdelt/batch",
+    "file": "pizzint/gdelt/batch.js",
+    "upstream_domains": [
+      "www.pizzint.watch"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/polymarket",
+    "file": "polymarket.js",
+    "upstream_domains": [
+      "gamma-api.polymarket.com"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/risk-scores",
+    "file": "risk-scores.js",
+    "upstream_domains": [
+      "acleddata.com"
+    ],
+    "required_env_keys": [
+      "ACLED_ACCESS_TOKEN"
+    ],
+    "auth_required": true,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/rss-proxy",
+    "file": "rss-proxy.js",
+    "upstream_domains": [],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/service-status",
+    "file": "service-status.js",
+    "upstream_domains": [
+      "azure.status.microsoft",
+      "bitbucket.status.atlassian.com",
+      "confluence.status.atlassian.com",
+      "discordstatus.com",
+      "health.aws.amazon.com",
+      "jira-software.status.atlassian.com",
+      "linearstatus.com",
+      "railway.instatus.com",
+      "slack-status.com",
+      "status.circleci.com",
+      "status.claude.com",
+      "status.cloud.google.com",
+      "status.datadoghq.com",
+      "status.digitalocean.com",
+      "status.gitlab.com",
+      "status.npmjs.org",
+      "status.openai.com",
+      "status.render.com",
+      "status.sentry.io",
+      "status.stripe.com",
+      "status.supabase.com",
+      "status.twilio.com",
+      "www.cloudflarestatus.com",
+      "www.dockerstatus.com",
+      "www.githubstatus.com",
+      "www.netlifystatus.com",
+      "www.notion-status.com",
+      "www.replicatestatus.com",
+      "www.vercel-status.com",
+      "www.zoomstatus.com"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/stablecoin-markets",
+    "file": "stablecoin-markets.js",
+    "upstream_domains": [
+      "api.coingecko.com"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/stock-index",
+    "file": "stock-index.js",
+    "upstream_domains": [
+      "query1.finance.yahoo.com"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": false
+  },
+  {
+    "endpoint": "/api/tech-events",
+    "file": "tech-events.js",
+    "upstream_domains": [
+      "collisionconf.com",
+      "dev.events",
+      "dubai.stepconference.com",
+      "websummit.com",
+      "www.gitex.com",
+      "www.techmeme.com",
+      "www.token2049.com"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/theater-posture",
+    "file": "theater-posture.js",
+    "upstream_domains": [
+      "customer-api.wingbits.com",
+      "opensky-network.org"
+    ],
+    "required_env_keys": [
+      "LOCAL_API_MODE",
+      "WINGBITS_API_KEY",
+      "WS_RELAY_URL"
+    ],
+    "auth_required": true,
+    "signal_or_macro_relevant": false
+  },
+  {
+    "endpoint": "/api/ucdp-events",
+    "file": "ucdp-events.js",
+    "upstream_domains": [
+      "ucdpapi.pcr.uu.se"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/ucdp",
+    "file": "ucdp.js",
+    "upstream_domains": [
+      "ucdpapi.pcr.uu.se"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/unhcr-population",
+    "file": "unhcr-population.js",
+    "upstream_domains": [
+      "api.unhcr.org"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/version",
+    "file": "version.js",
+    "upstream_domains": [
+      "api.github.com"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": false
+  },
+  {
+    "endpoint": "/api/wingbits/[[...path]]",
+    "file": "wingbits/[[...path]].js",
+    "upstream_domains": [
+      "customer-api.wingbits.com"
+    ],
+    "required_env_keys": [
+      "WINGBITS_API_KEY"
+    ],
+    "auth_required": true,
+    "signal_or_macro_relevant": false
+  },
+  {
+    "endpoint": "/api/wingbits/details/[icao24]",
+    "file": "wingbits/details/[icao24].js",
+    "upstream_domains": [
+      "customer-api.wingbits.com"
+    ],
+    "required_env_keys": [
+      "WINGBITS_API_KEY"
+    ],
+    "auth_required": true,
+    "signal_or_macro_relevant": false
+  },
+  {
+    "endpoint": "/api/wingbits/details/batch",
+    "file": "wingbits/details/batch.js",
+    "upstream_domains": [
+      "customer-api.wingbits.com"
+    ],
+    "required_env_keys": [
+      "WINGBITS_API_KEY"
+    ],
+    "auth_required": true,
+    "signal_or_macro_relevant": false
+  },
+  {
+    "endpoint": "/api/worldbank",
+    "file": "worldbank.js",
+    "upstream_domains": [
+      "api.worldbank.org",
+      "worldmonitor.app"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/worldpop-exposure",
+    "file": "worldpop-exposure.js",
+    "upstream_domains": [],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/yahoo-finance",
+    "file": "yahoo-finance.js",
+    "upstream_domains": [
+      "query1.finance.yahoo.com"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": true
+  },
+  {
+    "endpoint": "/api/youtube/embed",
+    "file": "youtube/embed.js",
+    "upstream_domains": [
+      "worldmonitor.app",
+      "www.youtube-nocookie.com",
+      "www.youtube.com"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": false
+  },
+  {
+    "endpoint": "/api/youtube/live",
+    "file": "youtube/live.js",
+    "upstream_domains": [
+      "www.youtube.com"
+    ],
+    "required_env_keys": [],
+    "auth_required": false,
+    "signal_or_macro_relevant": false
+  }
+]

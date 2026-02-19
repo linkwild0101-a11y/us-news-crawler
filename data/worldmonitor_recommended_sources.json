@@ -1,0 +1,962 @@
+[
+  {
+    "id": 540,
+    "name": "BBC World",
+    "listing_url": "https://feeds.bbci.co.uk/news/world/rss.xml",
+    "rss_url": "https://feeds.bbci.co.uk/news/world/rss.xml",
+    "description": "Imported from worldmonitor (politics)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 541,
+    "name": "NPR News",
+    "listing_url": "https://feeds.npr.org/1001/rss.xml",
+    "rss_url": "https://feeds.npr.org/1001/rss.xml",
+    "description": "Imported from worldmonitor (politics)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 542,
+    "name": "Guardian World",
+    "listing_url": "https://www.theguardian.com/world/rss",
+    "rss_url": "https://www.theguardian.com/world/rss",
+    "description": "Imported from worldmonitor (politics)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 543,
+    "name": "The Diplomat",
+    "listing_url": "https://thediplomat.com/feed/",
+    "rss_url": "https://thediplomat.com/feed/",
+    "description": "Imported from worldmonitor (politics)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 544,
+    "name": "El País",
+    "listing_url": "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada",
+    "rss_url": "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada",
+    "description": "Imported from worldmonitor (politics)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 545,
+    "name": "El Mundo",
+    "listing_url": "https://e00-elmundo.uecdn.es/elmundo/rss/portada.xml",
+    "rss_url": "https://e00-elmundo.uecdn.es/elmundo/rss/portada.xml",
+    "description": "Imported from worldmonitor (politics)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 546,
+    "name": "BBC Mundo",
+    "listing_url": "https://www.bbc.com/mundo/index.xml",
+    "rss_url": "https://www.bbc.com/mundo/index.xml",
+    "description": "Imported from worldmonitor (politics)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 547,
+    "name": "Tagesschau",
+    "listing_url": "https://www.tagesschau.de/xml/rss2/",
+    "rss_url": "https://www.tagesschau.de/xml/rss2/",
+    "description": "Imported from worldmonitor (politics)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 548,
+    "name": "Der Spiegel",
+    "listing_url": "https://www.spiegel.de/schlagzeilen/tops/index.rss",
+    "rss_url": "https://www.spiegel.de/schlagzeilen/tops/index.rss",
+    "description": "Imported from worldmonitor (politics)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 549,
+    "name": "Die Zeit",
+    "listing_url": "https://newsfeed.zeit.de/index",
+    "rss_url": "https://newsfeed.zeit.de/index",
+    "description": "Imported from worldmonitor (politics)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 550,
+    "name": "ANSA",
+    "listing_url": "https://www.ansa.it/sito/notizie/topnews/topnews_rss.xml",
+    "rss_url": "https://www.ansa.it/sito/notizie/topnews/topnews_rss.xml",
+    "description": "Imported from worldmonitor (politics)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 551,
+    "name": "Corriere della Sera",
+    "listing_url": "https://xml2.corriereobjects.it/rss/incipit.xml",
+    "rss_url": "https://xml2.corriereobjects.it/rss/incipit.xml",
+    "description": "Imported from worldmonitor (politics)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 552,
+    "name": "Repubblica",
+    "listing_url": "https://www.repubblica.it/rss/homepage/rss2.0.xml",
+    "rss_url": "https://www.repubblica.it/rss/homepage/rss2.0.xml",
+    "description": "Imported from worldmonitor (politics)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 553,
+    "name": "NOS Nieuws",
+    "listing_url": "https://feeds.nos.nl/nosnieuwsalgemeen",
+    "rss_url": "https://feeds.nos.nl/nosnieuwsalgemeen",
+    "description": "Imported from worldmonitor (politics)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 554,
+    "name": "NRC",
+    "listing_url": "https://www.nrc.nl/rss/",
+    "rss_url": "https://www.nrc.nl/rss/",
+    "description": "Imported from worldmonitor (politics)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 555,
+    "name": "De Telegraaf",
+    "listing_url": "https://www.telegraaf.nl/rss",
+    "rss_url": "https://www.telegraaf.nl/rss",
+    "description": "Imported from worldmonitor (politics)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 556,
+    "name": "SVT Nyheter",
+    "listing_url": "https://www.svt.se/nyheter/rss.xml",
+    "rss_url": "https://www.svt.se/nyheter/rss.xml",
+    "description": "Imported from worldmonitor (politics)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 557,
+    "name": "Dagens Nyheter",
+    "listing_url": "https://www.dn.se/rss/senaste-nytt/",
+    "rss_url": "https://www.dn.se/rss/senaste-nytt/",
+    "description": "Imported from worldmonitor (politics)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 558,
+    "name": "Svenska Dagbladet",
+    "listing_url": "https://www.svd.se/feed/articles.rss",
+    "rss_url": "https://www.svd.se/feed/articles.rss",
+    "description": "Imported from worldmonitor (politics)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 559,
+    "name": "BBC Middle East",
+    "listing_url": "https://feeds.bbci.co.uk/news/world/middle_east/rss.xml",
+    "rss_url": "https://feeds.bbci.co.uk/news/world/middle_east/rss.xml",
+    "description": "Imported from worldmonitor (middleeast)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 560,
+    "name": "Guardian ME",
+    "listing_url": "https://www.theguardian.com/world/middleeast/rss",
+    "rss_url": "https://www.theguardian.com/world/middleeast/rss",
+    "description": "Imported from worldmonitor (middleeast)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 561,
+    "name": "CNN World",
+    "listing_url": "http://rss.cnn.com/rss/cnn_world.rss",
+    "rss_url": "http://rss.cnn.com/rss/cnn_world.rss",
+    "description": "Imported from worldmonitor (middleeast)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 562,
+    "name": "BBC Persian",
+    "listing_url": "http://feeds.bbci.co.uk/persian/tv-and-radio-37434376/rss.xml",
+    "rss_url": "http://feeds.bbci.co.uk/persian/tv-and-radio-37434376/rss.xml",
+    "description": "Imported from worldmonitor (middleeast)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 563,
+    "name": "Haaretz",
+    "listing_url": "https://www.haaretz.com/cmlink/1.4608793",
+    "rss_url": "https://www.haaretz.com/cmlink/1.4608793",
+    "description": "Imported from worldmonitor (middleeast)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 564,
+    "name": "Arab News",
+    "listing_url": "https://www.arabnews.com/cat/1/rss.xml",
+    "rss_url": "https://www.arabnews.com/cat/1/rss.xml",
+    "description": "Imported from worldmonitor (middleeast)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 565,
+    "name": "Hacker News",
+    "listing_url": "https://hnrss.org/frontpage",
+    "rss_url": "https://hnrss.org/frontpage",
+    "description": "Imported from worldmonitor (tech)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 566,
+    "name": "Ars Technica",
+    "listing_url": "https://feeds.arstechnica.com/arstechnica/technology-lab",
+    "rss_url": "https://feeds.arstechnica.com/arstechnica/technology-lab",
+    "description": "Imported from worldmonitor (tech)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 567,
+    "name": "The Verge",
+    "listing_url": "https://www.theverge.com/rss/index.xml",
+    "rss_url": "https://www.theverge.com/rss/index.xml",
+    "description": "Imported from worldmonitor (tech)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 568,
+    "name": "MIT Tech Review",
+    "listing_url": "https://www.technologyreview.com/feed/",
+    "rss_url": "https://www.technologyreview.com/feed/",
+    "description": "Imported from worldmonitor (tech)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 569,
+    "name": "VentureBeat AI",
+    "listing_url": "https://venturebeat.com/category/ai/feed/",
+    "rss_url": "https://venturebeat.com/category/ai/feed/",
+    "description": "Imported from worldmonitor (ai)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 570,
+    "name": "The Verge AI",
+    "listing_url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+    "rss_url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+    "description": "Imported from worldmonitor (ai)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 571,
+    "name": "MIT Tech Review",
+    "listing_url": "https://www.technologyreview.com/topic/artificial-intelligence/feed",
+    "rss_url": "https://www.technologyreview.com/topic/artificial-intelligence/feed",
+    "description": "Imported from worldmonitor (ai)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 572,
+    "name": "ArXiv AI",
+    "listing_url": "https://export.arxiv.org/rss/cs.AI",
+    "rss_url": "https://export.arxiv.org/rss/cs.AI",
+    "description": "Imported from worldmonitor (ai)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 573,
+    "name": "SEC",
+    "listing_url": "https://www.sec.gov/news/pressreleases.rss",
+    "rss_url": "https://www.sec.gov/news/pressreleases.rss",
+    "description": "Imported from worldmonitor (gov)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 574,
+    "name": "UN News",
+    "listing_url": "https://news.un.org/feed/subscribe/en/news/all/rss.xml",
+    "rss_url": "https://news.un.org/feed/subscribe/en/news/all/rss.xml",
+    "description": "Imported from worldmonitor (gov)",
+    "category": "politics",
+    "anti_scraping": "railway",
+    "status": "active"
+  },
+  {
+    "id": 575,
+    "name": "CISA",
+    "listing_url": "https://www.cisa.gov/cybersecurity-advisories/all.xml",
+    "rss_url": "https://www.cisa.gov/cybersecurity-advisories/all.xml",
+    "description": "Imported from worldmonitor (gov)",
+    "category": "politics",
+    "anti_scraping": "railway",
+    "status": "active"
+  },
+  {
+    "id": 576,
+    "name": "Layoffs.fyi",
+    "listing_url": "https://layoffs.fyi/feed/",
+    "rss_url": "https://layoffs.fyi/feed/",
+    "description": "Imported from worldmonitor (layoffs)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 577,
+    "name": "TechCrunch Layoffs",
+    "listing_url": "https://techcrunch.com/tag/layoffs/feed/",
+    "rss_url": "https://techcrunch.com/tag/layoffs/feed/",
+    "description": "Imported from worldmonitor (layoffs)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 578,
+    "name": "Foreign Policy",
+    "listing_url": "https://foreignpolicy.com/feed/",
+    "rss_url": "https://foreignpolicy.com/feed/",
+    "description": "Imported from worldmonitor (thinktanks)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 579,
+    "name": "Atlantic Council",
+    "listing_url": "https://www.atlanticcouncil.org/feed/",
+    "rss_url": "https://www.atlanticcouncil.org/feed/",
+    "description": "Imported from worldmonitor (thinktanks)",
+    "category": "politics",
+    "anti_scraping": "railway",
+    "status": "active"
+  },
+  {
+    "id": 580,
+    "name": "Foreign Affairs",
+    "listing_url": "https://www.foreignaffairs.com/rss.xml",
+    "rss_url": "https://www.foreignaffairs.com/rss.xml",
+    "description": "Imported from worldmonitor (thinktanks)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 581,
+    "name": "Responsible Statecraft",
+    "listing_url": "https://responsiblestatecraft.org/feed/",
+    "rss_url": "https://responsiblestatecraft.org/feed/",
+    "description": "Imported from worldmonitor (thinktanks)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 582,
+    "name": "FPRI",
+    "listing_url": "https://www.fpri.org/feed/",
+    "rss_url": "https://www.fpri.org/feed/",
+    "description": "Imported from worldmonitor (thinktanks)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 583,
+    "name": "Jamestown",
+    "listing_url": "https://jamestown.org/feed/",
+    "rss_url": "https://jamestown.org/feed/",
+    "description": "Imported from worldmonitor (thinktanks)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 584,
+    "name": "CrisisWatch",
+    "listing_url": "https://www.crisisgroup.org/rss",
+    "rss_url": "https://www.crisisgroup.org/rss",
+    "description": "Imported from worldmonitor (crisis)",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 585,
+    "name": "IAEA",
+    "listing_url": "https://www.iaea.org/feeds/topnews",
+    "rss_url": "https://www.iaea.org/feeds/topnews",
+    "description": "Imported from worldmonitor (crisis)",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 586,
+    "name": "WHO",
+    "listing_url": "https://www.who.int/rss-feeds/news-english.xml",
+    "rss_url": "https://www.who.int/rss-feeds/news-english.xml",
+    "description": "Imported from worldmonitor (crisis)",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 587,
+    "name": "Moscow Times",
+    "listing_url": "https://www.themoscowtimes.com/rss/news",
+    "rss_url": "https://www.themoscowtimes.com/rss/news",
+    "description": "Imported from worldmonitor (regional)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 588,
+    "name": "News24",
+    "listing_url": "https://feeds.capi24.com/v1/Search/articles/news24/Africa/rss",
+    "rss_url": "https://feeds.capi24.com/v1/Search/articles/news24/Africa/rss",
+    "description": "Imported from worldmonitor (africa)",
+    "category": "politics",
+    "anti_scraping": "railway",
+    "status": "active"
+  },
+  {
+    "id": 589,
+    "name": "BBC Africa",
+    "listing_url": "https://feeds.bbci.co.uk/news/world/africa/rss.xml",
+    "rss_url": "https://feeds.bbci.co.uk/news/world/africa/rss.xml",
+    "description": "Imported from worldmonitor (africa)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 590,
+    "name": "Jeune Afrique",
+    "listing_url": "https://www.jeuneafrique.com/feed/",
+    "rss_url": "https://www.jeuneafrique.com/feed/",
+    "description": "Imported from worldmonitor (africa)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 591,
+    "name": "BBC Afrique",
+    "listing_url": "https://www.bbc.com/afrique/index.xml",
+    "rss_url": "https://www.bbc.com/afrique/index.xml",
+    "description": "Imported from worldmonitor (africa)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 592,
+    "name": "BBC Latin America",
+    "listing_url": "https://feeds.bbci.co.uk/news/world/latin_america/rss.xml",
+    "rss_url": "https://feeds.bbci.co.uk/news/world/latin_america/rss.xml",
+    "description": "Imported from worldmonitor (latam)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 593,
+    "name": "Guardian Americas",
+    "listing_url": "https://www.theguardian.com/world/americas/rss",
+    "rss_url": "https://www.theguardian.com/world/americas/rss",
+    "description": "Imported from worldmonitor (latam)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 594,
+    "name": "Clarín",
+    "listing_url": "https://www.clarin.com/rss/lo-ultimo/",
+    "rss_url": "https://www.clarin.com/rss/lo-ultimo/",
+    "description": "Imported from worldmonitor (latam)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 595,
+    "name": "O Globo",
+    "listing_url": "https://oglobo.globo.com/rss/top_noticias/",
+    "rss_url": "https://oglobo.globo.com/rss/top_noticias/",
+    "description": "Imported from worldmonitor (latam)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 596,
+    "name": "Folha de S.Paulo",
+    "listing_url": "https://feeds.folha.uol.com.br/emcimadahora/rss091.xml",
+    "rss_url": "https://feeds.folha.uol.com.br/emcimadahora/rss091.xml",
+    "description": "Imported from worldmonitor (latam)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 597,
+    "name": "El Tiempo",
+    "listing_url": "https://www.eltiempo.com/rss/mundo_latinoamerica.xml",
+    "rss_url": "https://www.eltiempo.com/rss/mundo_latinoamerica.xml",
+    "description": "Imported from worldmonitor (latam)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 598,
+    "name": "El Universal",
+    "listing_url": "https://www.eluniversal.com.mx/rss.xml",
+    "rss_url": "https://www.eluniversal.com.mx/rss.xml",
+    "description": "Imported from worldmonitor (latam)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 599,
+    "name": "La Silla Vacía",
+    "listing_url": "https://www.lasillavacia.com/rss",
+    "rss_url": "https://www.lasillavacia.com/rss",
+    "description": "Imported from worldmonitor (latam)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 600,
+    "name": "BBC Asia",
+    "listing_url": "https://feeds.bbci.co.uk/news/world/asia/rss.xml",
+    "rss_url": "https://feeds.bbci.co.uk/news/world/asia/rss.xml",
+    "description": "Imported from worldmonitor (asia)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 601,
+    "name": "South China Morning Post",
+    "listing_url": "https://www.scmp.com/rss/91/feed/",
+    "rss_url": "https://www.scmp.com/rss/91/feed/",
+    "description": "Imported from worldmonitor (asia)",
+    "category": "politics",
+    "anti_scraping": "railway",
+    "status": "active"
+  },
+  {
+    "id": 602,
+    "name": "NHK World",
+    "listing_url": "https://rsshub.app/nhk/news/en",
+    "rss_url": "https://rsshub.app/nhk/news/en",
+    "description": "Imported from worldmonitor (asia)",
+    "category": "politics",
+    "anti_scraping": "railway",
+    "status": "active"
+  },
+  {
+    "id": 603,
+    "name": "Asahi Shimbun",
+    "listing_url": "https://www.asahi.com/rss/asahi/newsheadlines.rdf",
+    "rss_url": "https://www.asahi.com/rss/asahi/newsheadlines.rdf",
+    "description": "Imported from worldmonitor (asia)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 604,
+    "name": "The Hindu",
+    "listing_url": "https://www.thehindu.com/news/national/feeder/default.rss",
+    "rss_url": "https://www.thehindu.com/news/national/feeder/default.rss",
+    "description": "Imported from worldmonitor (asia)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 605,
+    "name": "CNA",
+    "listing_url": "https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml",
+    "rss_url": "https://www.channelnewsasia.com/api/v1/rss-outbound-feed?_format=xml",
+    "description": "Imported from worldmonitor (asia)",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 606,
+    "name": "MIIT (China)",
+    "listing_url": "https://rsshub.app/gov/miit/zcjd",
+    "rss_url": "https://rsshub.app/gov/miit/zcjd",
+    "description": "Imported from worldmonitor (asia)",
+    "category": "politics",
+    "anti_scraping": "railway",
+    "status": "active"
+  },
+  {
+    "id": 607,
+    "name": "MOFCOM (China)",
+    "listing_url": "https://rsshub.app/gov/mofcom/article/xwfb",
+    "rss_url": "https://rsshub.app/gov/mofcom/article/xwfb",
+    "description": "Imported from worldmonitor (asia)",
+    "category": "politics",
+    "anti_scraping": "railway",
+    "status": "active"
+  },
+  {
+    "id": 608,
+    "name": "TechCrunch",
+    "listing_url": "https://techcrunch.com/feed/",
+    "rss_url": "https://techcrunch.com/feed/",
+    "description": "Imported from worldmonitor (tech)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 609,
+    "name": "ZDNet",
+    "listing_url": "https://www.zdnet.com/news/rss.xml",
+    "rss_url": "https://www.zdnet.com/news/rss.xml",
+    "description": "Imported from worldmonitor (tech)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 610,
+    "name": "TechMeme",
+    "listing_url": "https://www.techmeme.com/feed.xml",
+    "rss_url": "https://www.techmeme.com/feed.xml",
+    "description": "Imported from worldmonitor (tech)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 611,
+    "name": "Engadget",
+    "listing_url": "https://www.engadget.com/rss.xml",
+    "rss_url": "https://www.engadget.com/rss.xml",
+    "description": "Imported from worldmonitor (tech)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 612,
+    "name": "Fast Company",
+    "listing_url": "https://feeds.feedburner.com/fastcompany/headlines",
+    "rss_url": "https://feeds.feedburner.com/fastcompany/headlines",
+    "description": "Imported from worldmonitor (tech)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 613,
+    "name": "MIT Research",
+    "listing_url": "https://news.mit.edu/rss/research",
+    "rss_url": "https://news.mit.edu/rss/research",
+    "description": "Imported from worldmonitor (ai)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 614,
+    "name": "ArXiv ML",
+    "listing_url": "https://export.arxiv.org/rss/cs.LG",
+    "rss_url": "https://export.arxiv.org/rss/cs.LG",
+    "description": "Imported from worldmonitor (ai)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 615,
+    "name": "TechCrunch Startups",
+    "listing_url": "https://techcrunch.com/category/startups/feed/",
+    "rss_url": "https://techcrunch.com/category/startups/feed/",
+    "description": "Imported from worldmonitor (startups)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 616,
+    "name": "VentureBeat",
+    "listing_url": "https://venturebeat.com/feed/",
+    "rss_url": "https://venturebeat.com/feed/",
+    "description": "Imported from worldmonitor (startups)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 617,
+    "name": "Crunchbase News",
+    "listing_url": "https://news.crunchbase.com/feed/",
+    "rss_url": "https://news.crunchbase.com/feed/",
+    "description": "Imported from worldmonitor (startups)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 618,
+    "name": "SaaStr",
+    "listing_url": "https://www.saastr.com/feed/",
+    "rss_url": "https://www.saastr.com/feed/",
+    "description": "Imported from worldmonitor (startups)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 619,
+    "name": "TechCrunch Venture",
+    "listing_url": "https://techcrunch.com/category/venture/feed/",
+    "rss_url": "https://techcrunch.com/category/venture/feed/",
+    "description": "Imported from worldmonitor (startups)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 620,
+    "name": "CB Insights",
+    "listing_url": "https://www.cbinsights.com/research/feed/",
+    "rss_url": "https://www.cbinsights.com/research/feed/",
+    "description": "Imported from worldmonitor (startups)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 621,
+    "name": "Y Combinator Blog",
+    "listing_url": "https://www.ycombinator.com/blog/rss/",
+    "rss_url": "https://www.ycombinator.com/blog/rss/",
+    "description": "Imported from worldmonitor (vcblogs)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 622,
+    "name": "Stratechery",
+    "listing_url": "https://stratechery.com/feed/",
+    "rss_url": "https://stratechery.com/feed/",
+    "description": "Imported from worldmonitor (vcblogs)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 623,
+    "name": "Tech.eu",
+    "listing_url": "https://tech.eu/feed/",
+    "rss_url": "https://tech.eu/feed/",
+    "description": "Imported from worldmonitor (regionalStartups)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 624,
+    "name": "Sifted (Europe)",
+    "listing_url": "https://sifted.eu/feed",
+    "rss_url": "https://sifted.eu/feed",
+    "description": "Imported from worldmonitor (regionalStartups)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 625,
+    "name": "Inc42 (India)",
+    "listing_url": "https://inc42.com/feed/",
+    "rss_url": "https://inc42.com/feed/",
+    "description": "Imported from worldmonitor (regionalStartups)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 626,
+    "name": "YourStory",
+    "listing_url": "https://yourstory.com/feed",
+    "rss_url": "https://yourstory.com/feed",
+    "description": "Imported from worldmonitor (regionalStartups)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 627,
+    "name": "TechCabal (Africa)",
+    "listing_url": "https://techcabal.com/feed/",
+    "rss_url": "https://techcabal.com/feed/",
+    "description": "Imported from worldmonitor (regionalStartups)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 628,
+    "name": "Krebs Security",
+    "listing_url": "https://krebsonsecurity.com/feed/",
+    "rss_url": "https://krebsonsecurity.com/feed/",
+    "description": "Imported from worldmonitor (security)",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 629,
+    "name": "The Hacker News",
+    "listing_url": "https://feeds.feedburner.com/TheHackersNews",
+    "rss_url": "https://feeds.feedburner.com/TheHackersNews",
+    "description": "Imported from worldmonitor (security)",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 630,
+    "name": "Dark Reading",
+    "listing_url": "https://www.darkreading.com/rss.xml",
+    "rss_url": "https://www.darkreading.com/rss.xml",
+    "description": "Imported from worldmonitor (security)",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 631,
+    "name": "Schneier",
+    "listing_url": "https://www.schneier.com/feed/",
+    "rss_url": "https://www.schneier.com/feed/",
+    "description": "Imported from worldmonitor (security)",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 632,
+    "name": "InfoQ",
+    "listing_url": "https://feed.infoq.com/",
+    "rss_url": "https://feed.infoq.com/",
+    "description": "Imported from worldmonitor (cloud)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 633,
+    "name": "The New Stack",
+    "listing_url": "https://thenewstack.io/feed/",
+    "rss_url": "https://thenewstack.io/feed/",
+    "description": "Imported from worldmonitor (cloud)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 634,
+    "name": "DevOps.com",
+    "listing_url": "https://devops.com/feed/",
+    "rss_url": "https://devops.com/feed/",
+    "description": "Imported from worldmonitor (cloud)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  },
+  {
+    "id": 635,
+    "name": "CoinDesk",
+    "listing_url": "https://www.coindesk.com/arc/outboundfeeds/rss/",
+    "rss_url": "https://www.coindesk.com/arc/outboundfeeds/rss/",
+    "description": "Imported from worldmonitor (crypto)",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active"
+  }
+]

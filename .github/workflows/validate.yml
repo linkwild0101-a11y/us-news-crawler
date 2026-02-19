@@ -2,6 +2,15 @@ name: Validate RSS Sources
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "data/sources.json"
+      - "scripts/validate_rss.py"
+      - "scripts/merge_worldmonitor_sources.py"
+      - "scripts/import_worldmonitor_recommended.py"
+      - ".github/workflows/validate.yml"
   schedule:
     - cron: '0 0 * * 0'  # 每周日运行一次
 
