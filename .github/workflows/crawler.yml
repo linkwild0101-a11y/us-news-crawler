@@ -1,11 +1,6 @@
 name: RSS Crawler
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - ".github/workflows/crawler.yml"
   schedule:
     # 东部时间 9:00 AM (UTC 14:00) - 冬季
     # 夏令时期间会变成东部 10:00 AM
