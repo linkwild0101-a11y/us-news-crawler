@@ -12,11 +12,12 @@ import hashlib
 from datetime import datetime
 from typing import List, Dict, Optional
 from supabase import create_client
-from urllib.parse import urljoin, urlparse
+from urllib.parse import quote
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 WORKER_URL = os.getenv("WORKER_URL")
+RAILWAY_URL = os.getenv("RAILWAY_URL")
 
 
 class RSSCrawler:
@@ -45,26 +46,88 @@ class RSSCrawler:
         """抓取单个RSS源"""
         async with self.semaphore:
             try:
-                async with self.session.get(
-                    source["rss_url"],
-                    headers={"User-Agent": "Mozilla/5.0 (compatible; RSSCrawler/1.0)"},
-                ) as resp:
-                    if resp.status != 200:
-                        raise Exception(f"HTTP {resp.status}")
+                rss_url = source["rss_url"]
+                anti_scraping = source.get("anti_scraping", "None")
 
-                    content = await resp.text()
-                    feed = feedparser.parse(content)
+                # 1) 先尝试直接抓取
+                content = await self._fetch_rss_direct(rss_url)
 
-                    return {
-                        "source_id": source["id"],
-                        "category": source["category"],
-                        "anti_scraping": source.get("anti_scraping", "None"),
-                        "entries": feed.entries[:10],  # 只取前10条
-                    }
+                # 2) 直接失败后，根据策略走代理重试
+                if not content:
+                    if anti_scraping == "railway":
+                        content = await self._fetch_rss_via_railway(rss_url)
+                        if not content:
+                            content = await self._fetch_rss_via_worker(rss_url)
+                    elif anti_scraping in ["Cloudflare", "Paywall", "Partial Paywall"]:
+                        content = await self._fetch_rss_via_worker(rss_url)
+                        if not content:
+                            content = await self._fetch_rss_via_railway(rss_url)
+
+                if not content:
+                    raise Exception("RSS内容为空")
+
+                feed = feedparser.parse(content)
+                if not feed.entries:
+                    raise Exception("RSS无有效条目")
+
+                return {
+                    "source_id": source["id"],
+                    "category": source["category"],
+                    "anti_scraping": anti_scraping,
+                    "entries": feed.entries[:10],  # 只取前10条
+                }
             except Exception as e:
                 print(f"  ⚠️  RSS抓取失败 {source['name']}: {e}")
                 self.stats["errors"] += 1
                 return None
+
+    async def _fetch_rss_direct(self, rss_url: str) -> Optional[str]:
+        """直接抓取RSS内容"""
+        try:
+            async with self.session.get(
+                rss_url,
+                headers={"User-Agent": "Mozilla/5.0 (compatible; RSSCrawler/1.0)"},
+            ) as resp:
+                if resp.status != 200:
+                    return None
+                return await resp.text()
+        except Exception:
+            return None
+
+    async def _fetch_rss_via_worker(self, rss_url: str) -> Optional[str]:
+        """通过Cloudflare Worker抓取RSS内容"""
+        if not WORKER_URL:
+            return None
+        try:
+            async with self.session.post(
+                f"{WORKER_URL}/extract",
+                json={"url": rss_url, "raw": True},
+                headers={"Content-Type": "application/json"},
+            ) as resp:
+                if resp.status != 200:
+                    return None
+                data = await resp.json()
+                if not data.get("success"):
+                    return None
+                return data.get("content", "")
+        except Exception:
+            return None
+
+    async def _fetch_rss_via_railway(self, rss_url: str) -> Optional[str]:
+        """通过Railway代理抓取RSS内容"""
+        if not RAILWAY_URL:
+            return None
+        try:
+            encoded_url = quote(rss_url, safe="")
+            async with self.session.get(
+                f"{RAILWAY_URL}/rss?url={encoded_url}",
+                headers={"Accept": "application/xml"},
+            ) as resp:
+                if resp.status != 200:
+                    return None
+                return await resp.text()
+        except Exception:
+            return None
 
     async def extract_content(self, url: str, anti_scraping: str) -> Optional[Dict]:
         """混合内容提取"""
