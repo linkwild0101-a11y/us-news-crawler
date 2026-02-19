@@ -605,20 +605,25 @@ class HotspotAnalyzer:
                 names_by_type.setdefault(entity_type, []).append(name)
 
             existing_map: Dict[Tuple[str, str], Dict[str, Any]] = {}
+            name_query_batch_size = 100
             for entity_type, names in names_by_type.items():
                 unique_names = list(dict.fromkeys(names))
-                existing_rows = self._execute_with_retry(
-                    "load_existing_entities",
-                    lambda et=entity_type, un=unique_names: (
-                        self.supabase.table("entities")
-                        .select("id, name, entity_type, mention_count_total, metadata, category")
-                        .eq("entity_type", et)
-                        .in_("name", un)
-                        .execute()
-                    ),
-                )
-                for row in existing_rows.data or []:
-                    existing_map[(row["name"], row["entity_type"])] = row
+                for i in range(0, len(unique_names), name_query_batch_size):
+                    batch_names = unique_names[i : i + name_query_batch_size]
+                    existing_rows = self._execute_with_retry(
+                        "load_existing_entities",
+                        lambda et=entity_type, bn=batch_names: (
+                            self.supabase.table("entities")
+                            .select(
+                                "id, name, entity_type, mention_count_total, metadata, category"
+                            )
+                            .eq("entity_type", et)
+                            .in_("name", bn)
+                            .execute()
+                        ),
+                    )
+                    for row in existing_rows.data or []:
+                        existing_map[(row["name"], row["entity_type"])] = row
 
             upsert_rows: List[Dict[str, Any]] = []
             for key, agg in entity_agg.items():
@@ -662,18 +667,20 @@ class HotspotAnalyzer:
             entity_id_map: Dict[Tuple[str, str], int] = {}
             for entity_type, names in names_by_type.items():
                 unique_names = list(dict.fromkeys(names))
-                rows = self._execute_with_retry(
-                    "load_entity_ids_after_upsert",
-                    lambda et=entity_type, un=unique_names: (
-                        self.supabase.table("entities")
-                        .select("id, name, entity_type")
-                        .eq("entity_type", et)
-                        .in_("name", un)
-                        .execute()
-                    ),
-                )
-                for row in rows.data or []:
-                    entity_id_map[(row["name"], row["entity_type"])] = row["id"]
+                for i in range(0, len(unique_names), name_query_batch_size):
+                    batch_names = unique_names[i : i + name_query_batch_size]
+                    rows = self._execute_with_retry(
+                        "load_entity_ids_after_upsert",
+                        lambda et=entity_type, bn=batch_names: (
+                            self.supabase.table("entities")
+                            .select("id, name, entity_type")
+                            .eq("entity_type", et)
+                            .in_("name", bn)
+                            .execute()
+                        ),
+                    )
+                    for row in rows.data or []:
+                        entity_id_map[(row["name"], row["entity_type"])] = row["id"]
 
             relation_rows: List[Dict[str, Any]] = []
             for relation_key, mention_count in relation_counts.items():

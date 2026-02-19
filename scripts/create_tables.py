@@ -25,7 +25,7 @@ def create_tables():
             name VARCHAR(255) NOT NULL,
             rss_url VARCHAR(500) UNIQUE NOT NULL,
             listing_url VARCHAR(500),
-            category VARCHAR(50) NOT NULL CHECK (category IN ('military', 'politics', 'economy')),
+            category VARCHAR(50) NOT NULL CHECK (category IN ('military', 'politics', 'economy', 'tech')),
             anti_scraping VARCHAR(50) DEFAULT 'None',
             status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'error')),
             last_fetch TIMESTAMP,

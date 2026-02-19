@@ -209,7 +209,7 @@ PERSON_RULES = {
 - `id` (PK): 实体ID
 - `name`: 实体名称
 - `entity_type`: 类型(event/org/loc/person/concept)
-- `category`: 分类(military/politics/economy)
+- `category`: 分类(military/politics/economy/tech)
 - `mention_count_total`: 总提及次数
 - `mention_count_24h`: 24小时提及
 - `mention_count_7d`: 7天提及
@@ -228,7 +228,7 @@ Web界面 "📁 实体档案" 页面:
 - 显示前10热门实体（卡片形式）
 - 实体列表（可展开）
 - 按类型筛选（全部/person/organization/location/event/concept）
-- 按分类筛选（全部/military/politics/economy）
+- 按分类筛选（全部/military/politics/economy/tech）
 - 统计图表：类型分布、提及次数分布
 
 ---

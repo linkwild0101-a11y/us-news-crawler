@@ -13,7 +13,8 @@ SOURCES_FILE = ROOT / "data" / "sources.json"
 WORLDMONITOR_RSS_FILE = ROOT / "data" / "worldmonitor_rss_sources.json"
 RECOMMENDED_FILE = ROOT / "data" / "worldmonitor_recommended_sources.json"
 
-ALLOWED_SECTIONS = {
+MILITARY_SECTIONS = {"security", "crisis"}
+POLITICS_SECTIONS = {
     "politics",
     "regional",
     "middleeast",
@@ -22,37 +23,53 @@ ALLOWED_SECTIONS = {
     "latam",
     "gov",
     "thinktanks",
-    "crisis",
-    "security",
+    "policy",
+    "gccNews",
+}
+TECH_SECTIONS = {
     "tech",
     "ai",
-    "layoffs",
+    "cloud",
+    "dev",
+    "github",
+    "hardware",
+    "producthunt",
     "startups",
     "regionalStartups",
     "vcblogs",
-    "cloud",
+    "layoffs",
+    "podcasts",
+}
+ECONOMY_SECTIONS = {
+    "finance",
+    "markets",
+    "forex",
+    "bonds",
+    "economic",
+    "fintech",
+    "institutional",
+    "analysis",
+    "derivatives",
+    "commodities",
+    "energy",
+    "funding",
+    "ipo",
+    "unicorns",
+    "accelerators",
+    "centralbanks",
     "crypto",
+    "regulation",
 }
 
+ALLOWED_SECTIONS = (
+    MILITARY_SECTIONS | POLITICS_SECTIONS | TECH_SECTIONS | ECONOMY_SECTIONS
+)
+
 CATEGORY_BY_SECTION = {
-    "security": "military",
-    "crisis": "military",
-    "gov": "politics",
-    "politics": "politics",
-    "regional": "politics",
-    "middleeast": "politics",
-    "africa": "politics",
-    "asia": "politics",
-    "latam": "politics",
-    "thinktanks": "politics",
-    "tech": "economy",
-    "ai": "economy",
-    "layoffs": "economy",
-    "startups": "economy",
-    "regionalStartups": "economy",
-    "vcblogs": "economy",
-    "cloud": "economy",
-    "crypto": "economy",
+    **{section: "military" for section in MILITARY_SECTIONS},
+    **{section: "politics" for section in POLITICS_SECTIONS},
+    **{section: "tech" for section in TECH_SECTIONS},
+    **{section: "economy" for section in ECONOMY_SECTIONS},
 }
 
 
@@ -93,12 +110,22 @@ def main() -> None:
     worldmonitor_rows = load_json(WORLDMONITOR_RSS_FILE)
 
     existing_urls: Set[str] = {
-        _normalize_url(row.get("rss_url", "")) for row in current_sources if row.get("rss_url")
+        _normalize_url(row.get("rss_url", ""))
+        for row in current_sources
+        if row.get("rss_url")
+    }
+    source_by_url: Dict[str, Dict] = {
+        _normalize_url(row.get("rss_url", "")): row
+        for row in current_sources
+        if row.get("rss_url")
     }
     max_id = max((int(row.get("id", 0)) for row in current_sources), default=0)
 
     recommended_rows: List[Dict] = []
     seen_candidate_urls: Set[str] = set()
+    added = 0
+    updated = 0
+    skipped_existing = 0
 
     for row in worldmonitor_rows:
         url = _normalize_url(row.get("source_url", ""))
@@ -112,32 +139,61 @@ def main() -> None:
         if domain == "news.google.com":
             continue
 
-        # 仅合并当前 sources.json 中不存在的 URL
-        if url in existing_urls or url in seen_candidate_urls:
+        if url in seen_candidate_urls:
+            continue
+
+        current = source_by_url.get(url)
+        if current:
+            source = _build_source_record(row, int(current["id"]))
+            source["status"] = current.get("status", "active")
+            if str(current.get("description", "")).startswith("Imported from worldmonitor"):
+                fields = ("name", "listing_url", "category", "anti_scraping", "description")
+                changed = False
+                for field in fields:
+                    if current.get(field) != source.get(field):
+                        current[field] = source[field]
+                        changed = True
+                if changed:
+                    updated += 1
+            else:
+                skipped_existing += 1
+            recommended_rows.append(
+                {
+                    **source,
+                    "source_origin": "worldmonitor",
+                }
+            )
+            seen_candidate_urls.add(url)
             continue
 
         max_id += 1
         source = _build_source_record(row, max_id)
+        source["source_origin"] = "worldmonitor"
         recommended_rows.append(source)
+        current_sources.append({k: v for k, v in source.items() if k != "source_origin"})
         seen_candidate_urls.add(url)
+        existing_urls.add(url)
+        source_by_url[url] = current_sources[-1]
+        added += 1
 
-    # 将推荐源写入单独文件，便于审计
+    # 写入推荐源清单（用于同步 Supabase）
     RECOMMENDED_FILE.write_text(
         json.dumps(recommended_rows, indent=2, ensure_ascii=False), encoding="utf-8"
     )
 
-    merged_sources = current_sources + recommended_rows
     SOURCES_FILE.write_text(
-        json.dumps(merged_sources, indent=2, ensure_ascii=False), encoding="utf-8"
+        json.dumps(current_sources, indent=2, ensure_ascii=False), encoding="utf-8"
     )
 
     cat_counter = Counter(row["category"] for row in recommended_rows)
 
-    print(f"Current sources: {len(current_sources)}")
-    print(f"Recommended new sources: {len(recommended_rows)}")
-    print(f"Merged sources: {len(merged_sources)}")
+    print(f"Total sources after merge: {len(current_sources)}")
+    print(f"Worldmonitor candidate sources: {len(recommended_rows)}")
+    print(f"Added sources: {added}")
+    print(f"Updated existing worldmonitor sources: {updated}")
+    print(f"Skipped existing non-worldmonitor sources: {skipped_existing}")
     print(
-        "Recommended categories: "
+        "Worldmonitor categories: "
         + ", ".join(f"{k}={v}" for k, v in sorted(cat_counter.items()))
     )
     print(f"Wrote: {RECOMMENDED_FILE.relative_to(ROOT)}")

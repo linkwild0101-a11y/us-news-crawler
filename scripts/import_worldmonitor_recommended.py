@@ -33,6 +33,14 @@ def _chunks(rows: List[Dict], size: int):
         yield rows[idx : idx + size]
 
 
+def _same_record(db_row: Dict, target: Dict) -> bool:
+    fields = ("name", "rss_url", "listing_url", "category", "anti_scraping", "status")
+    for field in fields:
+        if (db_row.get(field) or "") != (target.get(field) or ""):
+            return False
+    return True
+
+
 def main() -> None:
     if not SUPABASE_KEY:
         raise RuntimeError("未设置 SUPABASE_KEY")
@@ -42,41 +50,64 @@ def main() -> None:
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
     recommended = json.loads(RECOMMENDED_FILE.read_text(encoding="utf-8"))
 
-    # 先取现有 URL，避免重复插入
-    all_existing = supabase.table("rss_sources").select("rss_url").execute().data
-    existing_urls = {
-        (row.get("rss_url") or "").strip() for row in all_existing if row.get("rss_url")
-    }
-
-    pending = [
-        _to_db_row(source)
-        for source in recommended
-        if source.get("rss_url", "").strip() and source.get("rss_url", "").strip() not in existing_urls
+    candidates = [
+        _to_db_row(source) for source in recommended if source.get("rss_url", "").strip()
     ]
+    candidate_urls = sorted({row["rss_url"].strip() for row in candidates})
+
+    existing_map: Dict[str, Dict] = {}
+    for batch_urls in _chunks(candidate_urls, 100):
+        rows = (
+            supabase.table("rss_sources")
+            .select("id, name, rss_url, listing_url, category, anti_scraping, status")
+            .in_("rss_url", batch_urls)
+            .execute()
+            .data
+        )
+        for row in rows:
+            existing_map[(row.get("rss_url") or "").strip()] = row
 
     inserted = 0
+    updated = 0
+    unchanged = 0
     failed = 0
+    tech_constraint_blocked = 0
+    failed_rows: List[Dict] = []
 
-    for batch in _chunks(pending, BATCH_SIZE):
+    for row in candidates:
+        existing = existing_map.get(row["rss_url"].strip())
+        if existing and _same_record(existing, row):
+            unchanged += 1
+            continue
+
         try:
-            supabase.table("rss_sources").insert(batch).execute()
-            inserted += len(batch)
-        except Exception:
-            # 批量失败时回退到逐条，避免单条异常阻塞整体导入
-            for row in batch:
-                try:
-                    supabase.table("rss_sources").insert(row).execute()
-                    inserted += 1
-                except Exception:
-                    failed += 1
+            if existing:
+                supabase.table("rss_sources").update(row).eq("id", existing["id"]).execute()
+                updated += 1
+            else:
+                supabase.table("rss_sources").insert(row).execute()
+                inserted += 1
+        except Exception as exc:
+            msg = str(exc)
+            if row["category"] == "tech" and "rss_sources_category_check" in msg:
+                tech_constraint_blocked += 1
+            else:
+                failed += 1
+                failed_rows.append({"name": row["name"], "rss_url": row["rss_url"], "error": msg[:240]})
 
     total = supabase.table("rss_sources").select("id", count="exact").execute().count
 
     print(f"Recommended total: {len(recommended)}")
-    print(f"Pending insert: {len(pending)}")
     print(f"Inserted: {inserted}")
+    print(f"Updated: {updated}")
+    print(f"Unchanged: {unchanged}")
+    print(f"Tech category blocked by DB constraint: {tech_constraint_blocked}")
     print(f"Failed: {failed}")
     print(f"DB total rss_sources: {total}")
+    if failed_rows:
+        print("Failure examples:")
+        for row in failed_rows[:5]:
+            print(f"- {row['name']} | {row['error']}")
 
 
 if __name__ == "__main__":

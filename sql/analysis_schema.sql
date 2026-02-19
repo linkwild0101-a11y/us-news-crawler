@@ -9,7 +9,7 @@
 CREATE TABLE IF NOT EXISTS analysis_clusters (
     id SERIAL PRIMARY KEY,
     cluster_key VARCHAR(64) UNIQUE NOT NULL,  -- 聚类内容哈希值，用于去重
-    category VARCHAR(50) NOT NULL,            -- 分类: military/politics/economy
+    category VARCHAR(50) NOT NULL,            -- 分类: military/politics/economy/tech
     primary_title TEXT NOT NULL,              -- 主要文章标题（英文）
     primary_link TEXT,                        -- 主要文章链接（英文原文）
     summary TEXT NOT NULL,                    -- 中文摘要（LLM生成）
@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS entities (
     name VARCHAR(255) NOT NULL,               -- 实体名称
     name_en VARCHAR(255),                     -- 英文名称
     entity_type VARCHAR(50) NOT NULL,         -- 实体类型: person/organization/location/event/concept
-    category VARCHAR(50),                     -- 所属分类: military/politics/economy
+    category VARCHAR(50),                     -- 所属分类: military/politics/economy/tech
     first_seen TIMESTAMP WITH TIME ZONE DEFAULT NOW(),  -- 首次出现时间
     last_seen TIMESTAMP WITH TIME ZONE DEFAULT NOW(),   -- 最后出现时间
     mention_count_24h INTEGER DEFAULT 0,      -- 24小时内提及次数

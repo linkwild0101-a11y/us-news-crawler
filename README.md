@@ -115,7 +115,7 @@ RSS源信息表
 | id | SERIAL | 主键 |
 | name | VARCHAR(255) | 源名称 |
 | rss_url | VARCHAR(500) | RSS地址（唯一） |
-| category | VARCHAR(50) | 分类: military/politics/economy |
+| category | VARCHAR(50) | 分类: military/politics/economy/tech |
 | anti_scraping | VARCHAR(50) | 反爬级别: None/Cloudflare/Paywall |
 | status | VARCHAR(20) | 状态: active/inactive/error |
 

@@ -363,6 +363,7 @@ def get_css():
     .category-military {{ color: {t["danger"]}; font-weight: 600; }}
     .category-politics {{ color: #b39cff; font-weight: 600; }}
     .category-economy {{ color: {t["ok"]}; font-weight: 600; }}
+    .category-tech {{ color: #67e8f9; font-weight: 600; }}
     
 </style>
 """
@@ -709,7 +710,7 @@ def render_sidebar():
     hours_map = {"24小时": 24, "7天": 168, "30天": 720}
 
     category = st.sidebar.selectbox(
-        "分类筛选:", ["全部", "military", "politics", "economy"]
+        "分类筛选:", ["全部", "military", "politics", "economy", "tech"]
     )
 
     return page, hours_map[time_range], category
@@ -806,22 +807,24 @@ def render_overview(supabase, hours: int, category: str):
             signal_name = get_signal_name(row)
             explanation = parse_signal_explanation(row)
             event_text = format_related_events(explanation.get("events", []), limit=2)
+            compact_why = short_text(explanation.get("why", ""), 68)
+            compact_meaning = short_text(explanation.get("meaning", ""), 68)
+            compact_events = short_text(event_text or "无可用关联事件", 56)
+            created_at = str(row.get("created_at", "N/A"))[:16]
 
             st.markdown(
                 f"""
             <div class="hotspot-card">
                 <h5>
-                    {row.get("icon", "⚡")} {signal_name}
+                    {html.escape(str(row.get("icon", "⚡")))} {html.escape(signal_name)}
                     <span class="signal-badge {level_class}">{level_text} 置信度</span>
                 </h5>
-                <p><strong>触发原因:</strong> {explanation["why"]}</p>
-                <p><strong>代表含义:</strong> {explanation["meaning"]}</p>
-                <p><strong>建议动作:</strong> {explanation["action"]}</p>
-                <p><strong>关联事件:</strong> {event_text or "无可用关联事件"}</p>
                 <p class="meta-text">
-                    置信度: {confidence:.2f} | 时间: {row.get("created_at", "N/A")[:16]} |
-                    依据: {explanation["confidence_reason"]}
+                    置信度: {confidence:.2f} | 时间: {html.escape(created_at)}
                 </p>
+                <p><strong>原因:</strong> {html.escape(compact_why)}</p>
+                <p><strong>含义:</strong> {html.escape(compact_meaning)}</p>
+                <p class="meta-text">关联: {html.escape(compact_events)}</p>
             </div>
             """,
                 unsafe_allow_html=True,
@@ -1230,7 +1233,7 @@ def render_entities(supabase):
         )
     with col2:
         category = st.selectbox(
-            "所属分类:", ["全部", "military", "politics", "economy"]
+            "所属分类:", ["全部", "military", "politics", "economy", "tech"]
         )
 
     # 获取实体列表
