@@ -10,7 +10,25 @@ import os
 from typing import List, Dict, Optional
 from datetime import datetime, timedelta
 
+from config.analysis_config import WORLDMONITOR_SIGNAL_CONFIG
 from scripts.datasources.signal_endpoint_sources import get_worldmonitor_no_auth_sources
+
+
+DEFAULT_WORLDMONITOR_ENDPOINTS = (
+    "/api/earthquakes",
+    "/api/ucdp-events",
+    "/api/ucdp",
+    "/api/unhcr-population",
+    "/api/hapi",
+    "/api/macro-signals",
+    "/api/yahoo-finance",
+    "/api/etf-flows",
+    "/api/worldbank",
+    "/api/faa-status",
+    "/api/service-status",
+    "/api/climate-anomalies",
+    "/api/nga-warnings",
+)
 
 
 class FREDClient:
@@ -304,29 +322,19 @@ class WorldMonitorClient:
             output["error"] = str(e)[:120]
             return output
 
-    async def fetch_no_auth_endpoints(self, max_priority: int = 2) -> Dict[str, Dict]:
+    async def fetch_no_auth_endpoints(
+        self,
+        max_priority: int = 2,
+        enabled_endpoints: Optional[List[str]] = None,
+    ) -> Dict[str, Dict]:
         """抓取 worldmonitor 无鉴权优先端点。"""
         catalog = get_worldmonitor_no_auth_sources()
-        enabled_endpoints = {
-            "/api/earthquakes",
-            "/api/ucdp-events",
-            "/api/ucdp",
-            "/api/unhcr-population",
-            "/api/hapi",
-            "/api/macro-signals",
-            "/api/yahoo-finance",
-            "/api/etf-flows",
-            "/api/worldbank",
-            "/api/faa-status",
-            "/api/service-status",
-            "/api/climate-anomalies",
-            "/api/nga-warnings",
-        }
+        enabled_set = set(enabled_endpoints or DEFAULT_WORLDMONITOR_ENDPOINTS)
         endpoints = []
         for item in catalog:
             if int(item.get("priority", 9)) <= max_priority:
                 endpoint = str(item.get("endpoint", "")).strip()
-                if endpoint and endpoint in enabled_endpoints:
+                if endpoint and endpoint in enabled_set:
                     endpoints.append(endpoint)
 
         results: Dict[str, Dict] = {}
@@ -393,14 +401,32 @@ async def fetch_all_data_sources(fred_api_key: Optional[str] = None) -> Dict:
         print(f"World Bank数据获取失败: {e}")
 
     # worldmonitor 无鉴权端点（优先级可配置）
-    worldmonitor_base_url = os.getenv("WORLDMONITOR_BASE_URL", "https://worldmonitor.app")
-    enable_worldmonitor = os.getenv("ENABLE_WORLDMONITOR_ENDPOINTS", "true").lower() == "true"
-    worldmonitor_max_priority = int(os.getenv("WORLDMONITOR_MAX_PRIORITY", "2"))
+    wm_defaults = WORLDMONITOR_SIGNAL_CONFIG
+    worldmonitor_base_url = os.getenv(
+        "WORLDMONITOR_BASE_URL", str(wm_defaults.get("base_url", ""))
+    )
+    enable_worldmonitor = (
+        os.getenv(
+            "ENABLE_WORLDMONITOR_ENDPOINTS",
+            str(wm_defaults.get("enabled", True)).lower(),
+        ).lower()
+        == "true"
+    )
+    worldmonitor_max_priority = int(
+        os.getenv(
+            "WORLDMONITOR_MAX_PRIORITY",
+            str(int(wm_defaults.get("max_priority", 2))),
+        )
+    )
+    enabled_endpoints = list(
+        wm_defaults.get("enabled_endpoints", list(DEFAULT_WORLDMONITOR_ENDPOINTS))
+    )
     if enable_worldmonitor and worldmonitor_base_url:
         wm = WorldMonitorClient(worldmonitor_base_url)
         try:
             results["worldmonitor"] = await wm.fetch_no_auth_endpoints(
-                max_priority=worldmonitor_max_priority
+                max_priority=worldmonitor_max_priority,
+                enabled_endpoints=enabled_endpoints,
             )
         except Exception as e:
             print(f"worldmonitor端点获取失败: {e}")

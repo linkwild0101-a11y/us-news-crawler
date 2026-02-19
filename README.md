@@ -66,6 +66,9 @@ ENABLE_WORLDMONITOR_ENDPOINTS=true
 WORLDMONITOR_MAX_PRIORITY=2
 ```
 
+端点白名单默认在 `config/analysis_config.py` 的
+`WORLDMONITOR_SIGNAL_CONFIG["enabled_endpoints"]` 配置，可按需增减。
+
 ### 2. 安装依赖
 
 ```bash

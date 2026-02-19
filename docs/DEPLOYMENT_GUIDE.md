@@ -361,6 +361,9 @@ export ENABLE_WORLDMONITOR_ENDPOINTS="true"
 export WORLDMONITOR_MAX_PRIORITY="2"
 ```
 
+端点白名单默认在 `config/analysis_config.py` 的
+`WORLDMONITOR_SIGNAL_CONFIG["enabled_endpoints"]` 中维护。
+
 ### 8.3 数据库迁移
 
 执行 SQL:

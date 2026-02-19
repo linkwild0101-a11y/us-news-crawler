@@ -546,6 +546,28 @@ DATA_SOURCES = {
     },
 }
 
+# worldmonitor 无鉴权信号端点默认配置（可被环境变量覆盖）
+WORLDMONITOR_SIGNAL_CONFIG = {
+    "enabled": True,
+    "base_url": "https://worldmonitor.app",
+    "max_priority": 2,
+    "enabled_endpoints": [
+        "/api/earthquakes",
+        "/api/ucdp-events",
+        "/api/ucdp",
+        "/api/unhcr-population",
+        "/api/hapi",
+        "/api/macro-signals",
+        "/api/yahoo-finance",
+        "/api/etf-flows",
+        "/api/worldbank",
+        "/api/faa-status",
+        "/api/service-status",
+        "/api/climate-anomalies",
+        "/api/nga-warnings",
+    ],
+}
+
 # 关键 FRED 指标系列
 FRED_SERIES = {
     "FEDFUNDS": "联邦基金利率",
