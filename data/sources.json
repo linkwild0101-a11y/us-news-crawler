@@ -6468,5 +6468,405 @@
     "category": "tech",
     "anti_scraping": "None",
     "status": "active"
+  },
+  {
+    "name": "Newtalk Politics",
+    "listing_url": "https://newtalk.tw/news/index",
+    "rss_url": "https://newtalk.tw/rss/category/2",
+    "description": "Taiwan politics news feed from Newtalk",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 648
+  },
+  {
+    "name": "Liberty Times Politics",
+    "listing_url": "https://news.ltn.com.tw/list/breakingnews/politics",
+    "rss_url": "https://news.ltn.com.tw/rss/politics.xml",
+    "description": "Taiwan political breaking news from Liberty Times",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 649
+  },
+  {
+    "name": "CNA Politics",
+    "listing_url": "https://www.cna.com.tw/list/aipl.aspx",
+    "rss_url": "https://feeds.feedburner.com/rsscna/politics",
+    "description": "Taiwan politics feed from Central News Agency",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 650
+  },
+  {
+    "name": "Office of the President News",
+    "listing_url": "https://www.president.gov.tw/Page/35",
+    "rss_url": "https://www.president.gov.tw/RSSNEWS.aspx",
+    "description": "Official Taiwan Office of the President news feed",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 651
+  },
+  {
+    "name": "Taipei Times",
+    "listing_url": "https://www.taipeitimes.com/",
+    "rss_url": "https://www.taipeitimes.com/xml/index.rss",
+    "description": "Taiwan English daily news feed",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 652
+  },
+  {
+    "name": "People News Taiwan",
+    "listing_url": "https://www.peoplenews.tw/",
+    "rss_url": "https://www.peoplenews.tw/rss/%E7%B8%BD%E8%A6%BD",
+    "description": "Taiwan current affairs and politics RSS from People News",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 653
+  },
+  {
+    "name": "PTS News",
+    "listing_url": "https://news.pts.org.tw/",
+    "rss_url": "https://about.pts.org.tw/rss/XML/newsfeed.xml",
+    "description": "Public Television Service Taiwan news feed",
+    "category": "politics",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 654
+  },
+  {
+    "name": "Newtalk Business",
+    "listing_url": "https://newtalk.tw/news/index",
+    "rss_url": "https://newtalk.tw/rss/category/3",
+    "description": "Taiwan business and economy feed from Newtalk",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 655
+  },
+  {
+    "name": "Liberty Times Business",
+    "listing_url": "https://ec.ltn.com.tw/list/breakingnews",
+    "rss_url": "https://news.ltn.com.tw/rss/business.xml",
+    "description": "Taiwan business news feed from Liberty Times",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 656
+  },
+  {
+    "name": "CNA Finance",
+    "listing_url": "https://www.cna.com.tw/list/ahel.aspx",
+    "rss_url": "https://feeds.feedburner.com/rsscna/finance",
+    "description": "Taiwan finance feed from Central News Agency",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 657
+  },
+  {
+    "name": "CTEE Macro",
+    "listing_url": "https://www.ctee.com.tw/category/general-news/macro",
+    "rss_url": "https://www.ctee.com.tw/rss_web/category/macro",
+    "description": "Taiwan macroeconomics feed from Commercial Times",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 658
+  },
+  {
+    "name": "CTEE Industry",
+    "listing_url": "https://www.ctee.com.tw/category/industry",
+    "rss_url": "https://www.ctee.com.tw/rss_web/livenews/industry",
+    "description": "Taiwan industry live news feed from Commercial Times",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 659
+  },
+  {
+    "name": "CTEE World",
+    "listing_url": "https://www.ctee.com.tw/category/world-news",
+    "rss_url": "https://www.ctee.com.tw/rss_web/livenews/world",
+    "description": "International economy feed from Commercial Times",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 660
+  },
+  {
+    "name": "CTEE Stock Highlights",
+    "listing_url": "https://www.ctee.com.tw/category/securities/star-stock",
+    "rss_url": "https://www.ctee.com.tw/rss_web/category/star",
+    "description": "Taiwan equities highlights feed from Commercial Times",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 661
+  },
+  {
+    "name": "MOEA Trade Admin News",
+    "listing_url": "https://www.trade.gov.tw/",
+    "rss_url": "https://www.trade.gov.tw/RSS/List.aspx?nodeID=40",
+    "description": "Taiwan Trade Administration press release RSS",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 662
+  },
+  {
+    "name": "MOEA Trade Admin Announcements",
+    "listing_url": "https://www.trade.gov.tw/",
+    "rss_url": "https://www.trade.gov.tw/RSS/List.aspx?nodeID=39",
+    "description": "Taiwan Trade Administration announcement RSS",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 663
+  },
+  {
+    "name": "MOEA Trade Admin International Analysis",
+    "listing_url": "https://www.trade.gov.tw/",
+    "rss_url": "https://www.trade.gov.tw/RSS/List.aspx?nodeID=4311",
+    "description": "Taiwan Trade Administration international analysis RSS",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 664
+  },
+  {
+    "name": "MOEA Trade Admin Trade Statistics",
+    "listing_url": "https://www.trade.gov.tw/",
+    "rss_url": "https://www.trade.gov.tw/RSS/List.aspx?nodeID=4312",
+    "description": "Taiwan Trade Administration trade statistics RSS",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 665
+  },
+  {
+    "name": "IDA News Releases",
+    "listing_url": "https://www.ida.gov.tw/",
+    "rss_url": "https://www.ida.gov.tw/ctlr?PRO=rss.RSSView&t=1",
+    "description": "Taiwan Industrial Development Administration news releases",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 666
+  },
+  {
+    "name": "IDA Activity Updates",
+    "listing_url": "https://www.ida.gov.tw/",
+    "rss_url": "https://www.ida.gov.tw/ctlr?PRO=rss.RSSView&t=10",
+    "description": "Taiwan Industrial Development Administration activity updates",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 667
+  },
+  {
+    "name": "IDA Industry Regulations",
+    "listing_url": "https://www.ida.gov.tw/",
+    "rss_url": "https://www.ida.gov.tw/ctlr?PRO=rss.RSSView&t=2",
+    "description": "Taiwan Industrial Development Administration regulatory updates",
+    "category": "economy",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 668
+  },
+  {
+    "name": "Newtalk Tech",
+    "listing_url": "https://newtalk.tw/news/index",
+    "rss_url": "https://newtalk.tw/rss/category/8",
+    "description": "Taiwan technology news feed from Newtalk",
+    "category": "tech",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 669
+  },
+  {
+    "name": "CNA Technology",
+    "listing_url": "https://www.cna.com.tw/list/ait.aspx",
+    "rss_url": "https://feeds.feedburner.com/rsscna/technology",
+    "description": "Taiwan technology feed from Central News Agency",
+    "category": "tech",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 670
+  },
+  {
+    "name": "TechNews Taiwan",
+    "listing_url": "https://technews.tw/",
+    "rss_url": "https://technews.tw/feed/",
+    "description": "Taiwan technology and semiconductor news",
+    "category": "tech",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 671
+  },
+  {
+    "name": "iThome",
+    "listing_url": "https://www.ithome.com.tw/",
+    "rss_url": "https://www.ithome.com.tw/rss",
+    "description": "Taiwan enterprise IT and cybersecurity news",
+    "category": "tech",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 672
+  },
+  {
+    "name": "DIGITIMES Tech Policy",
+    "listing_url": "https://www.digitimes.com.tw/tech/",
+    "rss_url": "https://www.digitimes.com.tw/tech/rss/xml/xmlrss_10_110.xml",
+    "description": "Technology policy coverage from DIGITIMES",
+    "category": "tech",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 673
+  },
+  {
+    "name": "DIGITIMES Semiconductors",
+    "listing_url": "https://www.digitimes.com.tw/tech/",
+    "rss_url": "https://www.digitimes.com.tw/tech/rss/xml/xmlrss_10_40.xml",
+    "description": "Semiconductor industry feed from DIGITIMES",
+    "category": "tech",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 674
+  },
+  {
+    "name": "DIGITIMES AI Focus",
+    "listing_url": "https://www.digitimes.com.tw/tech/",
+    "rss_url": "https://www.digitimes.com.tw/tech/rss/xml/xmlrss_30_25.xml",
+    "description": "AI industry feed from DIGITIMES",
+    "category": "tech",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 675
+  },
+  {
+    "name": "DIGITIMES Cloud",
+    "listing_url": "https://www.digitimes.com.tw/tech/",
+    "rss_url": "https://www.digitimes.com.tw/tech/rss/xml/xmlrss_30_24.xml",
+    "description": "Cloud computing feed from DIGITIMES",
+    "category": "tech",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 676
+  },
+  {
+    "name": "DIGITIMES Servers",
+    "listing_url": "https://www.digitimes.com.tw/tech/",
+    "rss_url": "https://www.digitimes.com.tw/tech/rss/xml/xmlrss_30_26.xml",
+    "description": "Server market feed from DIGITIMES",
+    "category": "tech",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 677
+  },
+  {
+    "name": "DIGITIMES Next-Gen Mobile",
+    "listing_url": "https://www.digitimes.com.tw/tech/",
+    "rss_url": "https://www.digitimes.com.tw/tech/rss/xml/xmlrss_30_27.xml",
+    "description": "Next-generation mobile communications feed from DIGITIMES",
+    "category": "tech",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 678
+  },
+  {
+    "name": "NSTC News",
+    "listing_url": "https://www.nstc.gov.tw/",
+    "rss_url": "https://www.nstc.gov.tw/nstc/rss/news",
+    "description": "Taiwan National Science and Technology Council latest news",
+    "category": "tech",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 679
+  },
+  {
+    "name": "NSTC News Data",
+    "listing_url": "https://www.nstc.gov.tw/",
+    "rss_url": "https://www.nstc.gov.tw/nstc/rss/newsdata",
+    "description": "Taiwan National Science and Technology Council press data",
+    "category": "tech",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 680
+  },
+  {
+    "name": "MNA Taiwan Defense",
+    "listing_url": "https://mna.mnd.gov.tw/news/",
+    "rss_url": "https://mna.mnd.gov.tw/K2S/RSS",
+    "description": "Taiwan Ministry of National Defense Military News Agency feed",
+    "category": "military",
+    "anti_scraping": "railway",
+    "status": "active",
+    "id": 681
+  },
+  {
+    "name": "Liberty Times Defense",
+    "listing_url": "https://def.ltn.com.tw/",
+    "rss_url": "https://news.ltn.com.tw/rss/def.xml",
+    "description": "Taiwan defense and military feed from Liberty Times",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 682
+  },
+  {
+    "name": "YDN Military News",
+    "listing_url": "https://www.ydn.com.tw/",
+    "rss_url": "https://www.ydn.com.tw/tw/Home/RSS.aspx?TID=2",
+    "description": "Taiwan Youth Daily military news RSS",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 683
+  },
+  {
+    "name": "YDN National Defense Focus",
+    "listing_url": "https://www.ydn.com.tw/",
+    "rss_url": "https://www.ydn.com.tw/tw/Home/RSS.aspx?CID=9",
+    "description": "Taiwan Youth Daily national defense focus RSS",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 684
+  },
+  {
+    "name": "YDN Military Forum",
+    "listing_url": "https://www.ydn.com.tw/",
+    "rss_url": "https://www.ydn.com.tw/tw/Home/RSS.aspx?CID=52",
+    "description": "Taiwan Youth Daily military forum RSS",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 685
+  },
+  {
+    "name": "YDN Strategy",
+    "listing_url": "https://www.ydn.com.tw/",
+    "rss_url": "https://www.ydn.com.tw/tw/Home/RSS.aspx?CID=48",
+    "description": "Taiwan Youth Daily strategy and security RSS",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 686
+  },
+  {
+    "name": "YDN Global Outlook",
+    "listing_url": "https://www.ydn.com.tw/",
+    "rss_url": "https://www.ydn.com.tw/tw/Home/RSS.aspx?CID=46",
+    "description": "Taiwan Youth Daily global security outlook RSS",
+    "category": "military",
+    "anti_scraping": "None",
+    "status": "active",
+    "id": 687
   }
 ]
