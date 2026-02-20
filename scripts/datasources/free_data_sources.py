@@ -10,7 +10,9 @@ import os
 from typing import List, Dict, Optional
 from datetime import datetime, timedelta
 
-from config.analysis_config import WORLDMONITOR_SIGNAL_CONFIG
+from config.independent_signal_config import INDEPENDENT_SIGNAL_CONFIG
+from config.watchlist_config import WATCHLIST_SENTINELS
+from scripts.datasources.independent_signal_sources import fetch_independent_signal_data
 from scripts.datasources.signal_endpoint_sources import get_worldmonitor_no_auth_sources
 
 
@@ -352,6 +354,73 @@ class WorldMonitorClient:
         return results
 
 
+def _build_watchlist_gdelt_queries() -> Dict[str, str]:
+    """根据哨兵配置生成 GDELT 查询模板。"""
+    queries: Dict[str, str] = {}
+    for sentinel in WATCHLIST_SENTINELS:
+        sentinel_id = str(sentinel.get("id", "")).strip()
+        if not sentinel_id:
+            continue
+
+        keyword_groups = sentinel.get("keyword_groups", {})
+        collected: List[str] = []
+        if isinstance(keyword_groups, dict):
+            for keywords in keyword_groups.values():
+                if not isinstance(keywords, list):
+                    continue
+                for keyword in keywords:
+                    token = str(keyword or "").strip()
+                    if not token:
+                        continue
+                    if token in collected:
+                        continue
+                    collected.append(token)
+                    if len(collected) >= 8:
+                        break
+                if len(collected) >= 8:
+                    break
+
+        if not collected:
+            collected = ["taiwan", "military", "export control"]
+
+        queries[sentinel_id] = " OR ".join(collected)
+
+    return queries
+
+
+async def _fetch_watchlist_gdelt_templates(gdelt: GDELTClient) -> Dict[str, Dict]:
+    """按哨兵模板抓取 GDELT 事件数据。"""
+    results: Dict[str, Dict] = {}
+    query_map = _build_watchlist_gdelt_queries()
+
+    async def _job(sentinel_id: str, query: str) -> None:
+        try:
+            events = await gdelt.query_events(query, days=2)
+            sample_title = ""
+            if events and isinstance(events[0], dict):
+                sample_title = str(events[0].get("title", ""))[:120]
+            results[sentinel_id] = {
+                "query": query,
+                "event_count": len(events),
+                "sample_title": sample_title,
+            }
+        except Exception as e:
+            results[sentinel_id] = {
+                "query": query,
+                "event_count": 0,
+                "sample_title": "",
+                "error": str(e)[:120],
+            }
+
+    await asyncio.gather(
+        *[
+            _job(sentinel_id, query)
+            for sentinel_id, query in query_map.items()
+        ]
+    )
+    return results
+
+
 # 便捷函数
 async def fetch_all_data_sources(fred_api_key: Optional[str] = None) -> Dict:
     """
@@ -364,8 +433,10 @@ async def fetch_all_data_sources(fred_api_key: Optional[str] = None) -> Dict:
         "timestamp": datetime.now().isoformat(),
         "fred": {},
         "gdelt": [],
+        "watchlist_gdelt": {},
         "usgs": [],
         "worldbank": {},
+        "independent_signals": {},
         "worldmonitor": {},
     }
 
@@ -383,6 +454,7 @@ async def fetch_all_data_sources(fred_api_key: Optional[str] = None) -> Dict:
     gdelt = GDELTClient()
     try:
         results["gdelt"] = await gdelt.query_events("conflict OR protest", days=1)
+        results["watchlist_gdelt"] = await _fetch_watchlist_gdelt_templates(gdelt)
     except Exception as e:
         print(f"GDELT数据获取失败: {e}")
 
@@ -400,36 +472,39 @@ async def fetch_all_data_sources(fred_api_key: Optional[str] = None) -> Dict:
     except Exception as e:
         print(f"World Bank数据获取失败: {e}")
 
-    # worldmonitor 无鉴权端点（优先级可配置）
-    wm_defaults = WORLDMONITOR_SIGNAL_CONFIG
-    worldmonitor_base_url = os.getenv(
-        "WORLDMONITOR_BASE_URL", str(wm_defaults.get("base_url", ""))
-    )
-    enable_worldmonitor = (
+    # 独立信号源（默认启用 priority + second）
+    independent_defaults = INDEPENDENT_SIGNAL_CONFIG
+    enable_independent = (
         os.getenv(
-            "ENABLE_WORLDMONITOR_ENDPOINTS",
-            str(wm_defaults.get("enabled", True)).lower(),
+            "ENABLE_INDEPENDENT_SIGNAL_SOURCES",
+            str(independent_defaults.get("enabled", True)).lower(),
         ).lower()
         == "true"
     )
-    worldmonitor_max_priority = int(
-        os.getenv(
-            "WORLDMONITOR_MAX_PRIORITY",
-            str(int(wm_defaults.get("max_priority", 2))),
-        )
+    enabled_tiers_env = os.getenv("INDEPENDENT_SIGNAL_TIERS", "").strip()
+    enabled_keys_env = os.getenv("INDEPENDENT_SIGNAL_KEYS", "").strip()
+    enabled_tiers = (
+        [part.strip() for part in enabled_tiers_env.split(",") if part.strip()]
+        if enabled_tiers_env
+        else list(independent_defaults.get("enabled_tiers", ["priority", "second"]))
     )
-    enabled_endpoints = list(
-        wm_defaults.get("enabled_endpoints", list(DEFAULT_WORLDMONITOR_ENDPOINTS))
+    enabled_keys = (
+        [part.strip() for part in enabled_keys_env.split(",") if part.strip()]
+        if enabled_keys_env
+        else None
     )
-    if enable_worldmonitor and worldmonitor_base_url:
-        wm = WorldMonitorClient(worldmonitor_base_url)
+
+    if enable_independent:
         try:
-            results["worldmonitor"] = await wm.fetch_no_auth_endpoints(
-                max_priority=worldmonitor_max_priority,
-                enabled_endpoints=enabled_endpoints,
+            independent_rows = await fetch_independent_signal_data(
+                enabled_tiers=enabled_tiers,
+                enabled_keys=enabled_keys,
             )
+            results["independent_signals"] = independent_rows
+            # 保持历史兼容，旧逻辑仍读取 worldmonitor 键。
+            results["worldmonitor"] = independent_rows
         except Exception as e:
-            print(f"worldmonitor端点获取失败: {e}")
+            print(f"独立信号源获取失败: {e}")
 
     return results
 
