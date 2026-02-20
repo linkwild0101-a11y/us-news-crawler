@@ -62,6 +62,68 @@ class EnhancedAnalyzer(HotspotAnalyzer):
             f"无鉴权候选: {len(self.no_auth_candidate_sources)}"
         )
 
+    def _load_all_unanalyzed_articles(
+        self, limit: int = None, hours: int = None
+    ) -> List[Dict[str, Any]]:
+        """分页加载未分析文章（默认全量，支持 limit）。"""
+        logger.info(
+            "加载未分析文章 "
+            f"(限制: {'不限制' if limit is None else limit}, "
+            f"时间窗口: {'不限制' if hours is None else f'{hours}小时'})"
+        )
+
+        try:
+            articles: List[Dict[str, Any]] = []
+            page_size = 1000
+            offset = 0
+
+            while True:
+                range_end = offset + page_size - 1
+                if limit is not None:
+                    remaining = limit - len(articles)
+                    if remaining <= 0:
+                        break
+                    range_end = offset + min(page_size, remaining) - 1
+
+                query = (
+                    self.supabase.table("articles")
+                    .select(
+                        "id, title, content, url, category, "
+                        "source_id, published_at, fetched_at"
+                    )
+                    .is_("analyzed_at", "null")
+                    .order("id")
+                    .range(offset, range_end)
+                )
+
+                if hours is not None:
+                    cutoff_time = (
+                        datetime.now() - timedelta(hours=hours)
+                    ).isoformat()
+                    query = query.gte("fetched_at", cutoff_time)
+
+                result = query.execute()
+                batch = result.data or []
+                if not batch:
+                    break
+
+                articles.extend(batch)
+                if len(batch) < page_size:
+                    break
+
+                offset += page_size
+
+            if limit is not None:
+                articles = articles[:limit]
+
+            self.stats["articles_loaded"] = len(articles)
+            logger.info(f"加载了 {len(articles)} 篇未分析文章")
+            return articles
+        except Exception as e:
+            logger.error(f"加载全部未分析文章失败: {e}")
+            self.stats["errors"] += 1
+            return []
+
     async def fetch_external_data(self) -> dict:
         """获取外部数据源"""
         start_time = time.time()
@@ -456,9 +518,7 @@ class EnhancedAnalyzer(HotspotAnalyzer):
             step2_start = time.time()
             logger.info("[STEP_2] 开始运行基础分析（全量完整分析并发）...")
 
-            articles = self.load_unanalyzed_articles(
-                limit=limit if limit else 500, hours=None
-            )
+            articles = self._load_all_unanalyzed_articles(limit=limit, hours=None)
             if not articles:
                 logger.warning("[STEP_2_SKIP] 没有未分析的文章，结束分析")
                 if enrich_signals_after_run and not dry_run:
