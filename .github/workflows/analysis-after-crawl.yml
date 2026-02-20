@@ -50,17 +50,13 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
           ALIBABA_API_KEY: ${{ secrets.ALIBABA_API_KEY }}
-          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
           PYTHONUNBUFFERED: "1"
         run: |
           python -u scripts/enhanced_analyzer.py \
-            --workers 5 \
             --enrich-signals-after-run \
-            --enrich-workers 5 \
-            --notify-l34-after-run \
-            --notify-hours 24 \
-            --notify-limit 80 \
-            --notify-cooldown-minutes 30
+            --enrich-hours 24 \
+            --enrich-limit 30 \
+            --enrich-workers 5
 
       - name: Summarize latest L3/L4 signals
         env:
