@@ -1,0 +1,95 @@
+name: Enhanced Analysis After Crawl
+
+on:
+  workflow_run:
+    workflows:
+      - RSS Crawler
+    types:
+      - completed
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.workflow_run.head_branch || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  enhanced-analysis:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Validate LLM secrets
+        env:
+          DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
+          ALIBABA_API_KEY: ${{ secrets.ALIBABA_API_KEY }}
+        run: |
+          if [ -z "$DASHSCOPE_API_KEY" ] && [ -z "$ALIBABA_API_KEY" ]; then
+            echo "::error::Missing DASHSCOPE_API_KEY / ALIBABA_API_KEY. LLM enhancement cannot run."
+            exit 1
+          fi
+
+      - name: Run enhanced analyzer
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          WORKER_URL: ${{ secrets.WORKER_URL }}
+          RAILWAY_URL: ${{ secrets.RAILWAY_URL }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
+          ALIBABA_API_KEY: ${{ secrets.ALIBABA_API_KEY }}
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/enhanced_analyzer.py \
+            --workers 5 \
+            --enrich-signals-after-run \
+            --enrich-workers 5 \
+            --notify-l34-after-run \
+            --notify-hours 24 \
+            --notify-limit 80 \
+            --notify-cooldown-minutes 30
+
+      - name: Summarize latest L3/L4 signals
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: |
+          python - <<'PY'
+          from datetime import datetime, timedelta
+          from supabase import create_client
+          import os
+
+          supabase = create_client(
+              os.getenv("SUPABASE_URL", ""),
+              os.getenv("SUPABASE_KEY", ""),
+          )
+          cutoff = (datetime.utcnow() - timedelta(hours=24)).isoformat()
+          result = (
+              supabase.table("analysis_signals")
+              .select("id", count="exact")
+              .eq("signal_type", "watchlist_alert")
+              .in_("alert_level", ["L3", "L4"])
+              .gte("created_at", cutoff)
+              .execute()
+          )
+          count = int(result.count or 0)
+
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
+              f.write("## Sentinel Signals (Last 24h)\n")
+              f.write(f"- L3/L4 alerts: **{count}**\n")
+              f.write(f"- Cutoff(UTC): `{cutoff}`\n")
+          print(f"L3/L4 alerts in last 24h: {count}")
+          PY
