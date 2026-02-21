@@ -236,15 +236,17 @@ class StockPipelineV2:
         content: str,
         base_direction: str,
         base_strength: float,
-    ) -> Tuple[str, float, str, bool]:
+    ) -> Tuple[str, float, str, bool, str, str]:
         """使用 LLM 修正方向/强度，失败时自动回退。"""
         if not self.llm_client:
-            return base_direction, base_strength, title[:160], False
+            short = title[:160]
+            return base_direction, base_strength, short, False, short, short
 
         prompt = (
-            "你是美股事件分析器。根据标题和正文判断交易方向与强度。"
+            "你是美股事件分析器。根据标题和正文判断交易方向与强度，并翻译成中文。"
             "请只输出 JSON："
-            "{\"direction\":\"LONG|SHORT|NEUTRAL\",\"strength\":0-1,\"summary\":\"<=60字\"}。\n"
+            "{\"direction\":\"LONG|SHORT|NEUTRAL\",\"strength\":0-1,"
+            "\"title_zh\":\"<=40字\",\"summary_zh\":\"<=80字\"}。\n"
             f"标题: {title[:220]}\n"
             f"正文摘要: {content[:1200]}\n"
             f"规则基线: direction={base_direction}, strength={base_strength:.2f}"
@@ -256,11 +258,16 @@ class StockPipelineV2:
                 direction = base_direction
             llm_strength = _clamp(_safe_float(result.get("strength"), base_strength), 0.0, 1.0)
             strength = _clamp(base_strength * 0.7 + llm_strength * 0.3, 0.0, 1.0)
-            summary = str(result.get("summary") or title).strip()[:180]
-            return direction, strength, summary, True
+            title_zh = str(result.get("title_zh") or "").strip()[:180]
+            summary_zh = str(
+                result.get("summary_zh") or result.get("summary") or title
+            ).strip()[:220]
+            summary = summary_zh or title[:180]
+            return direction, strength, summary, True, (title_zh or title[:180]), summary
         except Exception as e:
             logger.warning(f"[V2_LLM_FALLBACK] error={str(e)[:120]}")
-            return base_direction, base_strength, title[:160], False
+            short = title[:160]
+            return base_direction, base_strength, short, False, short, short
 
     def _load_articles_batch(
         self,
@@ -272,7 +279,7 @@ class StockPipelineV2:
             self.supabase.table("articles")
             .select("id,title,content,url,category,source_id,published_at,fetched_at,analyzed_at")
             .not_.is_("analyzed_at", "null")
-            .order("id")
+            .order("id", desc=True)
             .range(offset, offset + batch_size - 1)
         )
         if fetched_after:
@@ -334,6 +341,8 @@ class StockPipelineV2:
                         "source_id": article.get("source_id"),
                         "bias": round(bias, 4),
                         "llm_used": False,
+                        "title_zh": "",
+                        "summary_zh": "",
                     },
                     "published_at": published_at,
                     "as_of": now_iso,
@@ -387,7 +396,7 @@ class StockPipelineV2:
             for future in as_completed(future_map):
                 event_idx = future_map[future]
                 try:
-                    direction, strength, summary, llm_used = future.result()
+                    direction, strength, summary, llm_used, title_zh, summary_zh = future.result()
                 except Exception:
                     continue
                 row = event_rows[event_idx]
@@ -396,6 +405,8 @@ class StockPipelineV2:
                 row["summary"] = summary
                 details = row.get("details") or {}
                 details["llm_used"] = bool(llm_used)
+                details["title_zh"] = str(title_zh or details.get("title") or "")[:180]
+                details["summary_zh"] = str(summary_zh or summary or "")[:220]
                 row["details"] = details
                 if llm_used:
                     used_count += 1

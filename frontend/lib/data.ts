@@ -938,10 +938,19 @@ async function queryV2HotClusters(client: SupabaseClient): Promise<HotCluster[]>
       const details = (latest.details && typeof latest.details === "object" && !Array.isArray(latest.details))
         ? latest.details as Record<string, unknown>
         : {};
-      const title = String(details.title || latest.summary || `${eventType} 事件簇`).trim();
+      const title = String(
+        details.title_zh || details.title || details.summary_zh || latest.summary || `${eventType} 事件簇`
+      ).trim();
       const summary = items
         .slice(0, 3)
-        .map((item) => String(item.summary || "").trim())
+        .map((item) => {
+          const itemDetails = (
+            item.details
+            && typeof item.details === "object"
+            && !Array.isArray(item.details)
+          ) ? item.details as Record<string, unknown> : {};
+          return String(itemDetails.summary_zh || item.summary || "").trim();
+        })
         .filter((item) => item.length > 0)
         .join("；");
 
