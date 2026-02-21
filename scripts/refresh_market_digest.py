@@ -86,6 +86,7 @@ FRED_SERIES = {
     "us10y": "DGS10",
     "dxy": "DTWEXBGS",
 }
+_ANALYSIS_SIGNALS_HAS_DETAILS: bool | None = None
 
 
 def _init_supabase():
@@ -248,31 +249,21 @@ def _build_daily_brief(
 
 
 def _load_recent_signals(supabase, cutoff_iso: str, limit: int) -> List[Dict[str, Any]]:
-    try:
-        result = (
-            supabase.table("analysis_signals")
-            .select(
+    global _ANALYSIS_SIGNALS_HAS_DETAILS
+
+    def _query(include_details: bool) -> List[Dict[str, Any]]:
+        select_fields = (
+            "id,cluster_id,sentinel_id,alert_level,risk_score,description,"
+            "trigger_reasons,evidence_links,created_at"
+        )
+        if include_details:
+            select_fields = (
                 "id,cluster_id,sentinel_id,alert_level,risk_score,description,"
                 "trigger_reasons,evidence_links,details,created_at"
             )
-            .eq("signal_type", "watchlist_alert")
-            .gte("created_at", cutoff_iso)
-            .order("created_at", desc=True)
-            .limit(limit)
-            .execute()
-        )
-        return result.data or []
-    except Exception as e:
-        logger.warning(
-            "[MARKET_DIGEST_SCHEMA_FALLBACK] analysis_signals 缺少 details 字段，"
-            f"降级查询: {str(e)[:120]}"
-        )
         result = (
             supabase.table("analysis_signals")
-            .select(
-                "id,cluster_id,sentinel_id,alert_level,risk_score,description,"
-                "trigger_reasons,evidence_links,created_at"
-            )
+            .select(select_fields)
             .eq("signal_type", "watchlist_alert")
             .gte("created_at", cutoff_iso)
             .order("created_at", desc=True)
@@ -280,6 +271,24 @@ def _load_recent_signals(supabase, cutoff_iso: str, limit: int) -> List[Dict[str
             .execute()
         )
         return result.data or []
+
+    if _ANALYSIS_SIGNALS_HAS_DETAILS is False:
+        return _query(include_details=False)
+
+    try:
+        rows = _query(include_details=True)
+        _ANALYSIS_SIGNALS_HAS_DETAILS = True
+        return rows
+    except Exception as e:
+        error_text = str(e)
+        is_missing_column = "42703" in error_text or "analysis_signals.details" in error_text
+        if not is_missing_column:
+            raise
+        _ANALYSIS_SIGNALS_HAS_DETAILS = False
+        logger.info(
+            "[MARKET_DIGEST_SCHEMA_COMPAT] analysis_signals 无 details 字段，使用兼容查询。"
+        )
+        return _query(include_details=False)
 
 
 def _load_recent_clusters(supabase, cutoff_iso: str, limit: int) -> List[Dict[str, Any]]:
