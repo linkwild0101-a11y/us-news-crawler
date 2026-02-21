@@ -269,37 +269,39 @@ def get_css():
         background: transparent !important;
     }}
     [data-baseweb="popover"] [role="listbox"] {{
-        background: var(--bg-panel) !important;
-        border: 1px solid var(--border) !important;
+        background: #0f172a !important;
+        border: 1px solid #8bd3ff !important;
         border-radius: 10px !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55) !important;
     }}
     [data-baseweb="popover"] [role="option"] {{
-        background: transparent !important;
-        color: var(--text-main) !important;
+        background: #0f172a !important;
+        color: #f8fafc !important;
         opacity: 1 !important;
-        font-weight: 500 !important;
+        font-weight: 600 !important;
     }}
     [data-baseweb="popover"] [role="option"]:hover {{
-        background: rgba(139, 211, 255, 0.16) !important;
-        color: var(--text-main) !important;
+        background: #1e3a5f !important;
+        color: #ffffff !important;
     }}
     [data-baseweb="popover"] [aria-selected="true"][role="option"] {{
-        background: rgba(41, 240, 255, 0.18) !important;
-        color: var(--text-main) !important;
+        background: #2d5b8f !important;
+        color: #ffffff !important;
     }}
     /* 兼容不同版本 BaseWeb 菜单节点 */
     [role="listbox"],
     ul[role="listbox"] {{
-        background: var(--bg-panel) !important;
-        color: var(--text-main) !important;
+        background: #0f172a !important;
+        color: #f8fafc !important;
+        border: 1px solid #8bd3ff !important;
     }}
     [role="option"] {{
-        color: var(--text-main) !important;
+        color: #f8fafc !important;
+        background: #0f172a !important;
     }}
     [role="option"][aria-disabled="true"] {{
-        color: var(--text-muted) !important;
-        opacity: 0.75 !important;
+        color: #cbd5e1 !important;
+        opacity: 0.95 !important;
     }}
     
     /* 单选按钮 */
@@ -365,17 +367,30 @@ def get_css():
     }}
     /* 元素工具栏按钮（截图中右上角）提高对比度 */
     [data-testid="stElementToolbar"] {{
-        background: var(--bg-panel) !important;
-        border: 1px solid var(--border) !important;
+        background: #0f172a !important;
+        border: 1px solid #8bd3ff !important;
         border-radius: 10px !important;
     }}
     [data-testid="stElementToolbar"] button {{
-        background: transparent !important;
-        color: var(--text-main) !important;
+        background: #111c34 !important;
+        color: #f8fafc !important;
+        border: 1px solid #8bd3ff !important;
+        opacity: 1 !important;
+        filter: none !important;
+    }}
+    [data-testid="stElementToolbar"] button:hover {{
+        background: #1d3557 !important;
+        color: #ffffff !important;
     }}
     [data-testid="stElementToolbar"] svg {{
-        fill: var(--text-main) !important;
-        stroke: var(--text-main) !important;
+        fill: #f8fafc !important;
+        stroke: #f8fafc !important;
+        opacity: 1 !important;
+        filter: none !important;
+    }}
+    [data-testid="stElementToolbar"] svg path {{
+        fill: #f8fafc !important;
+        stroke: #f8fafc !important;
         opacity: 1 !important;
     }}
     /* Vega/Altair tooltip 对比度修复 */
