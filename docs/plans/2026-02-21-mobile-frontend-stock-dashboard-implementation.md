@@ -8,7 +8,8 @@
 - [x] 新建 `frontend/`（Next.js + Tailwind + Supabase 只读）
 - [x] 搭建四个移动端 Tab（市场/哨兵/看板/新闻）
 - [x] 增加 PWA 基础清单（manifest + icon）
-- [ ] 连接 Cloudflare Pages（需在平台控制台完成）
+- [x] 连接 Cloudflare Pages（项目: `us-monitor-mobile-dashboard`）
+- [x] 增加 GitHub Actions 自动部署（`deploy-mobile-frontend.yml`）
 
 ## Phase 2（已启动）
 

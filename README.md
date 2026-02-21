@@ -118,6 +118,8 @@ npm run dev
 - `WORKER_URL`: Cloudflare Worker URL（部署后获得）
 - `RAILWAY_URL`: Railway RSS 代理地址（可选，建议配置）
 - `WORLDMONITOR_BASE_URL`: worldmonitor API 基础地址（可选）
+- `NEXT_PUBLIC_SUPABASE_URL`: 前端只读 Supabase URL（用于移动端自动部署）
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: 前端只读 Supabase anon key（用于移动端自动部署）
 
 ## Cloudflare Worker 部署
 
