@@ -365,49 +365,9 @@ def get_css():
         border: 1px solid var(--border);
         border-radius: 10px;
     }}
-    /* 元素工具栏按钮（截图中右上角）高对比度 */
+    /* 隐藏元素工具栏（命令模式下对比度不稳定，影响可读性） */
     [data-testid="stElementToolbar"] {{
-        background: #ffffff !important;
-        border: 2px solid #0f172a !important;
-        border-radius: 12px !important;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35) !important;
-        padding: 2px !important;
-    }}
-    [data-testid="stElementToolbar"] button {{
-        background: #ffffff !important;
-        color: #0f172a !important;
-        border: 1px solid #0f172a !important;
-        border-radius: 10px !important;
-        min-width: 34px !important;
-        min-height: 34px !important;
-        opacity: 1 !important;
-        filter: none !important;
-    }}
-    [data-testid="stElementToolbar"] button:hover {{
-        background: #0f172a !important;
-        color: #ffffff !important;
-    }}
-    [data-testid="stElementToolbar"] button svg {{
-        width: 18px !important;
-        height: 18px !important;
-        opacity: 1 !important;
-        filter: none !important;
-    }}
-    [data-testid="stElementToolbar"] button svg * {{
-        fill: currentColor !important;
-        stroke: currentColor !important;
-        opacity: 1 !important;
-    }}
-    [role="tooltip"],
-    [data-baseweb="tooltip"] {{
-        background: #0f172a !important;
-        color: #ffffff !important;
-        border: 1px solid #93c5fd !important;
-    }}
-    [role="tooltip"] *,
-    [data-baseweb="tooltip"] * {{
-        color: #ffffff !important;
-        opacity: 1 !important;
+        display: none !important;
     }}
     /* Vega/Altair tooltip 对比度修复 */
     .vg-tooltip,
