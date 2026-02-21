@@ -1,0 +1,61 @@
+export type RiskLevel = "L0" | "L1" | "L2" | "L3" | "L4";
+
+export interface MarketSnapshot {
+  snapshot_date: string;
+  spy: number | null;
+  qqq: number | null;
+  dia: number | null;
+  vix: number | null;
+  us10y: number | null;
+  dxy: number | null;
+  risk_level: RiskLevel;
+  daily_brief: string;
+  updated_at: string;
+}
+
+export interface SentinelSignal {
+  id: number;
+  sentinel_id: string;
+  alert_level: RiskLevel;
+  risk_score: number;
+  description: string;
+  trigger_reasons: string[];
+  evidence_links: string[];
+  created_at: string;
+}
+
+export interface TickerSignalDigest {
+  ticker: string;
+  signal_count_24h: number;
+  related_cluster_count_24h: number;
+  risk_level: RiskLevel;
+  top_sentinel_levels: string[];
+  updated_at: string;
+}
+
+export interface HotCluster {
+  id: number;
+  category: string;
+  primary_title: string;
+  summary: string;
+  article_count: number;
+  created_at: string;
+}
+
+export interface EntityRelationItem {
+  id: number;
+  entity1_name: string;
+  entity2_name: string;
+  relation_text: string;
+  confidence: number;
+  last_seen: string;
+}
+
+export interface DashboardData {
+  marketSnapshot: MarketSnapshot;
+  sentinelSignals: SentinelSignal[];
+  tickerDigest: TickerSignalDigest[];
+  hotClusters: HotCluster[];
+  relations: EntityRelationItem[];
+  dataUpdatedAt: string;
+}

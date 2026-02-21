@@ -58,6 +58,16 @@ jobs:
             --enrich-limit 30 \
             --enrich-workers 5
 
+      - name: Refresh market digest aggregates
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/refresh_market_digest.py \
+            --hours 24 \
+            --limit 500
+
       - name: Summarize latest L3/L4 signals
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

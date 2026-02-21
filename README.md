@@ -38,6 +38,7 @@
 │   └── schema.sql            # 数据库表结构
 ├── workers/
 │   └── content-extractor/    # Cloudflare Worker
+├── frontend/                 # Next.js 移动端看板
 ├── .github/
 │   └── workflows/
 │       └── crawler.yml       # GitHub Actions
@@ -91,6 +92,21 @@ python scripts/import_sources.py
 
 ```bash
 python scripts/crawler.py
+```
+
+### 6. 刷新移动端聚合摘要（可选）
+
+```bash
+python scripts/refresh_market_digest.py --hours 24 --limit 500
+```
+
+### 7. 本地启动移动端前端（可选）
+
+```bash
+cd frontend
+cp .env.example .env.local
+npm install
+npm run dev
 ```
 
 ## GitHub Actions 配置
