@@ -367,30 +367,47 @@ def get_css():
     }}
     /* 元素工具栏按钮（截图中右上角）提高对比度 */
     [data-testid="stElementToolbar"] {{
-        background: #0f172a !important;
-        border: 1px solid #8bd3ff !important;
-        border-radius: 10px !important;
+        background: #020817 !important;
+        border: 1px solid #93c5fd !important;
+        border-radius: 12px !important;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55) !important;
+        padding: 2px !important;
     }}
     [data-testid="stElementToolbar"] button {{
-        background: #111c34 !important;
-        color: #f8fafc !important;
-        border: 1px solid #8bd3ff !important;
+        background: #0b1224 !important;
+        color: #ffffff !important;
+        border: 1px solid #60a5fa !important;
+        border-radius: 10px !important;
+        min-width: 34px !important;
+        min-height: 34px !important;
         opacity: 1 !important;
         filter: none !important;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18) !important;
     }}
     [data-testid="stElementToolbar"] button:hover {{
-        background: #1d3557 !important;
+        background: #1e3a8a !important;
         color: #ffffff !important;
+        border-color: #bfdbfe !important;
+    }}
+    [data-testid="stElementToolbar"] * {{
+        color: #ffffff !important;
+        opacity: 1 !important;
     }}
     [data-testid="stElementToolbar"] svg {{
-        fill: #f8fafc !important;
-        stroke: #f8fafc !important;
+        fill: #ffffff !important;
+        stroke: #ffffff !important;
         opacity: 1 !important;
         filter: none !important;
+        width: 18px !important;
+        height: 18px !important;
     }}
     [data-testid="stElementToolbar"] svg path {{
-        fill: #f8fafc !important;
-        stroke: #f8fafc !important;
+        fill: #ffffff !important;
+        stroke: #ffffff !important;
+        opacity: 1 !important;
+    }}
+    [data-testid="stElementToolbar"] img {{
+        filter: brightness(0) invert(1) contrast(1.4) !important;
         opacity: 1 !important;
     }}
     /* Vega/Altair tooltip 对比度修复 */
