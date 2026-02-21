@@ -56,7 +56,7 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.enable_llm }}" != "true" ]; then
             llm_flag=""
           elif [ -n "$DASHSCOPE_API_KEY" ] || [ -n "$ALIBABA_API_KEY" ]; then
-            llm_flag="--enable-llm --llm-event-cap 80"
+            llm_flag="--enable-llm --llm-event-cap 80 --llm-workers 10"
           fi
           printf "llm_flag=%s\n" "$llm_flag" >> "$GITHUB_OUTPUT"
 

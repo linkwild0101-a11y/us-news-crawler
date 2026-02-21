@@ -9,6 +9,7 @@ import logging
 import os
 import re
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
@@ -164,10 +165,11 @@ def _hash_text(text: str) -> str:
 class StockPipelineV2:
     """Stock V2 增量/回填引擎。"""
 
-    def __init__(self, enable_llm: bool = False):
+    def __init__(self, enable_llm: bool = False, llm_workers: int = 1):
         self.supabase = self._init_supabase()
         self.enable_llm = enable_llm
         self.llm_client = self._init_llm_client(enable_llm)
+        self.llm_workers = max(1, llm_workers)
         self.stats: Dict[str, int] = defaultdict(int)
 
     def _init_supabase(self) -> Client:
@@ -286,7 +288,7 @@ class StockPipelineV2:
     ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], int]:
         event_rows: List[Dict[str, Any]] = []
         raw_map_rows: List[Dict[str, Any]] = []
-        llm_used_count = 0
+        llm_candidates: List[Tuple[int, str, str, str, float]] = []
 
         for article in articles:
             self.stats["articles_seen"] += 1
@@ -309,18 +311,6 @@ class StockPipelineV2:
             direction = base_direction
             strength = base_strength
             summary = title or "美股事件"
-            llm_used = False
-
-            if llm_budget > 0:
-                direction, strength, summary, llm_used = self._llm_adjust(
-                    title=title,
-                    content=content,
-                    base_direction=base_direction,
-                    base_strength=base_strength,
-                )
-                if llm_used:
-                    llm_used_count += 1
-                    llm_budget -= 1
 
             article_id = int(article.get("id") or 0)
             event_key = f"article:{article_id}:{_hash_text(title)}"
@@ -343,7 +333,7 @@ class StockPipelineV2:
                         "category": article.get("category"),
                         "source_id": article.get("source_id"),
                         "bias": round(bias, 4),
-                        "llm_used": llm_used,
+                        "llm_used": False,
                     },
                     "published_at": published_at,
                     "as_of": now_iso,
@@ -351,6 +341,10 @@ class StockPipelineV2:
                     "is_active": True,
                 }
             )
+            event_idx = len(event_rows) - 1
+            if self.llm_client and llm_budget > 0:
+                llm_candidates.append((event_idx, title, content, base_direction, base_strength))
+                llm_budget -= 1
 
             for ticker in sorted(tickers):
                 raw_map_rows.append(
@@ -365,7 +359,47 @@ class StockPipelineV2:
                     }
                 )
 
+        llm_used_count = self._apply_llm_adjustments(event_rows, llm_candidates)
         return event_rows, raw_map_rows, llm_used_count
+
+    def _apply_llm_adjustments(
+        self,
+        event_rows: List[Dict[str, Any]],
+        llm_candidates: List[Tuple[int, str, str, str, float]],
+    ) -> int:
+        if not self.llm_client or not llm_candidates:
+            return 0
+
+        used_count = 0
+        worker_count = min(self.llm_workers, len(llm_candidates))
+
+        with ThreadPoolExecutor(max_workers=worker_count) as executor:
+            future_map = {
+                executor.submit(
+                    self._llm_adjust,
+                    title,
+                    content,
+                    base_direction,
+                    base_strength,
+                ): event_idx
+                for event_idx, title, content, base_direction, base_strength in llm_candidates
+            }
+            for future in as_completed(future_map):
+                event_idx = future_map[future]
+                try:
+                    direction, strength, summary, llm_used = future.result()
+                except Exception:
+                    continue
+                row = event_rows[event_idx]
+                row["direction"] = direction
+                row["strength"] = round(strength, 4)
+                row["summary"] = summary
+                details = row.get("details") or {}
+                details["llm_used"] = bool(llm_used)
+                row["details"] = details
+                if llm_used:
+                    used_count += 1
+        return used_count
 
     def _upsert_events(
         self,
@@ -850,9 +884,10 @@ def main() -> None:
     parser.add_argument("--lookback-hours", type=int, default=168, help="信号聚合回看小时")
     parser.add_argument("--enable-llm", action="store_true", help="启用 LLM 修正")
     parser.add_argument("--llm-event-cap", type=int, default=60, help="本轮最多 LLM 事件数")
+    parser.add_argument("--llm-workers", type=int, default=1, help="LLM 并发 worker 数")
     args = parser.parse_args()
 
-    engine = StockPipelineV2(enable_llm=args.enable_llm)
+    engine = StockPipelineV2(enable_llm=args.enable_llm, llm_workers=args.llm_workers)
     if args.mode == "incremental":
         metrics = engine.run_incremental(
             hours=args.hours,
