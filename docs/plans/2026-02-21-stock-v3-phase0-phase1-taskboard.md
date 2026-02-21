@@ -23,7 +23,9 @@
 - [x] P1-1 Provider Registry 规格文档
 - [x] P1-2 Source Health 指标定义文档
 - [x] P1-3 Research Run Contract 规格文档
-- [ ] P1-4~P1-8 执行中
+- [x] P1-4 V3 基础表 migration 草案
+- [x] P1-5 Run Logger 最小实现（flag 控制）
+- [ ] P1-6~P1-8 执行中
 
 ---
 

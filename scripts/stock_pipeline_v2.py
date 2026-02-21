@@ -181,6 +181,102 @@ class StockPipelineV2:
             f"ENABLE_STOCK_V3_PAPER={self.flags.enable_stock_v3_paper}"
         )
 
+    def _build_v3_params(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        merged = dict(params)
+        merged["enable_llm"] = self.enable_llm
+        merged["llm_workers"] = self.llm_workers
+        merged["flag_enable_stock_v3_run_log"] = self.flags.enable_stock_v3_run_log
+        merged["flag_enable_stock_v3_eval"] = self.flags.enable_stock_v3_eval
+        merged["flag_enable_stock_v3_paper"] = self.flags.enable_stock_v3_paper
+        return merged
+
+    def _v3_log_run_start(
+        self,
+        run_id: str,
+        pipeline_name: str,
+        started_at: datetime,
+        input_window: Dict[str, Any],
+        params_json: Dict[str, Any],
+    ) -> None:
+        if not self.flags.enable_stock_v3_run_log:
+            return
+        payload = {
+            "run_id": run_id,
+            "pipeline_name": pipeline_name,
+            "pipeline_version": os.getenv("GITHUB_SHA", "")[:12] or "local",
+            "trigger_type": os.getenv("GITHUB_EVENT_NAME", "manual"),
+            "status": "running",
+            "started_at": started_at.isoformat(),
+            "input_window": input_window,
+            "params_json": params_json,
+            "commit_sha": os.getenv("GITHUB_SHA", "")[:40],
+            "as_of": _now_utc().isoformat(),
+        }
+        try:
+            self.supabase.table("research_runs").upsert(
+                payload,
+                on_conflict="run_id",
+            ).execute()
+        except Exception as e:
+            logger.warning(f"[V3_RUN_LOG_START_FAILED] run_id={run_id} error={str(e)[:120]}")
+
+    def _v3_log_run_finish(
+        self,
+        run_id: str,
+        started_at: datetime,
+        status: str,
+        metrics: Dict[str, Any],
+        notes: str = "",
+    ) -> None:
+        if not self.flags.enable_stock_v3_run_log:
+            return
+
+        ended_at = _now_utc()
+        duration_sec = max(0, int((ended_at - started_at).total_seconds()))
+        status = status if status in ("success", "failed", "degraded") else "failed"
+
+        try:
+            (
+                self.supabase.table("research_runs")
+                .update(
+                    {
+                        "status": status,
+                        "ended_at": ended_at.isoformat(),
+                        "duration_sec": duration_sec,
+                        "notes": notes[:1000],
+                        "as_of": ended_at.isoformat(),
+                    }
+                )
+                .eq("run_id", run_id)
+                .execute()
+            )
+        except Exception as e:
+            logger.warning(f"[V3_RUN_LOG_FINISH_FAILED] run_id={run_id} error={str(e)[:120]}")
+
+        rows = []
+        for key, value in metrics.items():
+            try:
+                number = float(value)
+            except Exception:
+                continue
+            rows.append(
+                {
+                    "run_id": run_id,
+                    "metric_name": str(key)[:64],
+                    "metric_value": number,
+                    "metric_unit": "count",
+                }
+            )
+        if not rows:
+            return
+        try:
+            self.supabase.table("research_run_metrics").upsert(
+                rows,
+                on_conflict="run_id,metric_name",
+            ).execute()
+        except Exception as e:
+            logger.warning(f"[V3_RUN_METRICS_FAILED] run_id={run_id} error={str(e)[:120]}")
+
     def _init_supabase(self) -> Client:
         url = os.getenv("SUPABASE_URL")
         key = os.getenv("SUPABASE_KEY")
@@ -765,67 +861,104 @@ class StockPipelineV2:
     ) -> Dict[str, Any]:
         """执行增量计算。"""
         run_id = f"inc-{_now_utc().strftime('%Y%m%d%H%M%S')}"
+        run_started_at = _now_utc()
         cutoff_iso = (_now_utc() - timedelta(hours=hours)).isoformat()
         logger.info(
             f"[STOCK_V2_INCREMENTAL_START] run_id={run_id} hours={hours} limit={article_limit}"
         )
-
-        offset = 0
-        page_size = 500
-        remaining = article_limit
-        llm_budget = llm_event_cap
-        all_events: List[Dict[str, Any]] = []
-        all_mappings: List[Dict[str, Any]] = []
-
-        while remaining > 0:
-            current_size = min(page_size, remaining)
-            rows = self._load_articles_batch(
-                offset=offset,
-                batch_size=current_size,
-                fetched_after=cutoff_iso,
-            )
-            if not rows:
-                break
-
-            events, mappings, llm_used = self._build_events(
-                rows,
-                run_id=run_id,
-                now_iso=_now_utc().isoformat(),
-                llm_budget=llm_budget,
-            )
-            llm_budget -= llm_used
-            all_events.extend(events)
-            all_mappings.extend(mappings)
-
-            offset += current_size
-            remaining -= len(rows)
-            if len(rows) < current_size:
-                break
-
-        event_count = 0
-        mapping_count = 0
-        if all_events:
-            event_count, mapping_count = self._upsert_events(all_events, all_mappings)
-        else:
-            logger.warning("[STOCK_V2_NO_EVENTS] 本轮未发现可用事件")
-
-        serve_stats = self.refresh_serve_layer(run_id=run_id, lookback_hours=lookback_hours)
-        logger.info(
-            "[STOCK_V2_INCREMENTAL_DONE] "
-            f"articles_seen={self.stats['articles_seen']} "
-            f"stock_articles={self.stats['articles_stock_related']} "
-            f"events={event_count} mappings={mapping_count} "
-            f"signals={serve_stats['signals']} opps={serve_stats['opportunities']}"
+        self._v3_log_run_start(
+            run_id=run_id,
+            pipeline_name="stock_pipeline_v2_incremental",
+            started_at=run_started_at,
+            input_window={
+                "hours": hours,
+                "article_limit": article_limit,
+                "lookback_hours": lookback_hours,
+            },
+            params_json=self._build_v3_params(
+                {
+                    "mode": "incremental",
+                    "llm_event_cap": llm_event_cap,
+                }
+            ),
         )
-        return {
-            "run_id": run_id,
-            "articles_seen": self.stats["articles_seen"],
-            "stock_articles": self.stats["articles_stock_related"],
-            "events_upserted": event_count,
-            "mappings_upserted": mapping_count,
-            "signals_written": serve_stats["signals"],
-            "opportunities_written": serve_stats["opportunities"],
-        }
+
+        try:
+            offset = 0
+            page_size = 500
+            remaining = article_limit
+            llm_budget = llm_event_cap
+            all_events: List[Dict[str, Any]] = []
+            all_mappings: List[Dict[str, Any]] = []
+
+            while remaining > 0:
+                current_size = min(page_size, remaining)
+                rows = self._load_articles_batch(
+                    offset=offset,
+                    batch_size=current_size,
+                    fetched_after=cutoff_iso,
+                )
+                if not rows:
+                    break
+
+                events, mappings, llm_used = self._build_events(
+                    rows,
+                    run_id=run_id,
+                    now_iso=_now_utc().isoformat(),
+                    llm_budget=llm_budget,
+                )
+                llm_budget -= llm_used
+                all_events.extend(events)
+                all_mappings.extend(mappings)
+
+                offset += current_size
+                remaining -= len(rows)
+                if len(rows) < current_size:
+                    break
+
+            event_count = 0
+            mapping_count = 0
+            if all_events:
+                event_count, mapping_count = self._upsert_events(all_events, all_mappings)
+            else:
+                logger.warning("[STOCK_V2_NO_EVENTS] 本轮未发现可用事件")
+
+            serve_stats = self.refresh_serve_layer(run_id=run_id, lookback_hours=lookback_hours)
+            logger.info(
+                "[STOCK_V2_INCREMENTAL_DONE] "
+                f"articles_seen={self.stats['articles_seen']} "
+                f"stock_articles={self.stats['articles_stock_related']} "
+                f"events={event_count} mappings={mapping_count} "
+                f"signals={serve_stats['signals']} opps={serve_stats['opportunities']}"
+            )
+            metrics = {
+                "run_id": run_id,
+                "articles_seen": self.stats["articles_seen"],
+                "stock_articles": self.stats["articles_stock_related"],
+                "events_upserted": event_count,
+                "mappings_upserted": mapping_count,
+                "signals_written": serve_stats["signals"],
+                "opportunities_written": serve_stats["opportunities"],
+            }
+            self._v3_log_run_finish(
+                run_id=run_id,
+                started_at=run_started_at,
+                status="success",
+                metrics=metrics,
+            )
+            return metrics
+        except Exception as e:
+            self._v3_log_run_finish(
+                run_id=run_id,
+                started_at=run_started_at,
+                status="failed",
+                metrics={
+                    "articles_seen": self.stats["articles_seen"],
+                    "stock_articles": self.stats["articles_stock_related"],
+                },
+                notes=str(e),
+            )
+            raise
 
     def run_backfill(
         self,
@@ -836,62 +969,103 @@ class StockPipelineV2:
     ) -> Dict[str, Any]:
         """执行全量回填。"""
         run_id = f"backfill-{_now_utc().strftime('%Y%m%d%H%M%S')}"
+        run_started_at = _now_utc()
         logger.info(
             f"[STOCK_V2_BACKFILL_START] run_id={run_id} batch={batch_size} max={max_articles}"
         )
-
-        offset = 0
-        processed = 0
-        llm_budget = llm_event_cap
-        total_events = 0
-        total_mappings = 0
-
-        while True:
-            if max_articles is not None and processed >= max_articles:
-                break
-            current_size = batch_size
-            if max_articles is not None:
-                current_size = min(batch_size, max_articles - processed)
-            rows = self._load_articles_batch(offset=offset, batch_size=current_size, fetched_after=None)
-            if not rows:
-                break
-
-            events, mappings, llm_used = self._build_events(
-                rows,
-                run_id=run_id,
-                now_iso=_now_utc().isoformat(),
-                llm_budget=llm_budget,
-            )
-            llm_budget -= llm_used
-
-            event_count, mapping_count = self._upsert_events(events, mappings)
-            total_events += event_count
-            total_mappings += mapping_count
-            processed += len(rows)
-            offset += current_size
-
-            logger.info(
-                f"[STOCK_V2_BACKFILL_PROGRESS] processed={processed} events={total_events}"
-            )
-            if len(rows) < current_size:
-                break
-
-        serve_stats = self.refresh_serve_layer(run_id=run_id, lookback_hours=lookback_hours)
-        logger.info(
-            "[STOCK_V2_BACKFILL_DONE] "
-            f"processed={processed} stock_articles={self.stats['articles_stock_related']} "
-            f"events={total_events} signals={serve_stats['signals']} "
-            f"opps={serve_stats['opportunities']}"
+        self._v3_log_run_start(
+            run_id=run_id,
+            pipeline_name="stock_pipeline_v2_backfill",
+            started_at=run_started_at,
+            input_window={
+                "batch_size": batch_size,
+                "max_articles": max_articles,
+                "lookback_hours": lookback_hours,
+            },
+            params_json=self._build_v3_params(
+                {
+                    "mode": "backfill",
+                    "llm_event_cap": llm_event_cap,
+                }
+            ),
         )
-        return {
-            "run_id": run_id,
-            "processed_articles": processed,
-            "stock_articles": self.stats["articles_stock_related"],
-            "events_upserted": total_events,
-            "mappings_upserted": total_mappings,
-            "signals_written": serve_stats["signals"],
-            "opportunities_written": serve_stats["opportunities"],
-        }
+
+        try:
+            offset = 0
+            processed = 0
+            llm_budget = llm_event_cap
+            total_events = 0
+            total_mappings = 0
+
+            while True:
+                if max_articles is not None and processed >= max_articles:
+                    break
+                current_size = batch_size
+                if max_articles is not None:
+                    current_size = min(batch_size, max_articles - processed)
+                rows = self._load_articles_batch(
+                    offset=offset,
+                    batch_size=current_size,
+                    fetched_after=None,
+                )
+                if not rows:
+                    break
+
+                events, mappings, llm_used = self._build_events(
+                    rows,
+                    run_id=run_id,
+                    now_iso=_now_utc().isoformat(),
+                    llm_budget=llm_budget,
+                )
+                llm_budget -= llm_used
+
+                event_count, mapping_count = self._upsert_events(events, mappings)
+                total_events += event_count
+                total_mappings += mapping_count
+                processed += len(rows)
+                offset += current_size
+
+                logger.info(
+                    f"[STOCK_V2_BACKFILL_PROGRESS] processed={processed} events={total_events}"
+                )
+                if len(rows) < current_size:
+                    break
+
+            serve_stats = self.refresh_serve_layer(run_id=run_id, lookback_hours=lookback_hours)
+            logger.info(
+                "[STOCK_V2_BACKFILL_DONE] "
+                f"processed={processed} stock_articles={self.stats['articles_stock_related']} "
+                f"events={total_events} signals={serve_stats['signals']} "
+                f"opps={serve_stats['opportunities']}"
+            )
+            metrics = {
+                "run_id": run_id,
+                "processed_articles": processed,
+                "stock_articles": self.stats["articles_stock_related"],
+                "events_upserted": total_events,
+                "mappings_upserted": total_mappings,
+                "signals_written": serve_stats["signals"],
+                "opportunities_written": serve_stats["opportunities"],
+            }
+            self._v3_log_run_finish(
+                run_id=run_id,
+                started_at=run_started_at,
+                status="success",
+                metrics=metrics,
+            )
+            return metrics
+        except Exception as e:
+            self._v3_log_run_finish(
+                run_id=run_id,
+                started_at=run_started_at,
+                status="failed",
+                metrics={
+                    "processed_articles": self.stats["articles_seen"],
+                    "stock_articles": self.stats["articles_stock_related"],
+                },
+                notes=str(e),
+            )
+            raise
 
 
 def main() -> None:
