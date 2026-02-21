@@ -20,7 +20,10 @@
 - [x] P0-1 冻结 V2 基线（tag: `stock-v2-baseline-2026-02-21`）
 - [x] P0-2 接入 V3 feature flags（默认关闭）
 - [x] P0-3 周报/Gate 模板落盘
-- [ ] Phase 1 任务执行中
+- [x] P1-1 Provider Registry 规格文档
+- [x] P1-2 Source Health 指标定义文档
+- [x] P1-3 Research Run Contract 规格文档
+- [ ] P1-4~P1-8 执行中
 
 ---
 
