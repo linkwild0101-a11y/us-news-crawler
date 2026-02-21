@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 
+import { MetricHint } from "@/components/metric-hint";
+import { METRIC_EXPLANATIONS, MetricKey } from "@/lib/metric-explanations";
 import {
   DashboardData,
   OpportunityItem,
@@ -98,6 +100,15 @@ function rankOpportunities(items: OpportunityItem[]): OpportunityItem[] {
   });
 }
 
+function LabelWithHint({ label, hintKey }: { label: string; hintKey: MetricKey }) {
+  return (
+    <span className="inline-flex items-center">
+      {label}
+      <MetricHint explanation={METRIC_EXPLANATIONS[hintKey]} />
+    </span>
+  );
+}
+
 function SignalCard({ signal }: { signal: SentinelSignal }) {
   return (
     <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
@@ -109,7 +120,9 @@ function SignalCard({ signal }: { signal: SentinelSignal }) {
       </div>
       <p className="text-sm text-textMain">{signal.description}</p>
       {signal.trigger_reasons.length > 0 && (
-        <p className="mt-2 text-xs text-textMuted">触发: {signal.trigger_reasons.slice(0, 2).join("；")}</p>
+        <p className="mt-2 text-xs text-textMuted">
+          <LabelWithHint label="触发" hintKey="trigger_reasons" />: {signal.trigger_reasons.slice(0, 2).join("；")}
+        </p>
       )}
       <div className="mt-2 text-xs text-textMuted">{formatTime(signal.created_at)}</div>
     </article>
@@ -139,17 +152,23 @@ function OpportunityCard({ item }: { item: OpportunityItem }) {
 
       <div className="mb-3 grid grid-cols-2 gap-2 text-sm">
         <div className="rounded-lg bg-card/70 p-2">
-          <div className="text-xs text-textMuted">机会分</div>
+          <div className="text-xs text-textMuted">
+            <LabelWithHint label="机会分" hintKey="opportunity_score" />
+          </div>
           <div className="mt-1 font-semibold">{item.opportunity_score.toFixed(1)}</div>
         </div>
         <div className="rounded-lg bg-card/70 p-2">
-          <div className="text-xs text-textMuted">置信度</div>
+          <div className="text-xs text-textMuted">
+            <LabelWithHint label="置信度" hintKey="confidence" />
+          </div>
           <div className="mt-1 font-semibold">{Math.round(item.confidence * 100)}%</div>
         </div>
       </div>
 
       <p className="text-sm leading-6 text-textMain">{item.why_now}</p>
-      <p className="mt-2 text-xs leading-5 text-textMuted">失效条件: {item.invalid_if}</p>
+      <p className="mt-2 text-xs leading-5 text-textMuted">
+        <LabelWithHint label="失效条件" hintKey="invalid_if" />: {item.invalid_if}
+      </p>
 
       {item.catalysts.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
@@ -192,11 +211,13 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
             <h1 className="text-xl font-semibold">US-Monitor 美股机会看板</h1>
             <p className="mt-1 text-xs text-textMuted">数据更新时间: {formatTime(data.dataUpdatedAt)}</p>
             {data.marketRegime?.summary && (
-              <p className="mt-2 text-xs text-textMuted">市场状态: {data.marketRegime.summary}</p>
+              <p className="mt-2 text-xs text-textMuted">
+                <LabelWithHint label="市场状态" hintKey="market_state_summary" />: {data.marketRegime.summary}
+              </p>
             )}
           </div>
           <span className={`rounded-md border px-2 py-1 text-xs font-semibold ${levelClass(data.marketSnapshot.risk_level)}`}>
-            风险 {data.marketSnapshot.risk_level}
+            <LabelWithHint label={`风险 ${data.marketSnapshot.risk_level}`} hintKey="dashboard_risk_level" />
           </span>
         </div>
       </header>
@@ -222,21 +243,29 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
         <section className="space-y-4">
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
-              <div className="text-xs text-textMuted">总机会数</div>
+              <div className="text-xs text-textMuted">
+                <LabelWithHint label="总机会数" hintKey="total_opportunities" />
+              </div>
               <div className="mt-1 text-lg font-semibold">{opportunities.length}</div>
             </article>
             <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
-              <div className="text-xs text-textMuted">Horizon A</div>
+              <div className="text-xs text-textMuted">
+                <LabelWithHint label="Horizon A" hintKey="horizon_a" />
+              </div>
               <div className="mt-1 text-lg font-semibold">
                 {opportunities.filter((item) => item.horizon === "A").length}
               </div>
             </article>
             <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
-              <div className="text-xs text-textMuted">LONG</div>
+              <div className="text-xs text-textMuted">
+                <LabelWithHint label="LONG" hintKey="long_count" />
+              </div>
               <div className="mt-1 text-lg font-semibold text-riskLow">{longOpportunities.length}</div>
             </article>
             <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
-              <div className="text-xs text-textMuted">SHORT</div>
+              <div className="text-xs text-textMuted">
+                <LabelWithHint label="SHORT" hintKey="short_count" />
+              </div>
               <div className="mt-1 text-lg font-semibold text-riskHigh">{shortOpportunities.length}</div>
             </article>
           </div>
@@ -264,27 +293,39 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
         <section className="space-y-4">
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
             <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
-              <div className="text-xs text-textMuted">SPY</div>
+              <div className="text-xs text-textMuted">
+                <LabelWithHint label="SPY" hintKey="spy" />
+              </div>
               <div className="mt-1 text-lg font-semibold">{formatNumber(data.marketSnapshot.spy)}</div>
             </article>
             <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
-              <div className="text-xs text-textMuted">QQQ</div>
+              <div className="text-xs text-textMuted">
+                <LabelWithHint label="QQQ" hintKey="qqq" />
+              </div>
               <div className="mt-1 text-lg font-semibold">{formatNumber(data.marketSnapshot.qqq)}</div>
             </article>
             <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
-              <div className="text-xs text-textMuted">DIA</div>
+              <div className="text-xs text-textMuted">
+                <LabelWithHint label="DIA" hintKey="dia" />
+              </div>
               <div className="mt-1 text-lg font-semibold">{formatNumber(data.marketSnapshot.dia)}</div>
             </article>
             <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
-              <div className="text-xs text-textMuted">VIX</div>
+              <div className="text-xs text-textMuted">
+                <LabelWithHint label="VIX" hintKey="vix" />
+              </div>
               <div className="mt-1 text-lg font-semibold">{formatNumber(data.marketSnapshot.vix)}</div>
             </article>
             <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
-              <div className="text-xs text-textMuted">10Y</div>
+              <div className="text-xs text-textMuted">
+                <LabelWithHint label="10Y" hintKey="us10y" />
+              </div>
               <div className="mt-1 text-lg font-semibold">{formatNumber(data.marketSnapshot.us10y)}</div>
             </article>
             <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
-              <div className="text-xs text-textMuted">DXY</div>
+              <div className="text-xs text-textMuted">
+                <LabelWithHint label="DXY" hintKey="dxy" />
+              </div>
               <div className="mt-1 text-lg font-semibold">{formatNumber(data.marketSnapshot.dxy)}</div>
             </article>
           </div>
@@ -301,7 +342,9 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
                     </span>
                   </div>
                   <div className="text-xs text-textMuted">
-                    24h 信号 {row.signal_count_24h} · 关联热点 {row.related_cluster_count_24h}
+                    <LabelWithHint label="24h 信号" hintKey="signal_count_24h" /> {row.signal_count_24h}
+                    {" · "}
+                    <LabelWithHint label="关联热点" hintKey="related_cluster_count_24h" /> {row.related_cluster_count_24h}
                   </div>
                 </div>
               ))}
@@ -313,7 +356,10 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
       {activeTab === "signals" && (
         <section className="space-y-4">
           <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
-            <h2 className="mb-3 text-sm font-semibold">最新 L1-L4 哨兵（仅美股相关）</h2>
+            <h2 className="mb-3 text-sm font-semibold">
+              最新 L1-L4 哨兵（仅美股相关）
+              <MetricHint explanation={METRIC_EXPLANATIONS.sentinel_level_score} />
+            </h2>
             <div className="grid gap-3 sm:grid-cols-2">
               {topSignals.length > 0 ? (
                 topSignals.map((signal) => <SignalCard key={signal.id} signal={signal} />)
@@ -336,7 +382,11 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
                     <p className="text-sm font-medium">{cluster.primary_title}</p>
                     <p className="mt-1 line-clamp-3 text-xs text-textMuted">{cluster.summary}</p>
                     <div className="mt-2 text-xs text-textMuted">
-                      {cluster.category} · {cluster.article_count} 篇 · {formatTime(cluster.created_at)}
+                      {cluster.category}
+                      {" · "}
+                      <LabelWithHint label={`${cluster.article_count} 篇`} hintKey="cluster_article_count" />
+                      {" · "}
+                      {formatTime(cluster.created_at)}
                     </div>
                   </div>
                 ))
@@ -359,7 +409,9 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
                     </p>
                     <p className="mt-1 text-xs text-textMuted">{relation.relation_text}</p>
                     <p className="mt-1 text-xs text-textMuted">
-                      置信度 {Math.round(relation.confidence * 100)} · {formatTime(relation.last_seen)}
+                      <LabelWithHint label={`置信度 ${Math.round(relation.confidence * 100)}`} hintKey="relation_confidence" />
+                      {" · "}
+                      {formatTime(relation.last_seen)}
                     </p>
                   </div>
                 ))
