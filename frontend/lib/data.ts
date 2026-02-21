@@ -194,6 +194,15 @@ function toNumberMap(value: unknown): Record<string, number> {
   return result;
 }
 
+function stableIdFromText(text: string): number {
+  let hash = 0;
+  for (let i = 0; i < text.length; i += 1) {
+    hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0;
+  }
+  const positive = Math.abs(hash);
+  return positive === 0 ? 1 : positive;
+}
+
 function collectTickerTokens(text: string): string[] {
   const matches = text.toUpperCase().match(TICKER_PATTERN) || [];
   return matches.filter((token) => STOCK_TICKERS.has(token));
@@ -883,6 +892,182 @@ function buildTickerDigestFromSignals(signals: SentinelSignal[]): TickerSignalDi
     .sort((a, b) => b.signal_count_24h - a.signal_count_24h);
 }
 
+function buildTickerDigestFromV2(
+  signals: SentinelSignal[],
+  opportunities: OpportunityItem[]
+): TickerSignalDigest[] {
+  const fromSignals = buildTickerDigestFromSignals(signals);
+  if (fromSignals.length > 0) {
+    return fromSignals;
+  }
+
+  return opportunities.slice(0, 20).map((item) => ({
+    ticker: item.ticker,
+    signal_count_24h: Math.max(1, item.source_signal_ids.length),
+    related_cluster_count_24h: item.source_cluster_ids.length,
+    risk_level: item.risk_level,
+    top_sentinel_levels: [item.risk_level],
+    updated_at: item.as_of
+  }));
+}
+
+async function queryV2HotClusters(client: SupabaseClient): Promise<HotCluster[]> {
+  try {
+    const { data, error } = await client
+      .from("stock_events_v2")
+      .select("id,event_type,summary,details,as_of")
+      .eq("is_active", true)
+      .order("as_of", { ascending: false })
+      .limit(240);
+
+    if (error) {
+      throw error;
+    }
+
+    const rows = (data || []) as unknown as Array<Record<string, unknown>>;
+    const grouped = new Map<string, Array<Record<string, unknown>>>();
+    for (const row of rows) {
+      const eventType = String(row.event_type || "news").toLowerCase();
+      const current = grouped.get(eventType) || [];
+      current.push(row);
+      grouped.set(eventType, current);
+    }
+
+    const clusters: HotCluster[] = Array.from(grouped.entries()).map(([eventType, items]) => {
+      const latest = items[0] || {};
+      const details = (latest.details && typeof latest.details === "object" && !Array.isArray(latest.details))
+        ? latest.details as Record<string, unknown>
+        : {};
+      const title = String(details.title || latest.summary || `${eventType} 事件簇`).trim();
+      const summary = items
+        .slice(0, 3)
+        .map((item) => String(item.summary || "").trim())
+        .filter((item) => item.length > 0)
+        .join("；");
+
+      return {
+        id: Number(latest.id || 0),
+        category: eventType,
+        primary_title: title || `${eventType} 事件簇`,
+        summary: summary || "暂无摘要",
+        article_count: items.length,
+        created_at: toIsoString(latest.as_of)
+      };
+    });
+
+    clusters.sort((a, b) => {
+      if (b.article_count !== a.article_count) {
+        return b.article_count - a.article_count;
+      }
+      return b.created_at.localeCompare(a.created_at);
+    });
+
+    return clusters.slice(0, 20);
+  } catch (error) {
+    console.warn("[FRONTEND_V2_CLUSTER_FALLBACK]", error);
+    return [];
+  }
+}
+
+async function queryV2Relations(client: SupabaseClient): Promise<EntityRelationItem[]> {
+  try {
+    const { data: eventRows, error: eventError } = await client
+      .from("stock_events_v2")
+      .select("id,as_of")
+      .eq("is_active", true)
+      .order("as_of", { ascending: false })
+      .limit(300);
+
+    if (eventError) {
+      throw eventError;
+    }
+    const eventList = (eventRows || []) as unknown as Array<Record<string, unknown>>;
+    const eventIds = eventList
+      .map((item) => Number(item.id || 0))
+      .filter((item) => item > 0);
+    if (eventIds.length === 0) {
+      return [];
+    }
+    const eventTimeMap = new Map(
+      eventList.map((item) => [Number(item.id || 0), toIsoString(item.as_of)])
+    );
+
+    const { data: mapRows, error: mapError } = await client
+      .from("stock_event_tickers_v2")
+      .select("event_id,ticker,confidence")
+      .in("event_id", eventIds);
+
+    if (mapError) {
+      throw mapError;
+    }
+
+    const tickerMap = new Map<number, Array<{ ticker: string; confidence: number }>>();
+    for (const row of (mapRows || []) as unknown as Array<Record<string, unknown>>) {
+      const eventId = Number(row.event_id || 0);
+      if (eventId <= 0) {
+        continue;
+      }
+      const ticker = String(row.ticker || "").toUpperCase().trim();
+      if (!ticker) {
+        continue;
+      }
+      const bucket = tickerMap.get(eventId) || [];
+      bucket.push({ ticker, confidence: toScore(row.confidence) });
+      tickerMap.set(eventId, bucket);
+    }
+
+    const pairStats = new Map<string, { count: number; confidence: number; last_seen: string }>();
+    for (const [eventId, rows] of tickerMap.entries()) {
+      const uniqueTickers = Array.from(new Set(rows.map((item) => item.ticker))).sort();
+      if (uniqueTickers.length < 2) {
+        continue;
+      }
+      const avgConfidence = rows.reduce((acc, item) => acc + item.confidence, 0) / rows.length;
+      const lastSeen = eventTimeMap.get(eventId) || new Date().toISOString();
+      for (let i = 0; i < uniqueTickers.length - 1; i += 1) {
+        for (let j = i + 1; j < uniqueTickers.length; j += 1) {
+          const key = `${uniqueTickers[i]}|${uniqueTickers[j]}`;
+          const prev = pairStats.get(key);
+          if (!prev) {
+            pairStats.set(key, { count: 1, confidence: avgConfidence, last_seen: lastSeen });
+            continue;
+          }
+          prev.count += 1;
+          prev.confidence = (prev.confidence + avgConfidence) / 2;
+          if (lastSeen > prev.last_seen) {
+            prev.last_seen = lastSeen;
+          }
+          pairStats.set(key, prev);
+        }
+      }
+    }
+
+    return Array.from(pairStats.entries())
+      .map(([key, value]) => {
+        const [left, right] = key.split("|");
+        const confidence = Math.max(0, Math.min(1, 0.45 + value.count * 0.08 + value.confidence * 0.2));
+        return {
+          id: stableIdFromText(key),
+          entity1_name: left,
+          entity2_name: right,
+          relation_text: `同一美股事件中共同出现 ${value.count} 次`,
+          confidence,
+          last_seen: value.last_seen
+        };
+      })
+      .sort((a, b) => {
+        if (b.confidence !== a.confidence) {
+          return b.confidence - a.confidence;
+        }
+        return b.last_seen.localeCompare(a.last_seen);
+      })
+      .slice(0, 20);
+  } catch (error) {
+    console.warn("[FRONTEND_V2_RELATION_FALLBACK]", error);
+    return [];
+  }
+}
+
 async function getDashboardDataFromV2(client: SupabaseClient): Promise<DashboardData | null> {
   const [sentinelSignals, opportunities, marketRegime, v2Snapshot] = await Promise.all([
     queryV2Signals(client),
@@ -895,17 +1080,19 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
     return null;
   }
 
-  const tickerDigest = buildTickerDigestFromSignals(sentinelSignals);
+  const tickerDigest = buildTickerDigestFromV2(sentinelSignals, opportunities);
   const focusTickers = new Set(opportunities.map((item) => item.ticker));
   const filteredSignals = focusTickers.size
     ? sentinelSignals.filter((item) => signalMentionsTicker(item, focusTickers))
     : sentinelSignals;
 
-  const [marketSnapshotRaw, hotClusters, relations] = await Promise.all([
+  const [marketSnapshotRaw, v2HotClusters, v2Relations] = await Promise.all([
     queryMarketSnapshot(client, filteredSignals),
-    queryHotClusters(client, filteredSignals, opportunities),
-    queryEntityRelations(client)
+    queryV2HotClusters(client),
+    queryV2Relations(client)
   ]);
+  const hotClusters = v2HotClusters;
+  const relations = v2Relations;
 
   const marketSnapshot: MarketSnapshot = {
     ...marketSnapshotRaw,
