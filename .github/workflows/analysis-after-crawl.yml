@@ -89,68 +89,32 @@ jobs:
             --hours 168 \
             --limit 1200
 
+      - name: Collect source health snapshot (V3 optional)
+        if: ${{ env.ENABLE_STOCK_V3_RUN_LOG == 'true' || env.ENABLE_STOCK_V3_EVAL == 'true' || env.ENABLE_STOCK_V3_PAPER == 'true' }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/source_health_collector_v3.py \
+            --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+            --hours 24
+
       - name: Summarize Stock V2 metrics
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
         run: |
           duration=$(( $(date +%s) - ${PIPELINE_START_TS:-0} ))
-          export STOCK_V2_DURATION_SEC="$duration"
-          python - <<'PY'
-          import os
-          from datetime import datetime, timezone
-          from supabase import create_client
-
-          supabase = create_client(
-              os.getenv("SUPABASE_URL", ""),
-              os.getenv("SUPABASE_KEY", ""),
-          )
-
-          def count_rows(table: str, **filters):
-              query = supabase.table(table).select("id", count="exact")
-              for key, value in filters.items():
-                  query = query.eq(key, value)
-              result = query.limit(1).execute()
-              return int(result.count or 0)
-
-          signals_total = count_rows("stock_signals_v2", is_active=True)
-          opp_total = count_rows("stock_opportunities_v2", is_active=True)
-          long_total = count_rows("stock_opportunities_v2", is_active=True, side="LONG")
-          short_total = count_rows("stock_opportunities_v2", is_active=True, side="SHORT")
-          snapshot = (
-              supabase.table("stock_dashboard_snapshot_v2")
-              .select("snapshot_time,data_health")
-              .eq("is_active", True)
-              .order("snapshot_time", desc=True)
-              .limit(1)
-              .maybe_single()
-              .execute()
-          )
-          snapshot_time = ""
-          if snapshot and snapshot.data:
-              snapshot_time = str(snapshot.data.get("snapshot_time") or "")
-
-          duration_sec = int(os.getenv("STOCK_V2_DURATION_SEC") or 0)
-          generated_at = datetime.now(timezone.utc).isoformat()
-
-          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
-              f.write("## Stock V2 Metrics\n")
-              f.write(f"- Signals(active): **{signals_total}**\n")
-              f.write(f"- Opportunities(active): **{opp_total}**\n")
-              f.write(f"- LONG / SHORT: **{long_total} / {short_total}**\n")
-              f.write(f"- Pipeline duration: **{duration_sec}s**\n")
-              f.write(f"- Latest snapshot: `{snapshot_time}`\n")
-              f.write(f"- Generated at(UTC): `{generated_at}`\n")
-
-          print(
-              "Stock V2 metrics:",
-              f"signals={signals_total}",
-              f"opportunities={opp_total}",
-              f"long={long_total}",
-              f"short={short_total}",
-              f"duration_sec={duration_sec}",
-          )
-          PY
+          python -u scripts/stock_run_summary_v3.py \
+            --duration-sec "$duration" \
+            --health-date "$(date -u +%F)" \
+            --health-run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
 
   legacy-fallback-analysis:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.legacy_fallback == true }}
