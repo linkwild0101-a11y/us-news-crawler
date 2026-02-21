@@ -52,7 +52,36 @@ export interface EntityRelationItem {
   last_seen: string;
 }
 
+export interface OpportunityItem {
+  id: number;
+  ticker: string;
+  side: "LONG" | "SHORT";
+  horizon: "A" | "B";
+  opportunity_score: number;
+  confidence: number;
+  risk_level: RiskLevel;
+  why_now: string;
+  invalid_if: string;
+  catalysts: string[];
+  factor_breakdown: Record<string, number>;
+  source_signal_ids: number[];
+  source_cluster_ids: number[];
+  expires_at: string;
+  as_of: string;
+}
+
+export interface MarketRegime {
+  regime_date: string;
+  risk_state: string;
+  vol_state: string;
+  liquidity_state: string;
+  regime_score: number;
+  summary: string;
+}
+
 export interface DashboardData {
+  opportunities: OpportunityItem[];
+  marketRegime: MarketRegime | null;
   marketSnapshot: MarketSnapshot;
   sentinelSignals: SentinelSignal[];
   tickerDigest: TickerSignalDigest[];

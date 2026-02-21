@@ -68,6 +68,17 @@ jobs:
             --hours 24 \
             --limit 500
 
+      - name: Refresh opportunity engine
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/refresh_opportunities.py \
+            --hours 48 \
+            --limit 800 \
+            --topn 40
+
       - name: Summarize latest L3/L4 signals
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

@@ -2,15 +2,21 @@
 
 import { useMemo, useState } from "react";
 
-import { DashboardData, RiskLevel, SentinelSignal, TickerSignalDigest } from "@/lib/types";
+import {
+  DashboardData,
+  OpportunityItem,
+  RiskLevel,
+  SentinelSignal,
+  TickerSignalDigest
+} from "@/lib/types";
 
-type DashboardTab = "market" | "signals" | "stocks" | "news";
+type DashboardTab = "opportunities" | "market" | "signals" | "evidence";
 
 const TABS: { id: DashboardTab; label: string; icon: string }[] = [
+  { id: "opportunities", label: "机会", icon: "🎯" },
   { id: "market", label: "市场", icon: "📈" },
-  { id: "signals", label: "哨兵", icon: "🚨" },
-  { id: "stocks", label: "看板", icon: "🧭" },
-  { id: "news", label: "新闻", icon: "📰" }
+  { id: "signals", label: "信号", icon: "🚨" },
+  { id: "evidence", label: "证据", icon: "🧩" }
 ];
 
 function levelClass(level: RiskLevel): string {
@@ -21,6 +27,20 @@ function levelClass(level: RiskLevel): string {
     return "text-riskMid bg-amber-500/10 border-amber-300/30";
   }
   return "text-riskLow bg-emerald-500/10 border-emerald-300/30";
+}
+
+function sideClass(side: OpportunityItem["side"]): string {
+  if (side === "LONG") {
+    return "text-riskLow bg-emerald-500/10 border-emerald-300/30";
+  }
+  return "text-riskHigh bg-red-500/10 border-red-400/30";
+}
+
+function horizonClass(horizon: OpportunityItem["horizon"]): string {
+  if (horizon === "A") {
+    return "text-accent bg-cyan-500/10 border-cyan-300/30";
+  }
+  return "text-textMuted bg-slate-500/10 border-slate-300/30";
 }
 
 function formatNumber(value: number | null, digits = 2): string {
@@ -66,6 +86,18 @@ function rankTicker(items: TickerSignalDigest[]): TickerSignalDigest[] {
   });
 }
 
+function rankOpportunities(items: OpportunityItem[]): OpportunityItem[] {
+  return [...items].sort((a, b) => {
+    if (a.horizon !== b.horizon) {
+      return a.horizon === "A" ? -1 : 1;
+    }
+    if (b.opportunity_score !== a.opportunity_score) {
+      return b.opportunity_score - a.opportunity_score;
+    }
+    return b.confidence - a.confidence;
+  });
+}
+
 function SignalCard({ signal }: { signal: SentinelSignal }) {
   return (
     <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
@@ -84,11 +116,71 @@ function SignalCard({ signal }: { signal: SentinelSignal }) {
   );
 }
 
+function OpportunityCard({ item }: { item: OpportunityItem }) {
+  return (
+    <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
+      <div className="mb-3 flex items-start justify-between gap-3">
+        <div>
+          <h3 className="text-lg font-semibold">{item.ticker}</h3>
+          <p className="mt-1 text-xs text-textMuted">更新 {formatTime(item.as_of)}</p>
+        </div>
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <span className={`rounded-md border px-2 py-0.5 text-xs font-semibold ${sideClass(item.side)}`}>
+            {item.side}
+          </span>
+          <span className={`rounded-md border px-2 py-0.5 text-xs font-semibold ${horizonClass(item.horizon)}`}>
+            H{item.horizon}
+          </span>
+          <span className={`rounded-md border px-2 py-0.5 text-xs font-semibold ${levelClass(item.risk_level)}`}>
+            {item.risk_level}
+          </span>
+        </div>
+      </div>
+
+      <div className="mb-3 grid grid-cols-2 gap-2 text-sm">
+        <div className="rounded-lg bg-card/70 p-2">
+          <div className="text-xs text-textMuted">机会分</div>
+          <div className="mt-1 font-semibold">{item.opportunity_score.toFixed(1)}</div>
+        </div>
+        <div className="rounded-lg bg-card/70 p-2">
+          <div className="text-xs text-textMuted">置信度</div>
+          <div className="mt-1 font-semibold">{Math.round(item.confidence * 100)}%</div>
+        </div>
+      </div>
+
+      <p className="text-sm leading-6 text-textMain">{item.why_now}</p>
+      <p className="mt-2 text-xs leading-5 text-textMuted">失效条件: {item.invalid_if}</p>
+
+      {item.catalysts.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {item.catalysts.slice(0, 3).map((catalyst) => (
+            <span
+              key={`${item.id}-${catalyst}`}
+              className="rounded-md border border-slate-600/70 bg-card/70 px-2 py-1 text-xs text-textMuted"
+            >
+              {catalyst}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-3 text-xs text-textMuted">
+        信号证据 {item.source_signal_ids.length} · 聚类证据 {item.source_cluster_ids.length} · 到期
+        {" "}
+        {formatTime(item.expires_at)}
+      </div>
+    </article>
+  );
+}
+
 export function MobileDashboard({ data }: { data: DashboardData }) {
-  const [activeTab, setActiveTab] = useState<DashboardTab>("market");
+  const [activeTab, setActiveTab] = useState<DashboardTab>("opportunities");
 
   const rankedTicker = useMemo(() => rankTicker(data.tickerDigest), [data.tickerDigest]);
-  const topSignals = data.sentinelSignals.slice(0, 10);
+  const opportunities = useMemo(() => rankOpportunities(data.opportunities), [data.opportunities]);
+  const longOpportunities = opportunities.filter((item) => item.side === "LONG");
+  const shortOpportunities = opportunities.filter((item) => item.side === "SHORT");
+  const topSignals = data.sentinelSignals.slice(0, 16);
   const topClusters = data.hotClusters.slice(0, 12);
   const topRelations = data.relations.slice(0, 10);
 
@@ -97,8 +189,11 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
       <header className="mb-4 rounded-2xl border border-slate-700/80 bg-panel p-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-xl font-semibold">US-Monitor 移动看板</h1>
+            <h1 className="text-xl font-semibold">US-Monitor 美股机会看板</h1>
             <p className="mt-1 text-xs text-textMuted">数据更新时间: {formatTime(data.dataUpdatedAt)}</p>
+            {data.marketRegime?.summary && (
+              <p className="mt-2 text-xs text-textMuted">市场状态: {data.marketRegime.summary}</p>
+            )}
           </div>
           <span className={`rounded-md border px-2 py-1 text-xs font-semibold ${levelClass(data.marketSnapshot.risk_level)}`}>
             风险 {data.marketSnapshot.risk_level}
@@ -122,6 +217,48 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
           </button>
         ))}
       </nav>
+
+      {activeTab === "opportunities" && (
+        <section className="space-y-4">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
+              <div className="text-xs text-textMuted">总机会数</div>
+              <div className="mt-1 text-lg font-semibold">{opportunities.length}</div>
+            </article>
+            <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
+              <div className="text-xs text-textMuted">Horizon A</div>
+              <div className="mt-1 text-lg font-semibold">
+                {opportunities.filter((item) => item.horizon === "A").length}
+              </div>
+            </article>
+            <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
+              <div className="text-xs text-textMuted">LONG</div>
+              <div className="mt-1 text-lg font-semibold text-riskLow">{longOpportunities.length}</div>
+            </article>
+            <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
+              <div className="text-xs text-textMuted">SHORT</div>
+              <div className="mt-1 text-lg font-semibold text-riskHigh">{shortOpportunities.length}</div>
+            </article>
+          </div>
+
+          <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
+            <div className="mb-2 text-sm font-semibold">机会简报</div>
+            <p className="text-sm leading-6 text-textMain">{data.marketSnapshot.daily_brief}</p>
+          </article>
+
+          {opportunities.length > 0 ? (
+            <div className="grid gap-3 lg:grid-cols-2">
+              {opportunities.map((item) => (
+                <OpportunityCard key={item.id} item={item} />
+              ))}
+            </div>
+          ) : (
+            <article className="rounded-xl border border-slate-700/80 bg-panel p-4 text-sm text-textMuted">
+              暂无可交易机会，建议等待新的美股催化信号。
+            </article>
+          )}
+        </section>
+      )}
 
       {activeTab === "market" && (
         <section className="space-y-4">
@@ -151,70 +288,47 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
               <div className="mt-1 text-lg font-semibold">{formatNumber(data.marketSnapshot.dxy)}</div>
             </article>
           </div>
+
           <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
-            <div className="mb-2 text-sm font-semibold">当日简报</div>
-            <p className="text-sm leading-6 text-textMain">{data.marketSnapshot.daily_brief}</p>
-          </article>
-          <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
-            <div className="mb-3 text-sm font-semibold">最新 L1-L4 信号</div>
+            <h2 className="mb-3 text-sm font-semibold">股票信号热度</h2>
             <div className="grid gap-3 sm:grid-cols-2">
-              {topSignals.length > 0 ? (
-                topSignals.slice(0, 4).map((signal) => <SignalCard key={signal.id} signal={signal} />)
-              ) : (
-                <p className="text-sm text-textMuted">暂无信号</p>
-              )}
+              {rankedTicker.slice(0, 10).map((row) => (
+                <div key={row.ticker} className="rounded-lg border border-slate-700/80 bg-card/40 p-3">
+                  <div className="mb-2 flex items-center justify-between">
+                    <div className="font-semibold">{row.ticker}</div>
+                    <span className={`rounded-md border px-2 py-0.5 text-xs font-semibold ${levelClass(row.risk_level)}`}>
+                      {row.risk_level}
+                    </span>
+                  </div>
+                  <div className="text-xs text-textMuted">
+                    24h 信号 {row.signal_count_24h} · 关联热点 {row.related_cluster_count_24h}
+                  </div>
+                </div>
+              ))}
             </div>
           </article>
         </section>
       )}
 
       {activeTab === "signals" && (
-        <section className="grid gap-3 sm:grid-cols-2">
-          {topSignals.length > 0 ? (
-            topSignals.map((signal) => <SignalCard key={signal.id} signal={signal} />)
-          ) : (
-            <article className="rounded-xl border border-slate-700/80 bg-panel p-4 text-sm text-textMuted">
-              暂无哨兵告警
-            </article>
-          )}
-        </section>
-      )}
-
-      {activeTab === "stocks" && (
-        <section className="space-y-3">
-          {rankedTicker.map((row) => (
-            <article
-              key={row.ticker}
-              className="rounded-xl border border-slate-700/80 bg-panel p-3"
-            >
-              <div className="mb-2 flex items-center justify-between">
-                <h3 className="text-base font-semibold">{row.ticker}</h3>
-                <span className={`rounded-md border px-2 py-0.5 text-xs font-semibold ${levelClass(row.risk_level)}`}>
-                  {row.risk_level}
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="rounded-lg bg-card/70 p-2">
-                  <div className="text-xs text-textMuted">24h 信号数</div>
-                  <div className="mt-1 font-semibold">{row.signal_count_24h}</div>
-                </div>
-                <div className="rounded-lg bg-card/70 p-2">
-                  <div className="text-xs text-textMuted">关联热点</div>
-                  <div className="mt-1 font-semibold">{row.related_cluster_count_24h}</div>
-                </div>
-              </div>
-              {row.top_sentinel_levels.length > 0 && (
-                <p className="mt-2 text-xs text-textMuted">高频等级: {row.top_sentinel_levels.join(", ")}</p>
-              )}
-            </article>
-          ))}
-        </section>
-      )}
-
-      {activeTab === "news" && (
         <section className="space-y-4">
           <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
-            <h2 className="mb-3 text-sm font-semibold">热点聚类</h2>
+            <h2 className="mb-3 text-sm font-semibold">最新 L1-L4 哨兵（仅美股相关）</h2>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {topSignals.length > 0 ? (
+                topSignals.map((signal) => <SignalCard key={signal.id} signal={signal} />)
+              ) : (
+                <p className="text-sm text-textMuted">暂无美股相关哨兵告警</p>
+              )}
+            </div>
+          </article>
+        </section>
+      )}
+
+      {activeTab === "evidence" && (
+        <section className="space-y-4">
+          <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
+            <h2 className="mb-3 text-sm font-semibold">热点聚类（股票相关）</h2>
             <div className="space-y-3">
               {topClusters.length > 0 ? (
                 topClusters.map((cluster) => (
@@ -227,13 +341,13 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-textMuted">暂无热点聚类</p>
+                <p className="text-sm text-textMuted">暂无股票相关热点聚类</p>
               )}
             </div>
           </article>
 
           <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
-            <h2 className="mb-3 text-sm font-semibold">实体关系</h2>
+            <h2 className="mb-3 text-sm font-semibold">实体关系（股票相关）</h2>
             <div className="space-y-2">
               {topRelations.length > 0 ? (
                 topRelations.map((relation) => (
@@ -250,7 +364,7 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-textMuted">暂无关系数据</p>
+                <p className="text-sm text-textMuted">暂无股票相关关系数据</p>
               )}
             </div>
           </article>
