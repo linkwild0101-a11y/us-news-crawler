@@ -119,7 +119,8 @@ npm run dev
 - `RAILWAY_URL`: Railway RSS 代理地址（可选，建议配置）
 - `WORLDMONITOR_BASE_URL`: worldmonitor API 基础地址（可选）
 
-移动端前端自动部署仅要求 GitHub Secret `CLOUDFLARE_API_TOKEN`，而
+移动端前端自动部署仅要求 GitHub Secret `CLOUDFLARE_API_TOKEN`
+（兼容 `CF_API_TOKEN` / `CLOUDFLARE_TOKEN`），而
 `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` 建议配置在
 Cloudflare Pages 项目环境变量中。
 
