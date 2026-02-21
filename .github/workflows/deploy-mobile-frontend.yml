@@ -24,11 +24,9 @@ jobs:
       - name: Validate required secrets
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
         run: |
           missing=0
-          for key in CLOUDFLARE_API_TOKEN NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY; do
+          for key in CLOUDFLARE_API_TOKEN; do
             if [ -z "${!key}" ]; then
               echo "::error::Missing GitHub secret: ${key}"
               missing=1
@@ -51,9 +49,6 @@ jobs:
 
       - name: Build for Cloudflare Pages
         working-directory: frontend
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
         run: npx @cloudflare/next-on-pages@1
 
       - name: Deploy to Cloudflare Pages

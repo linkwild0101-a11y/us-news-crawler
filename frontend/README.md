@@ -36,5 +36,8 @@ npm run dev
 需要在 GitHub Secrets 中配置：
 
 - `CLOUDFLARE_API_TOKEN`
+
+另外请在 Cloudflare Pages 项目环境变量中配置：
+
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
