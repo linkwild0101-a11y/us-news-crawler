@@ -15,6 +15,7 @@ npm run dev
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_DASHBOARD_V3_EXPLAIN`（可选，默认 `false`）
 
 ## Cloudflare Pages
 
@@ -41,3 +42,4 @@ npm run dev
 
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_DASHBOARD_V3_EXPLAIN`（可选，默认 `false`）

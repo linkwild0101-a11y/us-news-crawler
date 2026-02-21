@@ -28,6 +28,10 @@ jobs:
     if: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || (github.event_name == 'workflow_dispatch' && inputs.legacy_fallback != true) }}
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    env:
+      ENABLE_STOCK_V3_RUN_LOG: ${{ vars.ENABLE_STOCK_V3_RUN_LOG || 'false' }}
+      ENABLE_STOCK_V3_EVAL: ${{ vars.ENABLE_STOCK_V3_EVAL || 'false' }}
+      ENABLE_STOCK_V3_PAPER: ${{ vars.ENABLE_STOCK_V3_PAPER || 'false' }}
 
     steps:
       - uses: actions/checkout@v3

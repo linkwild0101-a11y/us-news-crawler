@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 import { MetricHint } from "@/components/metric-hint";
+import { readDashboardV3ExplainFlag } from "@/lib/feature-flags";
 import { METRIC_EXPLANATIONS, MetricKey } from "@/lib/metric-explanations";
 import {
   DashboardData,
@@ -194,6 +195,7 @@ function OpportunityCard({ item }: { item: OpportunityItem }) {
 
 export function MobileDashboard({ data }: { data: DashboardData }) {
   const [activeTab, setActiveTab] = useState<DashboardTab>("opportunities");
+  const showV3ExplainBadge = readDashboardV3ExplainFlag();
 
   const rankedTicker = useMemo(() => rankTicker(data.tickerDigest), [data.tickerDigest]);
   const opportunities = useMemo(() => rankOpportunities(data.opportunities), [data.opportunities]);
@@ -208,7 +210,14 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
       <header className="mb-4 rounded-2xl border border-slate-700/80 bg-panel p-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-xl font-semibold">US-Monitor 美股机会看板</h1>
+            <h1 className="text-xl font-semibold">
+              US-Monitor 美股机会看板
+              {showV3ExplainBadge && (
+                <span className="ml-2 rounded border border-cyan-400/40 px-1.5 py-0.5 text-[10px] text-accent">
+                  V3 Explain Beta
+                </span>
+              )}
+            </h1>
             <p className="mt-1 text-xs text-textMuted">数据更新时间: {formatTime(data.dataUpdatedAt)}</p>
             {data.marketRegime?.summary && (
               <p className="mt-2 text-xs text-textMuted">

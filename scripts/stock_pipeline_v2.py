@@ -18,6 +18,8 @@ from supabase import Client, create_client
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from scripts.feature_flags import FeatureFlags
+
 try:
     from scripts.llm_client import LLMClient
 except Exception:
@@ -170,7 +172,14 @@ class StockPipelineV2:
         self.enable_llm = enable_llm
         self.llm_client = self._init_llm_client(enable_llm)
         self.llm_workers = max(1, llm_workers)
+        self.flags = FeatureFlags.from_env()
         self.stats: Dict[str, int] = defaultdict(int)
+        logger.info(
+            "[FEATURE_FLAGS] "
+            f"ENABLE_STOCK_V3_RUN_LOG={self.flags.enable_stock_v3_run_log} "
+            f"ENABLE_STOCK_V3_EVAL={self.flags.enable_stock_v3_eval} "
+            f"ENABLE_STOCK_V3_PAPER={self.flags.enable_stock_v3_paper}"
+        )
 
     def _init_supabase(self) -> Client:
         url = os.getenv("SUPABASE_URL")
