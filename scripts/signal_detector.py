@@ -5,11 +5,12 @@
 """
 
 import hashlib
-from typing import List, Dict, Set, Tuple, Optional
+from typing import Any, Dict, List, Optional, Set, Tuple
 from datetime import datetime, timedelta
-from collections import defaultdict, Counter
+from collections import defaultdict
 import sys
 import os
+from urllib.parse import urlparse
 
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -20,6 +21,18 @@ from config.analysis_config import (
     SIGNAL_TYPES,
     SIGNAL_COOLDOWN_HOURS,
 )
+from config.watchlist_config import (
+    HIGH_TRUST_DOMAIN_HINTS,
+    OFFICIAL_DOMAIN_HINTS,
+    OFFICIAL_EFFECTIVE_KEYWORDS,
+    WATCHLIST_HARD_GATES,
+    WATCHLIST_LEVEL_THRESHOLDS,
+    WATCHLIST_REVIEW_WINDOW_MINUTES,
+    WATCHLIST_RISK_WEIGHTS,
+    WATCHLIST_SENTINELS,
+    WATCHLIST_SUGGESTED_ACTIONS,
+)
+from scripts.text_normalizer import contains_any_keyword, normalize_zh_text
 
 
 def generate_signal_id(signal_type: str, cluster_ids: List[str]) -> str:
@@ -63,6 +76,11 @@ def classify_source(source_url: str) -> str:
         来源类型: wire/gov/intel/mainstream/financial/other
     """
     source_lower = source_url.lower()
+    if "://" in source_lower:
+        try:
+            source_lower = urlparse(source_lower).netloc.lower()
+        except Exception:
+            pass
 
     # 通讯社
     wire_agencies = ["reuters", "ap.org", "afp", "bloomberg", "associated press"]
@@ -201,22 +219,24 @@ def detect_convergence(clusters: List[Dict], min_sources: int = None) -> List[Di
     now = datetime.now()
 
     for cluster in clusters:
-        # 这里简化处理，假设每个聚类有sources字段
-        # 实际应该从cluster的articles中获取来源
         source_types = set()
 
-        # 模拟来源分类（实际应该使用真实来源URL）
-        if "sources" in cluster:
-            for source in cluster["sources"]:
+        source_candidates = []
+        if isinstance(cluster.get("source_domains"), list):
+            source_candidates.extend(cluster.get("source_domains", []))
+        if isinstance(cluster.get("sources"), list):
+            source_candidates.extend(cluster.get("sources", []))
+
+        if source_candidates:
+            for source in source_candidates:
                 source_type = classify_source(source)
                 source_types.add(source_type)
         else:
-            # 如果没有来源信息，使用模拟数据
-            # 基于聚类大小推测
+            # 没有来源信息时只给弱兜底，避免虚高分。
             if cluster["article_count"] >= 5:
-                source_types = {"wire", "mainstream", "financial"}
-            elif cluster["article_count"] >= 3:
                 source_types = {"wire", "mainstream"}
+            elif cluster["article_count"] >= 3:
+                source_types = {"mainstream"}
 
         if len(source_types) >= min_sources:
             confidence = min(0.95, 0.6 + (len(source_types) - 2) * 0.1)
@@ -263,15 +283,16 @@ def detect_triangulation(clusters: List[Dict]) -> List[Dict]:
     for cluster in clusters:
         source_types = set()
 
-        # 模拟来源分类
-        if "sources" in cluster:
-            for source in cluster["sources"]:
+        source_candidates = []
+        if isinstance(cluster.get("source_domains"), list):
+            source_candidates.extend(cluster.get("source_domains", []))
+        if isinstance(cluster.get("sources"), list):
+            source_candidates.extend(cluster.get("sources", []))
+
+        if source_candidates:
+            for source in source_candidates:
                 source_type = classify_source(source)
                 source_types.add(source_type)
-        else:
-            # 模拟：假设大聚类有更高概率包含多种来源
-            if cluster["article_count"] >= 4:
-                source_types = {"wire", "gov", "intel", "mainstream"}
 
         # 检查是否包含所有三种必需类型
         if required_types.issubset(source_types):
@@ -399,6 +420,293 @@ def detect_hotspot_escalation(
             signals.append(signal)
 
     return signals
+
+
+def _collect_source_domains(cluster: Dict[str, Any]) -> List[str]:
+    """收集聚类来源域名。"""
+    domains: List[str] = []
+    for key in ("source_domains", "sources"):
+        value = cluster.get(key)
+        if not isinstance(value, list):
+            continue
+        for item in value:
+            if not item:
+                continue
+            text = str(item).strip().lower()
+            if "://" in text:
+                text = urlparse(text).netloc.lower()
+            if text.startswith("www."):
+                text = text[4:]
+            if text and text not in domains:
+                domains.append(text)
+    return domains
+
+
+def _domain_matches(domain: str, hints: List[str]) -> bool:
+    """判断域名是否命中提示列表。"""
+    for hint in hints:
+        hint_lower = hint.lower()
+        if domain.endswith(hint_lower) or hint_lower in domain:
+            return True
+    return False
+
+
+def _determine_alert_level(risk_score: float) -> str:
+    """按阈值映射告警等级。"""
+    if risk_score >= WATCHLIST_LEVEL_THRESHOLDS["L4"]:
+        return "L4"
+    if risk_score >= WATCHLIST_LEVEL_THRESHOLDS["L3"]:
+        return "L3"
+    if risk_score >= WATCHLIST_LEVEL_THRESHOLDS["L2"]:
+        return "L2"
+    if risk_score >= WATCHLIST_LEVEL_THRESHOLDS["L1"]:
+        return "L1"
+    return "L0"
+
+
+def _extract_cluster_text(cluster: Dict[str, Any]) -> str:
+    """拼接用于关键词检测的文本。"""
+    summary = cluster.get("summary", {}) if isinstance(cluster.get("summary"), dict) else {}
+    pieces = [
+        str(cluster.get("primary_title", "")),
+        str(summary.get("summary", "")),
+        str(summary.get("impact", "")),
+        str(summary.get("trend", "")),
+    ]
+    return normalize_zh_text(" ".join([p for p in pieces if p]))
+
+
+def _extract_cluster_entities(cluster: Dict[str, Any]) -> List[str]:
+    """提取聚类实体列表。"""
+    summary = cluster.get("summary", {}) if isinstance(cluster.get("summary"), dict) else {}
+    entities = summary.get("key_entities", [])
+    if isinstance(entities, list):
+        return [str(item) for item in entities if item]
+    return []
+
+
+def _extract_evidence_links(cluster: Dict[str, Any], max_links: int = 5) -> List[str]:
+    """提取证据链接。"""
+    links: List[str] = []
+    primary_link = str(cluster.get("primary_link") or "").strip()
+    if primary_link:
+        links.append(primary_link)
+
+    article_refs = cluster.get("article_refs")
+    if isinstance(article_refs, list):
+        for row in article_refs:
+            if not isinstance(row, dict):
+                continue
+            url = str(row.get("url") or "").strip()
+            if url and url not in links:
+                links.append(url)
+            if len(links) >= max_links:
+                break
+    return links[:max_links]
+
+
+def detect_watchlist_signals(
+    clusters: List[Dict[str, Any]],
+    external_data: Optional[Dict[str, Any]] = None,
+) -> List[Dict[str, Any]]:
+    """
+    检测哨兵告警信号（L1-L4）。
+
+    输出字段对齐哨兵计划：level/risk_score/trigger_reasons/evidence_links。
+    """
+
+    now = datetime.now()
+    hour_bucket = int(now.timestamp() // 3600)
+    results: List[Dict[str, Any]] = []
+    watchlist_external: Dict[str, Any] = {}
+    if isinstance(external_data, dict):
+        gdelt_payload = external_data.get("watchlist_gdelt", {})
+        if isinstance(gdelt_payload, dict):
+            watchlist_external = gdelt_payload
+
+    for sentinel in WATCHLIST_SENTINELS:
+        sentinel_id = str(sentinel.get("id"))
+        sentinel_name = str(sentinel.get("name"))
+        min_groups_hit = int(sentinel.get("min_groups_hit", 1))
+        required_groups = [str(item) for item in sentinel.get("required_groups", [])]
+        keyword_groups = sentinel.get("keyword_groups", {})
+        if not isinstance(keyword_groups, dict):
+            continue
+
+        best_candidate: Optional[Dict[str, Any]] = None
+        matched_cluster_ids: List[str] = []
+
+        for cluster in clusters:
+            text = _extract_cluster_text(cluster)
+            if not text:
+                continue
+
+            hit_groups: List[str] = []
+            for group_name, keywords in keyword_groups.items():
+                if not isinstance(keywords, list):
+                    continue
+                if contains_any_keyword(text, [str(item) for item in keywords]):
+                    hit_groups.append(str(group_name))
+
+            if len(hit_groups) < min_groups_hit:
+                continue
+            if required_groups and not set(required_groups).issubset(set(hit_groups)):
+                continue
+
+            domains = _collect_source_domains(cluster)
+            unique_domains = len(set(domains))
+            official_sources = len(
+                [domain for domain in domains if _domain_matches(domain, OFFICIAL_DOMAIN_HINTS)]
+            )
+            independent_high_trust = len(
+                [domain for domain in domains if _domain_matches(domain, HIGH_TRUST_DOMAIN_HINTS)]
+            )
+            article_count = int(cluster.get("article_count", 0) or 0)
+            entities = _extract_cluster_entities(cluster)
+            entity_count = len(entities)
+
+            scenario_score = min(1.0, len(hit_groups) / max(len(keyword_groups), 1))
+            velocity_score = min(1.0, article_count / 8.0)
+            convergence_score = min(1.0, unique_domains / 5.0)
+            source_score = min(
+                1.0,
+                min(1.0, official_sources / 2.0) * 0.6
+                + min(1.0, independent_high_trust / 3.0) * 0.4,
+            )
+            entity_score = min(1.0, entity_count / 6.0)
+            external_row = watchlist_external.get(sentinel_id, {})
+            external_event_count = int(
+                external_row.get("event_count", 0)
+            ) if isinstance(external_row, dict) else 0
+            external_score = min(1.0, external_event_count / 40.0)
+
+            risk_score = (
+                WATCHLIST_RISK_WEIGHTS["scenario_match"] * scenario_score
+                + WATCHLIST_RISK_WEIGHTS["velocity"] * velocity_score
+                + WATCHLIST_RISK_WEIGHTS["convergence"] * convergence_score
+                + WATCHLIST_RISK_WEIGHTS["source_credibility"] * source_score
+                + WATCHLIST_RISK_WEIGHTS["entity_spike"] * entity_score
+            )
+            # 外部模板查询作为轻量加权，避免喧宾夺主
+            risk_score = min(1.0, risk_score + 0.08 * external_score)
+
+            alert_level = _determine_alert_level(risk_score)
+            official_text_effective = contains_any_keyword(text, OFFICIAL_EFFECTIVE_KEYWORDS)
+
+            l3_gate = WATCHLIST_HARD_GATES["L3"]
+            l4_gate = WATCHLIST_HARD_GATES["L4"]
+            pass_l3 = (
+                official_sources >= int(l3_gate["official_sources_min"])
+                and unique_domains >= int(l3_gate["unique_domains_min"])
+            )
+            pass_l4 = official_text_effective and independent_high_trust >= int(
+                l4_gate["independent_high_trust_min"]
+            )
+
+            if alert_level == "L4" and not pass_l4:
+                alert_level = "L3"
+            if alert_level in ("L3", "L4") and not pass_l3:
+                alert_level = "L2"
+            if alert_level == "L0":
+                continue
+
+            trigger_reasons = [
+                f"命中分组: {', '.join(hit_groups)}",
+                f"来源域名: {unique_domains} 个（官方 {official_sources}）",
+                f"高可信独立来源: {independent_high_trust} 个",
+                f"实体数: {entity_count}，文章数: {article_count}",
+            ]
+            if official_text_effective:
+                trigger_reasons.append("命中官方落地/生效关键词")
+            if external_event_count > 0:
+                trigger_reasons.append(f"外部模板查询命中 {external_event_count} 条事件")
+
+            suggested_action = WATCHLIST_SUGGESTED_ACTIONS.get(
+                alert_level, "建议人工复核并持续观察。"
+            )
+            review_minutes = int(WATCHLIST_REVIEW_WINDOW_MINUTES.get(alert_level, 120))
+            next_review_time = (now + timedelta(minutes=review_minutes)).isoformat()
+            evidence_links = _extract_evidence_links(cluster)
+            confidence = min(0.95, max(0.55, risk_score))
+
+            candidate = {
+                "cluster_id": cluster.get("cluster_id"),
+                "cluster_title": cluster.get("primary_title", ""),
+                "risk_score": round(risk_score, 4),
+                "alert_level": alert_level,
+                "confidence": round(confidence, 4),
+                "trigger_reasons": trigger_reasons,
+                "evidence_links": evidence_links,
+                "suggested_action": suggested_action,
+                "next_review_time": next_review_time,
+                "entities": entities[:8],
+                "affected_clusters": [cluster.get("cluster_id")],
+                "category": cluster.get("category", sentinel.get("category", "unknown")),
+                "source_stats": {
+                    "unique_domains": unique_domains,
+                    "official_sources": official_sources,
+                    "independent_high_trust": independent_high_trust,
+                    "official_text_effective": official_text_effective,
+                    "external_event_count": external_event_count,
+                },
+            }
+
+            matched_cluster_ids.append(str(cluster.get("cluster_id", "")))
+            if not best_candidate:
+                best_candidate = candidate
+                continue
+
+            current_score = float(best_candidate.get("risk_score", 0))
+            if candidate["risk_score"] > current_score:
+                best_candidate = candidate
+
+        if not best_candidate:
+            continue
+
+        details = {
+            "sentinel_id": sentinel_id,
+            "sentinel_name": sentinel_name,
+            "alert_level": best_candidate["alert_level"],
+            "risk_score": best_candidate["risk_score"],
+            "trigger_reasons": best_candidate["trigger_reasons"],
+            "evidence_links": best_candidate["evidence_links"],
+            "suggested_action": best_candidate["suggested_action"],
+            "next_review_time": best_candidate["next_review_time"],
+            "related_entities": best_candidate["entities"],
+            "matched_cluster_count": len([cid for cid in matched_cluster_ids if cid]),
+            "source_stats": best_candidate["source_stats"],
+            "external_query": watchlist_external.get(sentinel_id, {}),
+        }
+        signal_key = f"{sentinel_id}:{best_candidate.get('cluster_id')}"
+        signal = {
+            "signal_id": generate_dedupe_key("watchlist_alert", signal_key, hour_bucket),
+            "signal_type": "watchlist_alert",
+            "name": f"{sentinel_name} {best_candidate['alert_level']}",
+            "confidence": best_candidate["confidence"],
+            "description": (
+                f"{sentinel_name} 告警等级 {best_candidate['alert_level']}，"
+                f"风险分 {best_candidate['risk_score']:.2f}"
+            ),
+            "cluster_id": best_candidate["cluster_id"],
+            "affected_clusters": best_candidate["affected_clusters"],
+            "category": best_candidate["category"],
+            "details": details,
+            "data_source": "watchlist_rule_engine",
+            "sentinel_id": sentinel_id,
+            "alert_level": best_candidate["alert_level"],
+            "risk_score": best_candidate["risk_score"],
+            "trigger_reasons": best_candidate["trigger_reasons"],
+            "evidence_links": best_candidate["evidence_links"],
+            "suggested_action": best_candidate["suggested_action"],
+            "next_review_time": best_candidate["next_review_time"],
+            "related_entities": best_candidate["entities"],
+            "expires_at": (now + timedelta(hours=SIGNAL_COOLDOWN_HOURS)).isoformat(),
+            "created_at": now.isoformat(),
+        }
+        results.append(signal)
+
+    results.sort(key=lambda item: float(item.get("risk_score", 0) or 0), reverse=True)
+    return results
 
 
 def detect_all_signals(clusters: List[Dict]) -> List[Dict]:

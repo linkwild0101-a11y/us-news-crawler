@@ -1,0 +1,369 @@
+{
+  "total_new": 40,
+  "found_in_db": 40,
+  "active": [
+    {
+      "category": "politics",
+      "name": "Newtalk Politics",
+      "local_id": 648,
+      "db_id": 893,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:08.580809",
+      "rss_url": "https://newtalk.tw/rss/category/2"
+    },
+    {
+      "category": "politics",
+      "name": "Liberty Times Politics",
+      "local_id": 649,
+      "db_id": 894,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:08.932938",
+      "rss_url": "https://news.ltn.com.tw/rss/politics.xml"
+    },
+    {
+      "category": "politics",
+      "name": "CNA Politics",
+      "local_id": 650,
+      "db_id": 895,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:09.263008",
+      "rss_url": "https://feeds.feedburner.com/rsscna/politics"
+    },
+    {
+      "category": "politics",
+      "name": "Office of the President News",
+      "local_id": 651,
+      "db_id": 896,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:09.574886",
+      "rss_url": "https://www.president.gov.tw/RSSNEWS.aspx"
+    },
+    {
+      "category": "politics",
+      "name": "Taipei Times",
+      "local_id": 652,
+      "db_id": 897,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:09.866683",
+      "rss_url": "https://www.taipeitimes.com/xml/index.rss"
+    },
+    {
+      "category": "politics",
+      "name": "People News Taiwan",
+      "local_id": 653,
+      "db_id": 898,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:10.198828",
+      "rss_url": "https://www.peoplenews.tw/rss/%E7%B8%BD%E8%A6%BD"
+    },
+    {
+      "category": "politics",
+      "name": "PTS News",
+      "local_id": 654,
+      "db_id": 899,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:10.492137",
+      "rss_url": "https://about.pts.org.tw/rss/XML/newsfeed.xml"
+    },
+    {
+      "category": "economy",
+      "name": "Newtalk Business",
+      "local_id": 655,
+      "db_id": 900,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:10.800745",
+      "rss_url": "https://newtalk.tw/rss/category/3"
+    },
+    {
+      "category": "economy",
+      "name": "Liberty Times Business",
+      "local_id": 656,
+      "db_id": 901,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:11.113891",
+      "rss_url": "https://news.ltn.com.tw/rss/business.xml"
+    },
+    {
+      "category": "economy",
+      "name": "CNA Finance",
+      "local_id": 657,
+      "db_id": 902,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:11.410808",
+      "rss_url": "https://feeds.feedburner.com/rsscna/finance"
+    },
+    {
+      "category": "economy",
+      "name": "CTEE Macro",
+      "local_id": 658,
+      "db_id": 903,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:11.701502",
+      "rss_url": "https://www.ctee.com.tw/rss_web/category/macro"
+    },
+    {
+      "category": "economy",
+      "name": "CTEE Industry",
+      "local_id": 659,
+      "db_id": 904,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:12.021421",
+      "rss_url": "https://www.ctee.com.tw/rss_web/livenews/industry"
+    },
+    {
+      "category": "economy",
+      "name": "CTEE World",
+      "local_id": 660,
+      "db_id": 905,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:12.30412",
+      "rss_url": "https://www.ctee.com.tw/rss_web/livenews/world"
+    },
+    {
+      "category": "economy",
+      "name": "CTEE Stock Highlights",
+      "local_id": 661,
+      "db_id": 906,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:12.612565",
+      "rss_url": "https://www.ctee.com.tw/rss_web/category/star"
+    },
+    {
+      "category": "economy",
+      "name": "MOEA Trade Admin News",
+      "local_id": 662,
+      "db_id": 907,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:12.908772",
+      "rss_url": "https://www.trade.gov.tw/RSS/List.aspx?nodeID=40"
+    },
+    {
+      "category": "economy",
+      "name": "MOEA Trade Admin Announcements",
+      "local_id": 663,
+      "db_id": 908,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:13.225179",
+      "rss_url": "https://www.trade.gov.tw/RSS/List.aspx?nodeID=39"
+    },
+    {
+      "category": "economy",
+      "name": "IDA News Releases",
+      "local_id": 666,
+      "db_id": 911,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:14.355843",
+      "rss_url": "https://www.ida.gov.tw/ctlr?PRO=rss.RSSView&t=1"
+    },
+    {
+      "category": "economy",
+      "name": "IDA Activity Updates",
+      "local_id": 667,
+      "db_id": 912,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:14.673148",
+      "rss_url": "https://www.ida.gov.tw/ctlr?PRO=rss.RSSView&t=10"
+    },
+    {
+      "category": "economy",
+      "name": "IDA Industry Regulations",
+      "local_id": 668,
+      "db_id": 913,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:15.037144",
+      "rss_url": "https://www.ida.gov.tw/ctlr?PRO=rss.RSSView&t=2"
+    },
+    {
+      "category": "tech",
+      "name": "Newtalk Tech",
+      "local_id": 669,
+      "db_id": 914,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:15.318714",
+      "rss_url": "https://newtalk.tw/rss/category/8"
+    },
+    {
+      "category": "tech",
+      "name": "CNA Technology",
+      "local_id": 670,
+      "db_id": 915,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:15.623133",
+      "rss_url": "https://feeds.feedburner.com/rsscna/technology"
+    },
+    {
+      "category": "tech",
+      "name": "TechNews Taiwan",
+      "local_id": 671,
+      "db_id": 916,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:15.919702",
+      "rss_url": "https://technews.tw/feed/"
+    },
+    {
+      "category": "tech",
+      "name": "iThome",
+      "local_id": 672,
+      "db_id": 917,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:16.198847",
+      "rss_url": "https://www.ithome.com.tw/rss"
+    },
+    {
+      "category": "tech",
+      "name": "DIGITIMES Tech Policy",
+      "local_id": 673,
+      "db_id": 918,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:16.476178",
+      "rss_url": "https://www.digitimes.com.tw/tech/rss/xml/xmlrss_10_110.xml"
+    },
+    {
+      "category": "tech",
+      "name": "DIGITIMES Semiconductors",
+      "local_id": 674,
+      "db_id": 919,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:16.753275",
+      "rss_url": "https://www.digitimes.com.tw/tech/rss/xml/xmlrss_10_40.xml"
+    },
+    {
+      "category": "tech",
+      "name": "DIGITIMES AI Focus",
+      "local_id": 675,
+      "db_id": 920,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:17.078789",
+      "rss_url": "https://www.digitimes.com.tw/tech/rss/xml/xmlrss_30_25.xml"
+    },
+    {
+      "category": "tech",
+      "name": "DIGITIMES Cloud",
+      "local_id": 676,
+      "db_id": 921,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:17.401101",
+      "rss_url": "https://www.digitimes.com.tw/tech/rss/xml/xmlrss_30_24.xml"
+    },
+    {
+      "category": "tech",
+      "name": "DIGITIMES Servers",
+      "local_id": 677,
+      "db_id": 922,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:17.771026",
+      "rss_url": "https://www.digitimes.com.tw/tech/rss/xml/xmlrss_30_26.xml"
+    },
+    {
+      "category": "tech",
+      "name": "DIGITIMES Next-Gen Mobile",
+      "local_id": 678,
+      "db_id": 923,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:18.104002",
+      "rss_url": "https://www.digitimes.com.tw/tech/rss/xml/xmlrss_30_27.xml"
+    },
+    {
+      "category": "tech",
+      "name": "NSTC News",
+      "local_id": 679,
+      "db_id": 924,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:18.393407",
+      "rss_url": "https://www.nstc.gov.tw/nstc/rss/news"
+    },
+    {
+      "category": "tech",
+      "name": "NSTC News Data",
+      "local_id": 680,
+      "db_id": 925,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:18.665878",
+      "rss_url": "https://www.nstc.gov.tw/nstc/rss/newsdata"
+    },
+    {
+      "category": "military",
+      "name": "MNA Taiwan Defense",
+      "local_id": 681,
+      "db_id": 926,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:18.983414",
+      "rss_url": "https://mna.mnd.gov.tw/K2S/RSS"
+    },
+    {
+      "category": "military",
+      "name": "Liberty Times Defense",
+      "local_id": 682,
+      "db_id": 927,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:19.315347",
+      "rss_url": "https://news.ltn.com.tw/rss/def.xml"
+    },
+    {
+      "category": "military",
+      "name": "YDN Military News",
+      "local_id": 683,
+      "db_id": 928,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:19.606673",
+      "rss_url": "https://www.ydn.com.tw/tw/Home/RSS.aspx?TID=2"
+    },
+    {
+      "category": "military",
+      "name": "YDN National Defense Focus",
+      "local_id": 684,
+      "db_id": 929,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:19.934659",
+      "rss_url": "https://www.ydn.com.tw/tw/Home/RSS.aspx?CID=9"
+    },
+    {
+      "category": "military",
+      "name": "YDN Military Forum",
+      "local_id": 685,
+      "db_id": 930,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:20.210617",
+      "rss_url": "https://www.ydn.com.tw/tw/Home/RSS.aspx?CID=52"
+    },
+    {
+      "category": "military",
+      "name": "YDN Strategy",
+      "local_id": 686,
+      "db_id": 931,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:20.519089",
+      "rss_url": "https://www.ydn.com.tw/tw/Home/RSS.aspx?CID=48"
+    },
+    {
+      "category": "military",
+      "name": "YDN Global Outlook",
+      "local_id": 687,
+      "db_id": 932,
+      "status": "active",
+      "last_fetch": "2026-02-19T14:20:20.809922",
+      "rss_url": "https://www.ydn.com.tw/tw/Home/RSS.aspx?CID=46"
+    }
+  ],
+  "failed": [
+    {
+      "category": "economy",
+      "name": "MOEA Trade Admin International Analysis",
+      "local_id": 664,
+      "db_id": 909,
+      "status": "error",
+      "last_fetch": "2026-02-19T14:20:13.561452",
+      "rss_url": "https://www.trade.gov.tw/RSS/List.aspx?nodeID=4311"
+    },
+    {
+      "category": "economy",
+      "name": "MOEA Trade Admin Trade Statistics",
+      "local_id": 665,
+      "db_id": 910,
+      "status": "error",
+      "last_fetch": "2026-02-19T14:20:14.048738",
+      "rss_url": "https://www.trade.gov.tw/RSS/List.aspx?nodeID=4312"
+    }
+  ],
+  "missing": []
+}

@@ -5,16 +5,17 @@
 """
 
 import hashlib
-import re
 from typing import List, Dict, Set, Tuple
 from collections import defaultdict
 import sys
 import os
+from urllib.parse import urlparse
 
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from config.analysis_config import STOP_WORDS, SIMILARITY_THRESHOLD
+from scripts.text_normalizer import extract_cjk_ngrams, extract_latin_tokens
 
 
 def tokenize(text: str) -> Set[str]:
@@ -27,22 +28,24 @@ def tokenize(text: str) -> Set[str]:
     Returns:
         单词集合（已去停用词）
     """
-    # 转换为小写
-    text = text.lower()
+    # 英文 token + 中文 n-gram 混合分词，兼容繁体标题。
+    latin_tokens = set(extract_latin_tokens(text, STOP_WORDS))
+    cjk_tokens = extract_cjk_ngrams(text, min_n=2, max_n=3)
+    return latin_tokens | cjk_tokens
 
-    # 移除非字母数字字符，替换为空格
-    text = re.sub(r"[^a-z0-9\s]", " ", text)
 
-    # 分割成单词
-    words = text.split()
-
-    # 过滤停用词和短词
-    tokens = set()
-    for word in words:
-        if len(word) > 2 and word not in STOP_WORDS:
-            tokens.add(word)
-
-    return tokens
+def _extract_domain(url: str) -> str:
+    """从 URL 中提取域名。"""
+    if not url:
+        return ""
+    try:
+        parsed = urlparse(url if "://" in url else f"https://{url}")
+        domain = (parsed.netloc or "").lower()
+    except Exception:
+        return ""
+    if domain.startswith("www."):
+        domain = domain[4:]
+    return domain
 
 
 def jaccard_similarity(set1: Set[str], set2: Set[str]) -> float:
@@ -149,10 +152,19 @@ def cluster_news(
                     "id": article_id,
                     "title": article_tokens[article_id]["title"],
                     "url": article_tokens[article_id]["article"].get("url", ""),
+                    "source_id": article_tokens[article_id]["article"].get("source_id"),
                 }
             ],
             "categories": [
                 article_tokens[article_id]["article"].get("category", "unknown")
+            ],
+            "domains": [
+                _extract_domain(
+                    str(article_tokens[article_id]["article"].get("url", ""))
+                )
+            ],
+            "source_ids": [
+                str(article_tokens[article_id]["article"].get("source_id") or "")
             ],
         }
 
@@ -185,10 +197,23 @@ def cluster_news(
                         "id": candidate_id,
                         "title": article_tokens[candidate_id]["title"],
                         "url": article_tokens[candidate_id]["article"].get("url", ""),
+                        "source_id": article_tokens[candidate_id]["article"].get(
+                            "source_id"
+                        ),
                     }
                 )
                 current_cluster["categories"].append(
                     article_tokens[candidate_id]["article"].get("category", "unknown")
+                )
+                current_cluster["domains"].append(
+                    _extract_domain(
+                        str(article_tokens[candidate_id]["article"].get("url", ""))
+                    )
+                )
+                current_cluster["source_ids"].append(
+                    str(
+                        article_tokens[candidate_id]["article"].get("source_id") or ""
+                    )
                 )
                 processed.add(candidate_id)
 
@@ -220,11 +245,19 @@ def cluster_news(
                 "cluster_id": cluster_id,
                 "article_ids": cluster["article_ids"],
                 "titles": cluster["titles"],
+                "article_refs": cluster["article_refs"],
                 "primary_title": primary_title,
                 "primary_link": primary_link,
                 "token_set": cluster["token_set"],
                 "category": main_category,
                 "article_count": len(cluster["article_ids"]),
+                "source_domains": sorted(
+                    [domain for domain in set(cluster["domains"]) if domain]
+                ),
+                "source_ids": sorted(
+                    [source_id for source_id in set(cluster["source_ids"]) if source_id]
+                ),
+                "sources": sorted([domain for domain in set(cluster["domains"]) if domain]),
             }
         )
 

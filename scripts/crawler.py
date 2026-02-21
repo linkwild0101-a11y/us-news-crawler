@@ -9,10 +9,11 @@ import feedparser
 import json
 import os
 import hashlib
+import re
 from datetime import datetime
 from typing import List, Dict, Optional
 from supabase import create_client
-from urllib.parse import quote
+from urllib.parse import quote, urlparse, urlunparse
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
@@ -37,6 +38,50 @@ class RSSCrawler:
         """统一日志输出，确保CI环境实时刷新"""
         timestamp = datetime.now().strftime("%H:%M:%S")
         print(f"[{timestamp}] {message}", flush=True)
+
+    def _normalize_article_url(self, url: str) -> str:
+        """修复部分RSS源返回的异常链接（如 .twtw）。"""
+        if not url:
+            return ""
+
+        normalized = str(url).strip()
+        if not normalized:
+            return ""
+
+        if normalized.startswith("//"):
+            normalized = f"https:{normalized}"
+
+        parsed = urlparse(normalized)
+        if not parsed.scheme:
+            if normalized.startswith("/"):
+                return normalized
+            parsed = urlparse(f"https://{normalized.lstrip('/')}")
+
+        host = parsed.hostname or ""
+        if not host:
+            return normalized
+
+        # 例如 www.ydn.com.twtw -> www.ydn.com.tw
+        fixed_host = re.sub(r"\.([a-z]{2})\1$", r".\1", host)
+        if fixed_host == host:
+            return normalized
+
+        netloc = fixed_host
+        if parsed.port:
+            netloc = f"{netloc}:{parsed.port}"
+
+        fixed_url = urlunparse(
+            (
+                parsed.scheme or "https",
+                netloc,
+                parsed.path,
+                parsed.params,
+                parsed.query,
+                parsed.fragment,
+            )
+        )
+        self._log(f"🔧 修正异常链接: {normalized} -> {fixed_url}")
+        return fixed_url
 
     async def __aenter__(self):
         timeout = aiohttp.ClientTimeout(total=30)
@@ -294,7 +339,8 @@ class RSSCrawler:
 
     async def process_entry(self, entry, source_info: Dict) -> Optional[Dict]:
         """处理单个RSS条目"""
-        url = entry.get("link", "")
+        raw_url = entry.get("link", "")
+        url = self._normalize_article_url(raw_url)
         if not url:
             return None
 

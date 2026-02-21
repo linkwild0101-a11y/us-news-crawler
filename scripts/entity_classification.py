@@ -305,3 +305,51 @@ def merge_entity_metadata(
     if prompt_version:
         metadata["prompt_version"] = prompt_version
     return metadata
+
+
+def normalize_relation_items(raw_relations: Any) -> List[Dict[str, Any]]:
+    """标准化关系抽取结果。"""
+    if not isinstance(raw_relations, list):
+        return []
+
+    normalized: List[Dict[str, Any]] = []
+    dedupe = set()
+    for row in raw_relations:
+        if not isinstance(row, dict):
+            continue
+
+        from_name = str(row.get("from") or "").strip()
+        to_name = str(row.get("to") or "").strip()
+        description = str(row.get("description") or "").strip()
+        if not from_name or not to_name or not description:
+            continue
+        if from_name == to_name:
+            continue
+
+        from_type = normalize_entity_type(row.get("from_type"))
+        to_type = normalize_entity_type(row.get("to_type"))
+        confidence = _safe_float(row.get("confidence"))
+        if confidence is None:
+            confidence = 0.6
+
+        dedupe_key = (
+            from_name.lower(),
+            to_name.lower(),
+            description.lower(),
+        )
+        if dedupe_key in dedupe:
+            continue
+        dedupe.add(dedupe_key)
+
+        normalized.append(
+            {
+                "from": from_name[:MAX_ENTITY_LENGTH],
+                "from_type": from_type,
+                "to": to_name[:MAX_ENTITY_LENGTH],
+                "to_type": to_type,
+                "description": description[:180],
+                "confidence": max(0.0, min(float(confidence), 1.0)),
+            }
+        )
+
+    return normalized

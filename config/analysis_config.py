@@ -471,6 +471,40 @@ LLM_PROMPTS = {
   "escalation_level": "low/medium/high/critical",
   "rationale": "评分理由（中文）"
 }}""",
+    "entity_relation_extraction": """你是新闻实体关系发现器。请从以下聚类信息中提取实体关系。
+
+聚类标题：{primary_title}
+标题样本：
+{title_samples}
+
+聚类摘要：
+{cluster_summary}
+
+已识别实体（可参考，不必局限）：
+{known_entities}
+
+要求：
+1. 仅输出有明确语义关系的实体对，避免无意义共现。
+2. 关系描述使用中文短句，15-40字。
+3. confidence 范围 0-1，建议保留两位小数。
+4. 实体类型只能取：
+   person / organization / location / event / holiday
+   / metric / media / product / law_policy / other
+5. 输出 JSON，不要加额外解释。
+
+输出格式：
+{{
+  "relations": [
+    {{
+      "from": "实体A",
+      "from_type": "organization",
+      "to": "实体B",
+      "to_type": "person",
+      "description": "实体A宣布与实体B启动联合行动",
+      "confidence": 0.81
+    }}
+  ]
+}}""",
 }
 
 # ============================================
@@ -512,6 +546,11 @@ SIGNAL_TYPES = {
         "name": "地缘政治紧张",
         "description": "地缘政治事件强度增加",
         "icon": "🌍",
+    },
+    "watchlist_alert": {
+        "name": "场景哨兵告警",
+        "description": "按哨兵规则计算的 L1-L4 预警",
+        "icon": "🛰️",
     },
 }
 

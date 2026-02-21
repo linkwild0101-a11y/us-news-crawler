@@ -10,6 +10,7 @@ import logging
 import os
 import sys
 import time
+from itertools import combinations
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Tuple
@@ -28,10 +29,12 @@ from scripts.entity_classification import (
     extract_entity_names,
     merge_entity_metadata,
     normalize_entity_mentions,
+    normalize_relation_items,
+    normalize_entity_type,
 )
 from scripts.llm_client import LLMClient
 from scripts.clustering import cluster_news
-from scripts.signal_detector import detect_all_signals
+from scripts.signal_detector import detect_all_signals, detect_watchlist_signals
 
 # 配置日志 - 同时输出到控制台和文件
 logger = logging.getLogger(__name__)
@@ -106,6 +109,10 @@ class HotspotAnalyzer:
         self.db_max_retries = 4  # DB瞬时故障重试次数
         self.db_retry_base_seconds = 1.0  # DB重试基础退避
         self.db_batch_size = 200  # 批量写库默认分片
+        self.enable_entity_relations = True  # 是否提取实体关系
+        self.entity_relation_min_confidence = 0.55
+        self.entity_relation_max_clusters = 40
+        self._signal_extended_columns_supported: Optional[bool] = None
 
     def load_unanalyzed_articles(
         self, limit: Optional[int] = None, hours: Optional[int] = None
@@ -475,6 +482,20 @@ class HotspotAnalyzer:
             importance = f"热点升级等级为 {level}，综合评分 {score}。"
             meaning = "说明事件影响面和传播势能正在抬升。"
             actionable = "建议结合实体趋势做连续复核。"
+        elif signal_type == "watchlist_alert":
+            level = signal.get("alert_level") or details.get("alert_level", "L1")
+            risk_score = signal.get("risk_score") or details.get("risk_score", 0)
+            sentinel_name = details.get("sentinel_name", signal.get("name", "场景哨兵"))
+            importance = (
+                f"{sentinel_name} 触发 {level} 告警，风险分 "
+                f"{float(risk_score or 0):.2f}。"
+            )
+            trigger_reasons = details.get("trigger_reasons", [])
+            if isinstance(trigger_reasons, list) and trigger_reasons:
+                meaning = f"触发依据: {'；'.join([str(x) for x in trigger_reasons[:3]])}"
+            else:
+                meaning = "说明目标场景出现多维信号收敛，需重点复核。"
+            actionable = details.get("suggested_action", "建议值班分析员尽快复核证据。")
         else:
             importance = description or "系统检测到异常信号。"
             meaning = description or "说明该事件存在进一步关注价值。"
@@ -714,6 +735,294 @@ class HotspotAnalyzer:
         except Exception as e:
             logger.error(f"批量更新实体失败: {e}")
 
+    def _supports_extended_signal_columns(self) -> bool:
+        """检测 analysis_signals 是否已完成哨兵字段迁移。"""
+        if self._signal_extended_columns_supported is not None:
+            return self._signal_extended_columns_supported
+
+        try:
+            self.supabase.table("analysis_signals").select("id,sentinel_id").limit(1).execute()
+            self._signal_extended_columns_supported = True
+        except Exception:
+            self._signal_extended_columns_supported = False
+            logger.info(
+                "[SIGNAL_SCHEMA_FALLBACK] analysis_signals 未包含哨兵扩展字段，"
+                "将仅写入 rationale.details"
+            )
+        return self._signal_extended_columns_supported
+
+    def _extract_cluster_relations(self, cluster: Dict[str, Any], summary: Dict[str, Any]) -> List[Dict]:
+        """提取聚类内实体关系（LLM优先，失败回退规则法）。"""
+        entity_mentions = normalize_entity_mentions(
+            summary.get("entity_mentions") or summary.get("key_entities", [])
+        )
+        entities = []
+        for entity in entity_mentions:
+            canonical_name = str(entity.get("canonical_name") or "").strip()
+            if not canonical_name:
+                continue
+            entities.append(
+                {
+                    "name": canonical_name,
+                    "entity_type": normalize_entity_type(entity.get("entity_type")),
+                }
+            )
+        if len(entities) < 2:
+            return []
+
+        relations: List[Dict[str, Any]] = []
+        if self.llm_client and cluster.get("article_count", 0) >= self.hot_threshold:
+            title_samples = "\n".join(
+                [str(title) for title in cluster.get("titles", [])[:5] if title]
+            )
+            known_entities = ", ".join([item["name"] for item in entities[:12]])
+            prompt = LLM_PROMPTS["entity_relation_extraction"].format(
+                primary_title=cluster.get("primary_title", ""),
+                title_samples=title_samples[:600],
+                cluster_summary=str(summary.get("summary", ""))[:1000],
+                known_entities=known_entities[:400],
+            )
+            try:
+                result = self.llm_client.summarize(prompt, model=self.analysis_model)
+                self.stats["llm_calls"] += 1
+                if isinstance(result, dict) and not result.get("error"):
+                    relations = normalize_relation_items(result.get("relations", []))
+            except Exception as e:
+                logger.warning(f"LLM关系提取失败，回退规则法: {str(e)[:100]}")
+
+        if relations:
+            return relations
+
+        # 规则回退：实体共现关系（用于保证基础覆盖）
+        dedup_entities: List[Dict[str, str]] = []
+        seen_pairs = set()
+        for item in entities:
+            key = (item["name"], item["entity_type"])
+            if key in seen_pairs:
+                continue
+            seen_pairs.add(key)
+            dedup_entities.append(item)
+
+        fallback_relations: List[Dict[str, Any]] = []
+        for left, right in list(combinations(dedup_entities[:8], 2))[:12]:
+            fallback_relations.append(
+                {
+                    "from": left["name"],
+                    "from_type": left["entity_type"],
+                    "to": right["name"],
+                    "to_type": right["entity_type"],
+                    "description": "在同一新闻聚类中被共同提及",
+                    "confidence": 0.58,
+                }
+            )
+        return fallback_relations
+
+    def _update_entity_relations_bulk(self, relation_tasks: List[Dict[str, Any]]):
+        """批量写入实体关系与关系证据。"""
+        if not relation_tasks:
+            return
+
+        try:
+            now_iso = datetime.now().isoformat()
+            entity_keys = set()
+            for task in relation_tasks:
+                for relation in task.get("relations", []):
+                    from_name = str(relation.get("from") or "").strip()
+                    to_name = str(relation.get("to") or "").strip()
+                    from_type = normalize_entity_type(relation.get("from_type"))
+                    to_type = normalize_entity_type(relation.get("to_type"))
+                    if from_name:
+                        entity_keys.add((from_name, from_type, task.get("category", "unknown")))
+                    if to_name:
+                        entity_keys.add((to_name, to_type, task.get("category", "unknown")))
+
+            if not entity_keys:
+                return
+
+            names_by_type: Dict[str, List[str]] = {}
+            category_map: Dict[Tuple[str, str], str] = {}
+            for name, entity_type, category in entity_keys:
+                names_by_type.setdefault(entity_type, []).append(name)
+                category_map[(name, entity_type)] = category
+
+            entity_id_map: Dict[Tuple[str, str], int] = {}
+            query_batch = 200
+            for entity_type, names in names_by_type.items():
+                unique_names = list(dict.fromkeys(names))
+                for i in range(0, len(unique_names), query_batch):
+                    batch_names = unique_names[i : i + query_batch]
+                    rows = self._execute_with_retry(
+                        "load_entities_for_relations",
+                        lambda et=entity_type, bn=batch_names: (
+                            self.supabase.table("entities")
+                            .select("id, name, entity_type")
+                            .eq("entity_type", et)
+                            .in_("name", bn)
+                            .execute()
+                        ),
+                    )
+                    for row in rows.data or []:
+                        entity_id_map[(row["name"], row["entity_type"])] = row["id"]
+
+            missing_rows = []
+            for name, entity_type, _ in entity_keys:
+                if (name, entity_type) in entity_id_map:
+                    continue
+                missing_rows.append(
+                    {
+                        "name": name,
+                        "entity_type": entity_type,
+                        "category": category_map.get((name, entity_type), "unknown"),
+                        "last_seen": now_iso,
+                        "mention_count_total": 0,
+                    }
+                )
+
+            for i in range(0, len(missing_rows), self.db_batch_size):
+                batch_rows = missing_rows[i : i + self.db_batch_size]
+                self._execute_with_retry(
+                    "upsert_entities_for_relations",
+                    lambda rows=batch_rows: (
+                        self.supabase.table("entities")
+                        .upsert(rows, on_conflict="name,entity_type")
+                        .execute()
+                    ),
+                )
+
+            # 补齐缺失实体ID
+            for entity_type, names in names_by_type.items():
+                unique_names = list(dict.fromkeys(names))
+                for i in range(0, len(unique_names), query_batch):
+                    batch_names = unique_names[i : i + query_batch]
+                    rows = self._execute_with_retry(
+                        "reload_entities_for_relations",
+                        lambda et=entity_type, bn=batch_names: (
+                            self.supabase.table("entities")
+                            .select("id, name, entity_type")
+                            .eq("entity_type", et)
+                            .in_("name", bn)
+                            .execute()
+                        ),
+                    )
+                    for row in rows.data or []:
+                        entity_id_map[(row["name"], row["entity_type"])] = row["id"]
+
+            relation_agg: Dict[Tuple[int, int, str], Dict[str, Any]] = {}
+            for task in relation_tasks:
+                article_ids = [
+                    int(article_id)
+                    for article_id in task.get("article_ids", [])
+                    if isinstance(article_id, int)
+                ]
+                for relation in task.get("relations", []):
+                    from_name = str(relation.get("from") or "").strip()
+                    to_name = str(relation.get("to") or "").strip()
+                    relation_text = str(relation.get("description") or "").strip()
+                    if not from_name or not to_name or not relation_text:
+                        continue
+                    from_type = normalize_entity_type(relation.get("from_type"))
+                    to_type = normalize_entity_type(relation.get("to_type"))
+                    from_id = entity_id_map.get((from_name, from_type))
+                    to_id = entity_id_map.get((to_name, to_type))
+                    if not from_id or not to_id or from_id == to_id:
+                        continue
+                    key = (from_id, to_id, relation_text[:180])
+                    agg = relation_agg.setdefault(
+                        key,
+                        {
+                            "entity1_id": from_id,
+                            "entity2_id": to_id,
+                            "relation_text": relation_text[:180],
+                            "confidence": 0.0,
+                            "source_article_ids": set(),
+                            "first_seen": now_iso,
+                            "last_seen": now_iso,
+                        },
+                    )
+                    agg["confidence"] = max(
+                        float(agg["confidence"]),
+                        float(relation.get("confidence", 0.6) or 0.6),
+                    )
+                    agg["source_article_ids"].update(article_ids)
+                    agg["last_seen"] = now_iso
+
+            if not relation_agg:
+                return
+
+            relation_rows = []
+            for item in relation_agg.values():
+                article_ids = sorted([aid for aid in item["source_article_ids"] if aid > 0])
+                relation_rows.append(
+                    {
+                        "entity1_id": item["entity1_id"],
+                        "entity2_id": item["entity2_id"],
+                        "relation_text": item["relation_text"],
+                        "confidence": round(min(1.0, max(0.0, item["confidence"])), 4),
+                        "source_article_ids": article_ids,
+                        "source_count": len(article_ids),
+                        "first_seen": item["first_seen"],
+                        "last_seen": item["last_seen"],
+                    }
+                )
+
+            relation_id_map: Dict[Tuple[int, int, str], int] = {}
+            for i in range(0, len(relation_rows), self.db_batch_size):
+                batch_rows = relation_rows[i : i + self.db_batch_size]
+                upsert_result = self._execute_with_retry(
+                    "upsert_entity_relations_batch",
+                    lambda rows=batch_rows: (
+                        self.supabase.table("entity_relations")
+                        .upsert(rows, on_conflict="entity1_id,entity2_id,relation_text")
+                        .execute()
+                    ),
+                )
+                for row in upsert_result.data or []:
+                    relation_key = (
+                        row.get("entity1_id"),
+                        row.get("entity2_id"),
+                        row.get("relation_text"),
+                    )
+                    relation_id = row.get("id")
+                    if relation_key[0] and relation_key[1] and relation_key[2] and relation_id:
+                        relation_id_map[relation_key] = relation_id
+
+            evidence_rows = []
+            for row in relation_rows:
+                relation_key = (
+                    row["entity1_id"],
+                    row["entity2_id"],
+                    row["relation_text"],
+                )
+                relation_id = relation_id_map.get(relation_key)
+                if not relation_id:
+                    continue
+                for article_id in row.get("source_article_ids", []):
+                    evidence_rows.append(
+                        {
+                            "relation_id": relation_id,
+                            "article_id": article_id,
+                            "extracted_at": now_iso,
+                        }
+                    )
+
+            for i in range(0, len(evidence_rows), self.db_batch_size):
+                batch_rows = evidence_rows[i : i + self.db_batch_size]
+                self._execute_with_retry(
+                    "upsert_relation_evidence_batch",
+                    lambda rows=batch_rows: (
+                        self.supabase.table("relation_evidence")
+                        .upsert(rows, on_conflict="relation_id,article_id")
+                        .execute()
+                    ),
+                )
+
+            logger.info(
+                f"[RELATIONS_BULK_UPDATED] 聚类: {len(relation_tasks)} | "
+                f"关系: {len(relation_rows)} | 证据: {len(evidence_rows)}"
+            )
+        except Exception as e:
+            logger.warning(f"实体关系写入失败（可能尚未执行迁移）: {str(e)[:160]}")
+
     def save_analysis_results(self, clusters: List[Dict], signals: List[Dict]):
         """
         保存分析结果到数据库
@@ -727,6 +1036,8 @@ class HotspotAnalyzer:
         try:
             cluster_lookup: Dict[str, Dict[str, Any]] = {}
             entity_tasks: List[Dict[str, Any]] = []
+            relation_tasks: List[Dict[str, Any]] = []
+            relation_clusters_left = self.entity_relation_max_clusters
 
             # 保存聚类
             for cluster in clusters:
@@ -814,6 +1125,19 @@ class HotspotAnalyzer:
                                 "prompt_version": summary.get("prompt_version", ""),
                             }
                         )
+                        if self.enable_entity_relations and relation_clusters_left > 0:
+                            relations = self._extract_cluster_relations(cluster, summary)
+                            if relations:
+                                relation_tasks.append(
+                                    {
+                                        "cluster_id": cluster_id,
+                                        "cluster_key": cluster["cluster_id"],
+                                        "article_ids": cluster.get("article_ids", []),
+                                        "category": cluster["category"],
+                                        "relations": relations,
+                                    }
+                                )
+                                relation_clusters_left -= 1
                 except Exception as e:
                     logger.error(
                         f"[CLUSTER_SAVE_FAILED] cluster_key={cluster.get('cluster_id')} | "
@@ -824,9 +1148,12 @@ class HotspotAnalyzer:
 
             if entity_tasks:
                 self._update_entities_bulk(entity_tasks)
+            if relation_tasks:
+                self._update_entity_relations_bulk(relation_tasks)
 
             # 保存信号
             logger.info("信号解释模式: 先写规则解释，LLM增强由 signal_explainer 异步补充")
+            supports_extended_signal_columns = self._supports_extended_signal_columns()
             sorted_signals = sorted(
                 signals,
                 key=lambda item: float(item.get("confidence", 0) or 0),
@@ -883,6 +1210,16 @@ class HotspotAnalyzer:
                             signal.get("created_at") or datetime.now().isoformat()
                         ),
                     }
+                    if supports_extended_signal_columns:
+                        signal_data.update(
+                            {
+                                "sentinel_id": signal.get("sentinel_id"),
+                                "alert_level": signal.get("alert_level"),
+                                "risk_score": signal.get("risk_score"),
+                                "trigger_reasons": signal.get("trigger_reasons", []),
+                                "evidence_links": signal.get("evidence_links", []),
+                            }
+                        )
                     self._execute_with_retry(
                         "upsert_analysis_signal",
                         lambda payload=signal_data: (
@@ -1070,23 +1407,28 @@ class HotspotAnalyzer:
     def run_analysis(
         self,
         limit: int = None,
+        workers: int = 10,
         dry_run: bool = False,
         enrich_signals_after_run: bool = False,
         enrich_hours: int = 24,
         enrich_limit: int = 30,
-        enrich_workers: int = 3,
+        enrich_workers: int = 5,
     ):
         """
         运行完整的分析流程（全量完整分析 + 并发）
 
         Args:
             limit: 最大处理文章数
+            workers: 主分析并发 worker 数
             dry_run: 试运行模式（不保存到数据库）
             enrich_signals_after_run: 分析完成后是否补充信号 LLM 解释
             enrich_hours: 信号解释回看窗口（小时）
             enrich_limit: 本轮最多补充解释的信号数
             enrich_workers: 信号解释并发 worker 数
         """
+        if workers and workers > 0:
+            self.concurrent_workers = int(workers)
+
         logger.info("=" * 60)
         logger.info("开始新闻分析（全量完整分析 + 并发处理）")
         logger.info(
@@ -1143,6 +1485,10 @@ class HotspotAnalyzer:
         # 6. 信号检测（只对信号目标聚类）
         logger.info("检测信号（仅信号目标聚类）...")
         signals = detect_all_signals(hot_clusters)
+        watchlist_signals = detect_watchlist_signals(clusters)
+        if watchlist_signals:
+            logger.info(f"检测到 {len(watchlist_signals)} 个哨兵告警信号")
+            signals.extend(watchlist_signals)
         self.stats["signals_detected"] = len(signals)
 
         if signals:
@@ -1255,6 +1601,12 @@ def main():
     parser.add_argument(
         "--dry-run", action="store_true", help="试运行模式（不保存到数据库）"
     )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=10,
+        help="主分析并发 worker 数",
+    )
     parser.add_argument("--hours", type=int, default=24, help="兼容参数（已不用于主分析）")
     parser.add_argument(
         "--enrich-signals-only",
@@ -1281,7 +1633,7 @@ def main():
     parser.add_argument(
         "--enrich-workers",
         type=int,
-        default=3,
+        default=5,
         help="信号解释增强并发 worker 数",
     )
 
@@ -1299,6 +1651,7 @@ def main():
 
         analyzer.run_analysis(
             limit=args.limit,
+            workers=args.workers,
             dry_run=args.dry_run,
             enrich_signals_after_run=args.enrich_signals_after_run,
             enrich_hours=args.enrich_hours,
