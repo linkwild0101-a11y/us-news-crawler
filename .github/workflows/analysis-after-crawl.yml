@@ -1,4 +1,4 @@
-name: Enhanced Analysis After Crawl
+name: Stock V2 Analysis After Crawl
 
 on:
   workflow_run:
@@ -7,14 +7,149 @@ on:
     types:
       - completed
   workflow_dispatch:
+    inputs:
+      legacy_fallback:
+        description: "Run legacy enhanced analyzer pipeline"
+        required: false
+        default: false
+        type: boolean
+      enable_llm:
+        description: "Enable LLM correction in Stock V2 pipeline"
+        required: false
+        default: true
+        type: boolean
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.workflow_run.head_branch || github.ref_name }}
   cancel-in-progress: false
 
 jobs:
-  enhanced-analysis:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+  stock-v2-analysis:
+    if: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || (github.event_name == 'workflow_dispatch' && inputs.legacy_fallback != true) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Mark start timestamp
+        run: |
+          echo "PIPELINE_START_TS=$(date +%s)" >> "$GITHUB_ENV"
+
+      - name: Resolve Stock V2 runtime flags
+        id: stock_v2_flags
+        env:
+          DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
+          ALIBABA_API_KEY: ${{ secrets.ALIBABA_API_KEY }}
+        run: |
+          llm_flag=""
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.enable_llm }}" != "true" ]; then
+            llm_flag=""
+          elif [ -n "$DASHSCOPE_API_KEY" ] || [ -n "$ALIBABA_API_KEY" ]; then
+            llm_flag="--enable-llm --llm-event-cap 80"
+          fi
+          printf "llm_flag=%s\n" "$llm_flag" >> "$GITHUB_OUTPUT"
+
+      - name: Run Stock V2 incremental pipeline
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
+          ALIBABA_API_KEY: ${{ secrets.ALIBABA_API_KEY }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_pipeline_v2.py \
+            --mode incremental \
+            --hours 168 \
+            --article-limit 3000 \
+            --lookback-hours 336 \
+            ${{ steps.stock_v2_flags.outputs.llm_flag }}
+
+      - name: Refresh market digest prices
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/refresh_market_digest.py \
+            --hours 168 \
+            --limit 1200
+
+      - name: Summarize Stock V2 metrics
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: |
+          duration=$(( $(date +%s) - ${PIPELINE_START_TS:-0} ))
+          export STOCK_V2_DURATION_SEC="$duration"
+          python - <<'PY'
+          import os
+          from datetime import datetime, timezone
+          from supabase import create_client
+
+          supabase = create_client(
+              os.getenv("SUPABASE_URL", ""),
+              os.getenv("SUPABASE_KEY", ""),
+          )
+
+          def count_rows(table: str, **filters):
+              query = supabase.table(table).select("id", count="exact")
+              for key, value in filters.items():
+                  query = query.eq(key, value)
+              result = query.limit(1).execute()
+              return int(result.count or 0)
+
+          signals_total = count_rows("stock_signals_v2", is_active=True)
+          opp_total = count_rows("stock_opportunities_v2", is_active=True)
+          long_total = count_rows("stock_opportunities_v2", is_active=True, side="LONG")
+          short_total = count_rows("stock_opportunities_v2", is_active=True, side="SHORT")
+          snapshot = (
+              supabase.table("stock_dashboard_snapshot_v2")
+              .select("snapshot_time,data_health")
+              .eq("is_active", True)
+              .order("snapshot_time", desc=True)
+              .limit(1)
+              .maybe_single()
+              .execute()
+          )
+          snapshot_time = ""
+          if snapshot and snapshot.data:
+              snapshot_time = str(snapshot.data.get("snapshot_time") or "")
+
+          duration_sec = int(os.getenv("STOCK_V2_DURATION_SEC") or 0)
+          generated_at = datetime.now(timezone.utc).isoformat()
+
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
+              f.write("## Stock V2 Metrics\n")
+              f.write(f"- Signals(active): **{signals_total}**\n")
+              f.write(f"- Opportunities(active): **{opp_total}**\n")
+              f.write(f"- LONG / SHORT: **{long_total} / {short_total}**\n")
+              f.write(f"- Pipeline duration: **{duration_sec}s**\n")
+              f.write(f"- Latest snapshot: `{snapshot_time}`\n")
+              f.write(f"- Generated at(UTC): `{generated_at}`\n")
+
+          print(
+              "Stock V2 metrics:",
+              f"signals={signals_total}",
+              f"opportunities={opp_total}",
+              f"long={long_total}",
+              f"short={short_total}",
+              f"duration_sec={duration_sec}",
+          )
+          PY
+
+  legacy-fallback-analysis:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.legacy_fallback == true }}
     runs-on: ubuntu-latest
     timeout-minutes: 360
 
@@ -37,11 +172,11 @@ jobs:
           ALIBABA_API_KEY: ${{ secrets.ALIBABA_API_KEY }}
         run: |
           if [ -z "$DASHSCOPE_API_KEY" ] && [ -z "$ALIBABA_API_KEY" ]; then
-            echo "::error::Missing DASHSCOPE_API_KEY / ALIBABA_API_KEY. LLM enhancement cannot run."
+            echo "::error::Missing DASHSCOPE_API_KEY / ALIBABA_API_KEY. Legacy analyzer cannot run."
             exit 1
           fi
 
-      - name: Run enhanced analyzer
+      - name: Run legacy enhanced analyzer (manual fallback)
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
@@ -58,7 +193,7 @@ jobs:
             --enrich-limit 30 \
             --enrich-workers 5
 
-      - name: Refresh market digest aggregates
+      - name: Refresh legacy market digest
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
@@ -68,7 +203,7 @@ jobs:
             --hours 24 \
             --limit 500
 
-      - name: Refresh opportunity engine
+      - name: Refresh legacy opportunity engine
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
@@ -78,35 +213,3 @@ jobs:
             --hours 48 \
             --limit 800 \
             --topn 40
-
-      - name: Summarize latest L3/L4 signals
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-        run: |
-          python - <<'PY'
-          from datetime import datetime, timedelta
-          from supabase import create_client
-          import os
-
-          supabase = create_client(
-              os.getenv("SUPABASE_URL", ""),
-              os.getenv("SUPABASE_KEY", ""),
-          )
-          cutoff = (datetime.utcnow() - timedelta(hours=24)).isoformat()
-          result = (
-              supabase.table("analysis_signals")
-              .select("id", count="exact")
-              .eq("signal_type", "watchlist_alert")
-              .in_("alert_level", ["L3", "L4"])
-              .gte("created_at", cutoff)
-              .execute()
-          )
-          count = int(result.count or 0)
-
-          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
-              f.write("## Sentinel Signals (Last 24h)\n")
-              f.write(f"- L3/L4 alerts: **{count}**\n")
-              f.write(f"- Cutoff(UTC): `{cutoff}`\n")
-          print(f"L3/L4 alerts in last 24h: {count}")
-          PY

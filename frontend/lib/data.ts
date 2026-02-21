@@ -101,6 +101,16 @@ const STOCK_CLUSTER_HINTS = [
   "YIELD"
 ];
 const TICKER_PATTERN = /\b[A-Z]{2,5}\b/g;
+const TRUE_VALUES = new Set(["1", "true", "yes", "on"]);
+
+function readV2Enabled(): boolean {
+  const raw = String(
+    process.env.NEXT_PUBLIC_DASHBOARD_READ_V2
+    || process.env.DASHBOARD_READ_V2
+    || ""
+  ).trim().toLowerCase();
+  return TRUE_VALUES.has(raw);
+}
 
 function toIsoString(value: unknown): string {
   if (typeof value === "string" && value.trim()) {
@@ -139,6 +149,33 @@ function toStringArray(value: unknown): string[] {
   }
   return value
     .map((item) => String(item || "").trim())
+    .filter((item) => item.length > 0)
+    .slice(0, 5);
+}
+
+function toCatalystArray(value: unknown): string[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return value
+    .map((item) => {
+      if (typeof item === "string") {
+        return item.trim();
+      }
+      if (!item || typeof item !== "object" || Array.isArray(item)) {
+        return "";
+      }
+      const row = item as Record<string, unknown>;
+      const eventType = String(row.event_type || "").trim();
+      const count = Number(row.count || 0);
+      if (!eventType) {
+        return "";
+      }
+      if (count > 0) {
+        return `${eventType} x${count}`;
+      }
+      return eventType;
+    })
     .filter((item) => item.length > 0)
     .slice(0, 5);
 }
@@ -316,6 +353,168 @@ async function querySentinelSignals(client: SupabaseClient): Promise<SentinelSig
   } catch (error) {
     console.warn("[FRONTEND_SIGNAL_QUERY_FALLBACK]", error);
     return [];
+  }
+}
+
+interface V2SnapshotRow {
+  snapshot_time: string;
+  market_brief: string;
+  risk_badge: RiskLevel;
+  as_of: string;
+}
+
+async function queryV2Signals(client: SupabaseClient): Promise<SentinelSignal[]> {
+  try {
+    const { data, error } = await client
+      .from("stock_signals_v2")
+      .select("id,ticker,level,signal_score,explanation,trigger_factors,source_event_ids,as_of")
+      .eq("is_active", true)
+      .order("signal_score", { ascending: false })
+      .limit(30);
+
+    if (error) {
+      throw error;
+    }
+
+    const rows = (data || []) as unknown as Array<Record<string, unknown>>;
+    return rows.map((row) => {
+      const ticker = String(row.ticker || "").toUpperCase();
+      return {
+        id: Number(row.id || 0),
+        cluster_id: null,
+        sentinel_id: `stock_v2:${ticker || "UNKNOWN"}`,
+        alert_level: toLevel(row.level),
+        risk_score: Math.max(0, Math.min(1, Number(row.signal_score || 0) / 100)),
+        description: String(row.explanation || `${ticker} Stock V2 信号`),
+        trigger_reasons: toCatalystArray(row.trigger_factors),
+        evidence_links: Array.isArray(row.source_event_ids)
+          ? row.source_event_ids
+            .map((item) => Number(item || 0))
+            .filter((item) => item > 0)
+            .slice(0, 5)
+            .map((id) => `event:${id}`)
+          : [],
+        created_at: toIsoString(row.as_of)
+      };
+    });
+  } catch (error) {
+    console.warn("[FRONTEND_V2_SIGNAL_FALLBACK]", error);
+    return [];
+  }
+}
+
+async function queryV2Opportunities(client: SupabaseClient): Promise<OpportunityItem[]> {
+  try {
+    const { data, error } = await client
+      .from("stock_opportunities_v2")
+      .select(
+        "id,ticker,side,horizon,opportunity_score,confidence,risk_level,why_now,invalid_if,"
+        + "catalysts,source_signal_ids,source_event_ids,expires_at,as_of"
+      )
+      .eq("is_active", true)
+      .order("opportunity_score", { ascending: false })
+      .limit(40);
+
+    if (error) {
+      throw error;
+    }
+
+    const rows = (data || []) as unknown as Array<Record<string, unknown>>;
+    const now = new Date().toISOString();
+    return rows
+      .map((row) => {
+        const side: OpportunityItem["side"] = String(row.side || "LONG").toUpperCase() === "SHORT"
+          ? "SHORT"
+          : "LONG";
+        const horizon: OpportunityItem["horizon"] = String(row.horizon || "A").toUpperCase() === "B"
+          ? "B"
+          : "A";
+        return {
+          id: Number(row.id || 0),
+          ticker: String(row.ticker || "").toUpperCase(),
+          side,
+          horizon,
+          opportunity_score: Number(row.opportunity_score || 0),
+          confidence: toScore(row.confidence),
+          risk_level: toLevel(row.risk_level),
+          why_now: String(row.why_now || ""),
+          invalid_if: String(row.invalid_if || ""),
+          catalysts: toCatalystArray(row.catalysts),
+          factor_breakdown: {},
+          source_signal_ids: Array.isArray(row.source_signal_ids)
+            ? row.source_signal_ids
+              .map((item: unknown) => Number(item || 0))
+              .filter((item) => item > 0)
+            : [],
+          source_cluster_ids: [],
+          expires_at: toIsoString(row.expires_at),
+          as_of: toIsoString(row.as_of)
+        };
+      })
+      .filter((item) => item.ticker && item.expires_at >= now);
+  } catch (error) {
+    console.warn("[FRONTEND_V2_OPPORTUNITY_FALLBACK]", error);
+    return [];
+  }
+}
+
+async function queryV2Regime(client: SupabaseClient): Promise<MarketRegime | null> {
+  try {
+    const { data, error } = await client
+      .from("stock_market_regime_v2")
+      .select("regime_date,risk_state,vol_state,liquidity_state,regime_score,summary,as_of")
+      .eq("is_active", true)
+      .order("as_of", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error || !data) {
+      if (error) {
+        throw error;
+      }
+      return null;
+    }
+
+    return {
+      regime_date: toIsoString(data.regime_date),
+      risk_state: String(data.risk_state || "neutral"),
+      vol_state: String(data.vol_state || "mid_vol"),
+      liquidity_state: String(data.liquidity_state || "neutral"),
+      regime_score: Number(data.regime_score || 0),
+      summary: String(data.summary || "")
+    };
+  } catch (error) {
+    console.warn("[FRONTEND_V2_REGIME_FALLBACK]", error);
+    return null;
+  }
+}
+
+async function queryV2Snapshot(client: SupabaseClient): Promise<V2SnapshotRow | null> {
+  try {
+    const { data, error } = await client
+      .from("stock_dashboard_snapshot_v2")
+      .select("snapshot_time,market_brief,risk_badge,as_of")
+      .eq("is_active", true)
+      .order("snapshot_time", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error || !data) {
+      if (error) {
+        throw error;
+      }
+      return null;
+    }
+
+    return {
+      snapshot_time: toIsoString(data.snapshot_time),
+      market_brief: String(data.market_brief || ""),
+      risk_badge: toLevel(data.risk_badge),
+      as_of: toIsoString(data.as_of)
+    };
+  } catch (error) {
+    console.warn("[FRONTEND_V2_SNAPSHOT_FALLBACK]", error);
+    return null;
   }
 }
 
@@ -659,6 +858,86 @@ async function queryEntityRelations(client: SupabaseClient): Promise<EntityRelat
   }
 }
 
+function buildTickerDigestFromSignals(signals: SentinelSignal[]): TickerSignalDigest[] {
+  const bucket = new Map<string, SentinelSignal[]>();
+  for (const signal of signals) {
+    const source = String(signal.sentinel_id || "");
+    const ticker = source.includes(":") ? source.split(":")[1] : "";
+    if (!ticker) {
+      continue;
+    }
+    const items = bucket.get(ticker) || [];
+    items.push(signal);
+    bucket.set(ticker, items);
+  }
+
+  return Array.from(bucket.entries())
+    .map(([ticker, rows]) => ({
+      ticker,
+      signal_count_24h: rows.length,
+      related_cluster_count_24h: 0,
+      risk_level: calculateTopRisk(rows),
+      top_sentinel_levels: rows.slice(0, 3).map((item) => item.alert_level),
+      updated_at: rows[0]?.created_at || new Date().toISOString()
+    }))
+    .sort((a, b) => b.signal_count_24h - a.signal_count_24h);
+}
+
+async function getDashboardDataFromV2(client: SupabaseClient): Promise<DashboardData | null> {
+  const [sentinelSignals, opportunities, marketRegime, v2Snapshot] = await Promise.all([
+    queryV2Signals(client),
+    queryV2Opportunities(client),
+    queryV2Regime(client),
+    queryV2Snapshot(client)
+  ]);
+
+  if (!v2Snapshot && sentinelSignals.length === 0 && opportunities.length === 0) {
+    return null;
+  }
+
+  const tickerDigest = buildTickerDigestFromSignals(sentinelSignals);
+  const focusTickers = new Set(opportunities.map((item) => item.ticker));
+  const filteredSignals = focusTickers.size
+    ? sentinelSignals.filter((item) => signalMentionsTicker(item, focusTickers))
+    : sentinelSignals;
+
+  const [marketSnapshotRaw, hotClusters, relations] = await Promise.all([
+    queryMarketSnapshot(client, filteredSignals),
+    queryHotClusters(client, filteredSignals, opportunities),
+    queryEntityRelations(client)
+  ]);
+
+  const marketSnapshot: MarketSnapshot = {
+    ...marketSnapshotRaw,
+    risk_level: v2Snapshot?.risk_badge || marketSnapshotRaw.risk_level,
+    daily_brief: v2Snapshot?.market_brief || marketSnapshotRaw.daily_brief,
+    updated_at: v2Snapshot?.as_of || marketSnapshotRaw.updated_at
+  };
+
+  const topOpportunityTime = opportunities[0]?.as_of || "";
+  const topSignalTime = filteredSignals[0]?.created_at || "";
+  const topClusterTime = hotClusters[0]?.created_at || "";
+  const topRelationTime = relations[0]?.last_seen || "";
+
+  return {
+    opportunities,
+    marketRegime,
+    marketSnapshot,
+    sentinelSignals: filteredSignals,
+    tickerDigest,
+    hotClusters,
+    relations,
+    dataUpdatedAt: getLatestTimestamp([
+      marketSnapshot.updated_at,
+      v2Snapshot?.snapshot_time || "",
+      topOpportunityTime,
+      topSignalTime,
+      topClusterTime,
+      topRelationTime
+    ])
+  };
+}
+
 function getLatestTimestamp(values: string[]): string {
   return values.reduce<string>((latest, current) => {
     if (!current) {
@@ -670,6 +949,7 @@ function getLatestTimestamp(values: string[]): string {
 
 export async function getDashboardData(): Promise<DashboardData> {
   const client = buildReadonlyClient();
+  const readV2 = readV2Enabled();
 
   if (!client) {
     const now = new Date().toISOString();
@@ -708,6 +988,14 @@ export async function getDashboardData(): Promise<DashboardData> {
       relations: [],
       dataUpdatedAt: now
     };
+  }
+
+  if (readV2) {
+    const v2Data = await getDashboardDataFromV2(client);
+    if (v2Data) {
+      return v2Data;
+    }
+    console.warn("[FRONTEND_V2_EMPTY_FALLBACK] V2 数据为空，回退 legacy 聚合");
   }
 
   const sentinelSignals = await querySentinelSignals(client);
