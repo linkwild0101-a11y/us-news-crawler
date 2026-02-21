@@ -10,7 +10,7 @@ import json
 import html
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -257,6 +257,13 @@ def get_css():
     [data-baseweb="select"] svg {{
         fill: var(--text-muted) !important;
     }}
+    /* 选中值和占位符在命令模式下保持可读 */
+    [data-baseweb="select"] [data-testid="stMarkdownContainer"] p,
+    [data-baseweb="select"] span,
+    [data-baseweb="select"] input {{
+        color: var(--text-main) !important;
+        opacity: 1 !important;
+    }}
     /* 下拉选项菜单（portal 弹层） */
     [data-baseweb="popover"] {{
         background: transparent !important;
@@ -270,6 +277,8 @@ def get_css():
     [data-baseweb="popover"] [role="option"] {{
         background: transparent !important;
         color: var(--text-main) !important;
+        opacity: 1 !important;
+        font-weight: 500 !important;
     }}
     [data-baseweb="popover"] [role="option"]:hover {{
         background: rgba(139, 211, 255, 0.16) !important;
@@ -278,6 +287,19 @@ def get_css():
     [data-baseweb="popover"] [aria-selected="true"][role="option"] {{
         background: rgba(41, 240, 255, 0.18) !important;
         color: var(--text-main) !important;
+    }}
+    /* 兼容不同版本 BaseWeb 菜单节点 */
+    [role="listbox"],
+    ul[role="listbox"] {{
+        background: var(--bg-panel) !important;
+        color: var(--text-main) !important;
+    }}
+    [role="option"] {{
+        color: var(--text-main) !important;
+    }}
+    [role="option"][aria-disabled="true"] {{
+        color: var(--text-muted) !important;
+        opacity: 0.75 !important;
     }}
     
     /* 单选按钮 */
@@ -340,6 +362,21 @@ def get_css():
         background: var(--bg-card);
         border: 1px solid var(--border);
         border-radius: 10px;
+    }}
+    /* 元素工具栏按钮（截图中右上角）提高对比度 */
+    [data-testid="stElementToolbar"] {{
+        background: var(--bg-panel) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 10px !important;
+    }}
+    [data-testid="stElementToolbar"] button {{
+        background: transparent !important;
+        color: var(--text-main) !important;
+    }}
+    [data-testid="stElementToolbar"] svg {{
+        fill: var(--text-main) !important;
+        stroke: var(--text-main) !important;
+        opacity: 1 !important;
     }}
     /* Vega/Altair tooltip 对比度修复 */
     .vg-tooltip,
@@ -428,6 +465,109 @@ def get_signals(_supabase, hours: int = 24) -> pd.DataFrame:
 
 
 @st.cache_data(ttl=300)
+def get_watchlist_signals(_supabase, hours: int = 24) -> pd.DataFrame:
+    """获取哨兵告警信号。"""
+    cutoff = (datetime.now() - timedelta(hours=hours)).isoformat()
+    result = (
+        _supabase.table("analysis_signals")
+        .select("*")
+        .eq("signal_type", "watchlist_alert")
+        .gte("created_at", cutoff)
+        .order("created_at", desc=True)
+        .limit(500)
+        .execute()
+    )
+    if result.data:
+        return pd.DataFrame(result.data)
+    return pd.DataFrame()
+
+
+@st.cache_data(ttl=300)
+def get_entity_relations_graph(
+    _supabase,
+    min_confidence: float = 0.55,
+    limit: int = 400,
+) -> pd.DataFrame:
+    """获取实体关系图谱数据。"""
+    relation_rows = (
+        _supabase.table("entity_relations")
+        .select("*")
+        .gte("confidence", min_confidence)
+        .order("last_seen", desc=True)
+        .limit(limit)
+        .execute()
+    )
+    relations = relation_rows.data or []
+    if not relations:
+        return pd.DataFrame()
+
+    def _as_int(value: Any) -> int:
+        if isinstance(value, int):
+            return value
+        if isinstance(value, str) and value.isdigit():
+            return int(value)
+        return -1
+
+    entity_ids = sorted(
+        {
+            _as_int(entity_id)
+            for row in relations
+            for entity_id in [row.get("entity1_id"), row.get("entity2_id")]
+            if _as_int(entity_id) > 0
+        }
+    )
+    if not entity_ids:
+        return pd.DataFrame()
+
+    entity_map: Dict[int, Dict[str, str]] = {}
+    batch_size = 200
+    for i in range(0, len(entity_ids), batch_size):
+        batch_ids = entity_ids[i : i + batch_size]
+        entity_rows = (
+            _supabase.table("entities")
+            .select("id,name,entity_type,category")
+            .in_("id", batch_ids)
+            .execute()
+        )
+        for row in entity_rows.data or []:
+            entity_id = _as_int(row.get("id"))
+            if entity_id <= 0:
+                continue
+            entity_map[entity_id] = {
+                "name": str(row.get("name", "")),
+                "entity_type": str(row.get("entity_type", "other")),
+                "category": str(row.get("category", "unknown")),
+            }
+
+    normalized_rows: List[Dict[str, Any]] = []
+    for row in relations:
+        entity1_id = _as_int(row.get("entity1_id"))
+        entity2_id = _as_int(row.get("entity2_id"))
+        if entity1_id not in entity_map or entity2_id not in entity_map:
+            continue
+        left = entity_map[entity1_id]
+        right = entity_map[entity2_id]
+        normalized_rows.append(
+            {
+                "id": row.get("id"),
+                "entity1_id": entity1_id,
+                "entity2_id": entity2_id,
+                "entity1_name": left["name"],
+                "entity1_type": left["entity_type"],
+                "entity2_name": right["name"],
+                "entity2_type": right["entity_type"],
+                "relation_text": row.get("relation_text", ""),
+                "confidence": float(row.get("confidence", 0.0) or 0.0),
+                "source_count": int(row.get("source_count", 0) or 0),
+                "last_seen": row.get("last_seen"),
+                "source_article_ids": row.get("source_article_ids", []),
+            }
+        )
+
+    return pd.DataFrame(normalized_rows)
+
+
+@st.cache_data(ttl=300)
 def get_cluster_article_links(
     _supabase, cluster_ids: Tuple[int, ...], per_cluster: int = 3
 ) -> Dict[int, List[Dict[str, str]]]:
@@ -499,7 +639,37 @@ SIGNAL_TYPE_NAMES = {
     "economic_indicator_alert": "📊 经济指标异常",
     "natural_disaster_signal": "🌋 自然灾害",
     "geopolitical_intensity": "🌍 地缘政治紧张",
+    "watchlist_alert": "🛰️ 场景哨兵告警",
 }
+
+WATCHLIST_LEVEL_COLORS = {
+    "L1": "#67f7c2",
+    "L2": "#ffd166",
+    "L3": "#ff9f43",
+    "L4": "#ff6b7a",
+}
+
+
+def parse_json_field(value: Any, expected_type: type):
+    """解析 JSON 字段（兼容对象和字符串）。"""
+    if isinstance(value, expected_type):
+        return value
+    if isinstance(value, str) and value.strip():
+        try:
+            parsed = json.loads(value)
+            if isinstance(parsed, expected_type):
+                return parsed
+        except Exception:
+            return expected_type()
+    return expected_type()
+
+
+def parse_string_list(value: Any) -> List[str]:
+    """解析字符串列表字段。"""
+    parsed = parse_json_field(value, list)
+    if isinstance(parsed, list):
+        return [str(item).strip() for item in parsed if str(item).strip()]
+    return []
 
 
 def get_signal_name(row: pd.Series) -> str:
@@ -545,6 +715,7 @@ def parse_signal_explanation(row: pd.Series) -> dict:
                 "confidence_reason", f"当前系统评分置信度为 {confidence:.2f}"
             ),
             "events": related_events,
+            "alert_level": details.get("alert_level"),
         }
 
     def _format_source_types(value) -> str:
@@ -579,6 +750,17 @@ def parse_signal_explanation(row: pd.Series) -> dict:
         why = f"升级等级 {level}，总评分 {score}，聚类文章数 {article_count}"
         meaning = "代表事件热度和影响面正在抬升，后续可能升级。"
         action = "建议结合实体趋势与来源变化，持续复核升级方向。"
+    elif signal_type == "watchlist_alert":
+        sentinel_name = parsed_details.get("sentinel_name", row.get("description", "场景哨兵"))
+        level = row.get("alert_level") or parsed_details.get("alert_level", "L1")
+        risk_score = row.get("risk_score") or parsed_details.get("risk_score", "N/A")
+        trigger_reasons = parsed_details.get("trigger_reasons", [])
+        why = f"{sentinel_name} 当前等级 {level}，风险分 {risk_score}"
+        if isinstance(trigger_reasons, list) and trigger_reasons:
+            meaning = "；".join([str(item) for item in trigger_reasons[:3]])
+        else:
+            meaning = "已命中场景规则，建议关注来源收敛与官方确认。"
+        action = parsed_details.get("suggested_action", "建议快速复核并更新哨兵态势。")
     else:
         why = row.get("description", "暂无触发原因")
         meaning = "代表系统检测到值得关注的异常变化。"
@@ -590,6 +772,7 @@ def parse_signal_explanation(row: pd.Series) -> dict:
         "action": action,
         "confidence_reason": f"当前系统评分置信度为 {confidence:.2f}",
         "events": related_events,
+        "alert_level": parsed_details.get("alert_level"),
     }
 
 
@@ -652,6 +835,44 @@ def short_text(text: str, max_len: int = 80) -> str:
     return f"{cleaned[:max_len]}..."
 
 
+def normalize_watchlist_record(row: pd.Series) -> Dict[str, Any]:
+    """标准化哨兵记录，便于页面渲染。"""
+    details = parse_json_field(row.get("details"), dict)
+    trigger_reasons = parse_string_list(
+        row.get("trigger_reasons", details.get("trigger_reasons", []))
+    )
+    evidence_links = parse_string_list(
+        row.get("evidence_links", details.get("evidence_links", []))
+    )
+    related_entities = parse_string_list(details.get("related_entities", []))
+
+    created_at = str(row.get("created_at", ""))
+    sentinel_name = str(
+        details.get("sentinel_name")
+        or row.get("name")
+        or row.get("description")
+        or "场景哨兵"
+    )
+
+    return {
+        "signal_key": str(row.get("signal_key", "")),
+        "sentinel_id": str(
+            row.get("sentinel_id") or details.get("sentinel_id") or "unknown"
+        ),
+        "sentinel_name": sentinel_name,
+        "alert_level": str(row.get("alert_level") or details.get("alert_level") or "L1"),
+        "risk_score": float(row.get("risk_score") or details.get("risk_score") or 0.0),
+        "confidence": float(row.get("confidence") or 0.0),
+        "trigger_reasons": trigger_reasons,
+        "evidence_links": evidence_links,
+        "related_entities": related_entities,
+        "suggested_action": str(details.get("suggested_action") or "建议人工复核。"),
+        "next_review_time": str(details.get("next_review_time") or ""),
+        "description": str(row.get("description") or ""),
+        "created_at": created_at,
+    }
+
+
 @st.cache_data(ttl=300)
 def get_stats(_supabase) -> dict:
     """获取统计信息"""
@@ -699,7 +920,15 @@ def render_sidebar():
 
     page = st.sidebar.radio(
         "选择页面:",
-        ["🏠 概览首页", "🔥 热点详情", "📡 信号中心", "📁 实体档案", "📈 数据统计"],
+        [
+            "🏠 概览首页",
+            "🛰️ 哨兵态势",
+            "🕸️ 关系图谱",
+            "🔥 热点详情",
+            "📡 信号中心",
+            "📁 实体档案",
+            "📈 数据统计",
+        ],
     )
 
     st.sidebar.markdown("---")
@@ -794,7 +1023,20 @@ def render_overview(supabase, hours: int, category: str):
     else:
         for idx, row in signals_df.head(5).iterrows():
             confidence = row.get("confidence", 0)
-            if confidence >= 0.8:
+            explanation = parse_signal_explanation(row)
+            alert_level = str(
+                row.get("alert_level") or explanation.get("alert_level") or ""
+            ).strip().upper()
+            if alert_level in {"L4", "L3"}:
+                level_class = "signal-high"
+                level_text = alert_level
+            elif alert_level == "L2":
+                level_class = "signal-medium"
+                level_text = alert_level
+            elif alert_level == "L1":
+                level_class = "signal-low"
+                level_text = alert_level
+            elif confidence >= 0.8:
                 level_class = "signal-high"
                 level_text = "高"
             elif confidence >= 0.6:
@@ -805,7 +1047,6 @@ def render_overview(supabase, hours: int, category: str):
                 level_text = "低"
 
             signal_name = get_signal_name(row)
-            explanation = parse_signal_explanation(row)
             event_text = format_related_events(explanation.get("events", []), limit=2)
             compact_why = short_text(explanation.get("why", ""), 68)
             compact_meaning = short_text(explanation.get("meaning", ""), 68)
@@ -817,7 +1058,7 @@ def render_overview(supabase, hours: int, category: str):
             <div class="hotspot-card">
                 <h5>
                     {html.escape(str(row.get("icon", "⚡")))} {html.escape(signal_name)}
-                    <span class="signal-badge {level_class}">{level_text} 置信度</span>
+                    <span class="signal-badge {level_class}">{level_text}</span>
                 </h5>
                 <p class="meta-text">
                     置信度: {confidence:.2f} | 时间: {html.escape(created_at)}
@@ -1069,6 +1310,270 @@ def render_signals(supabase, hours: int):
                 labels=["低", "中", "高"],
             ).value_counts()
             st.bar_chart(conf_dist)
+
+
+def render_monitor(supabase, hours: int):
+    """渲染哨兵态势页。"""
+    st.markdown('<div class="main-header">🛰️ 哨兵态势</div>', unsafe_allow_html=True)
+
+    watchlist_df = get_watchlist_signals(supabase, hours)
+    if watchlist_df.empty:
+        st.info("最近时间窗口内暂无哨兵告警。")
+        return
+
+    records = [normalize_watchlist_record(row) for _, row in watchlist_df.iterrows()]
+    records_df = pd.DataFrame(records)
+    records_df["created_dt"] = pd.to_datetime(records_df["created_at"], errors="coerce")
+    records_df = records_df.sort_values("created_dt", ascending=False)
+
+    l34_count = int(records_df["alert_level"].isin(["L3", "L4"]).sum())
+    sentinel_count = int(records_df["sentinel_id"].nunique())
+    latest_time = records_df["created_dt"].max()
+    latest_text = "N/A" if pd.isna(latest_time) else str(latest_time)[:16]
+
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric("告警总数", len(records_df))
+    with col2:
+        st.metric("L3/L4", l34_count)
+    with col3:
+        st.metric("哨兵数量", sentinel_count)
+    with col4:
+        st.metric("最新告警", latest_text)
+
+    levels = ["L1", "L2", "L3", "L4"]
+    selected_levels = st.multiselect("等级筛选", levels, default=levels)
+    sentinel_options = ["全部"] + sorted(records_df["sentinel_name"].dropna().unique().tolist())
+    selected_sentinel = st.selectbox("哨兵筛选", sentinel_options)
+
+    filtered_df = records_df[records_df["alert_level"].isin(selected_levels)]
+    if selected_sentinel != "全部":
+        filtered_df = filtered_df[filtered_df["sentinel_name"] == selected_sentinel]
+
+    if filtered_df.empty:
+        st.info("筛选条件下暂无告警。")
+        return
+
+    st.markdown("### 场景态势卡")
+    latest_df = (
+        filtered_df.sort_values("created_dt", ascending=False)
+        .drop_duplicates(subset=["sentinel_id"])
+        .reset_index(drop=True)
+    )
+
+    columns = st.columns(2)
+    for idx, (_, row) in enumerate(latest_df.iterrows()):
+        level = str(row.get("alert_level", "L1")).upper()
+        card_color = WATCHLIST_LEVEL_COLORS.get(level, "#8ea0bf")
+        with columns[idx % 2]:
+            st.markdown(
+                f"""
+<div class="hotspot-card" style="border-left: 4px solid {card_color};">
+  <h4>{html.escape(str(row.get("sentinel_name", "场景哨兵")))} · {level}</h4>
+  <p><strong>风险分:</strong> {float(row.get("risk_score", 0.0)):.2f}</p>
+  <p class="meta-text">时间: {str(row.get("created_at", "N/A"))[:16]}</p>
+  <p><strong>建议动作:</strong> {html.escape(str(row.get("suggested_action", "")))}</p>
+</div>
+""",
+                unsafe_allow_html=True,
+            )
+            reasons = row.get("trigger_reasons", [])
+            if isinstance(reasons, list) and reasons:
+                st.markdown("**触发原因**")
+                for reason in reasons[:4]:
+                    st.write(f"- {reason}")
+            entities = row.get("related_entities", [])
+            if isinstance(entities, list) and entities:
+                st.caption(f"相关实体: {', '.join([str(item) for item in entities[:8]])}")
+            next_review = str(row.get("next_review_time", "")).strip()
+            if next_review:
+                st.caption(f"下次复核: {next_review[:16]}")
+            links = row.get("evidence_links", [])
+            if isinstance(links, list) and links:
+                for link_idx, link in enumerate(links[:3], 1):
+                    render_external_link(f"证据链接 {link_idx}", str(link))
+
+    st.markdown("### 等级分布")
+    level_counts = (
+        filtered_df["alert_level"].value_counts().reindex(["L4", "L3", "L2", "L1"]).fillna(0)
+    )
+    st.bar_chart(level_counts)
+
+    st.markdown("### 告警明细")
+    detail_df = filtered_df[
+        [
+            "created_at",
+            "sentinel_name",
+            "alert_level",
+            "risk_score",
+            "confidence",
+            "description",
+        ]
+    ].rename(
+        columns={
+            "created_at": "时间",
+            "sentinel_name": "哨兵",
+            "alert_level": "等级",
+            "risk_score": "风险分",
+            "confidence": "置信度",
+            "description": "摘要",
+        }
+    )
+    st.dataframe(detail_df, use_container_width=True, hide_index=True)
+
+
+def render_graph(supabase, hours: int):
+    """渲染实体关系图谱页。"""
+    st.markdown('<div class="main-header">🕸️ 关系图谱</div>', unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        min_confidence = st.slider("最小置信度", 0.3, 1.0, 0.55, 0.05)
+    with col2:
+        min_source_count = st.slider("最小来源数", 1, 10, 1, 1)
+    with col3:
+        limit = st.slider("最大关系数", 100, 800, 400, 50)
+
+    search_term = st.text_input("搜索实体/关系关键词", "")
+
+    graph_df = get_entity_relations_graph(
+        supabase,
+        min_confidence=min_confidence,
+        limit=limit,
+    )
+    if graph_df.empty:
+        st.info("暂无可展示的实体关系数据。")
+        return
+
+    graph_df = graph_df[graph_df["source_count"] >= min_source_count]
+    if search_term.strip():
+        pattern = search_term.strip().lower()
+        graph_df = graph_df[
+            graph_df["entity1_name"].str.lower().str.contains(pattern, na=False)
+            | graph_df["entity2_name"].str.lower().str.contains(pattern, na=False)
+            | graph_df["relation_text"].str.lower().str.contains(pattern, na=False)
+        ]
+
+    watchlist_df = get_watchlist_signals(supabase, hours=72)
+    watchlist_entities = set()
+    for _, row in watchlist_df.iterrows():
+        normalized = normalize_watchlist_record(row)
+        for entity in normalized.get("related_entities", []):
+            watchlist_entities.add(str(entity).strip().lower())
+
+    graph_df["watchlist_related"] = graph_df.apply(
+        lambda row: (
+            str(row.get("entity1_name", "")).lower() in watchlist_entities
+            or str(row.get("entity2_name", "")).lower() in watchlist_entities
+        ),
+        axis=1,
+    )
+    only_watchlist_related = st.checkbox("仅显示哨兵相关关系", value=False)
+    if only_watchlist_related:
+        graph_df = graph_df[graph_df["watchlist_related"]]
+
+    if graph_df.empty:
+        st.info("筛选条件下暂无关系数据。")
+        return
+
+    unique_entities = pd.unique(
+        pd.concat([graph_df["entity1_name"], graph_df["entity2_name"]], ignore_index=True)
+    )
+    avg_conf = float(graph_df["confidence"].mean() or 0.0)
+    col_a, col_b, col_c = st.columns(3)
+    with col_a:
+        st.metric("关系数量", len(graph_df))
+    with col_b:
+        st.metric("实体数量", len(unique_entities))
+    with col_c:
+        st.metric("平均置信度", f"{avg_conf:.2f}")
+
+    st.markdown("### 关系表")
+    table_df = graph_df[
+        [
+            "entity1_name",
+            "entity1_type",
+            "relation_text",
+            "entity2_name",
+            "entity2_type",
+            "confidence",
+            "source_count",
+            "watchlist_related",
+        ]
+    ].sort_values(["watchlist_related", "confidence", "source_count"], ascending=False)
+    st.dataframe(table_df, use_container_width=True, hide_index=True)
+
+    st.markdown("### 图谱预览")
+    preview_df = graph_df.sort_values(
+        ["watchlist_related", "source_count", "confidence"],
+        ascending=False,
+    ).head(80)
+
+    def _dot_escape(text: str) -> str:
+        return str(text or "").replace("\\", "\\\\").replace('"', '\\"')
+
+    node_types: Dict[str, str] = {}
+    for _, row in preview_df.iterrows():
+        left_name = str(row.get("entity1_name", "")).strip()
+        right_name = str(row.get("entity2_name", "")).strip()
+        if left_name and left_name not in node_types:
+            node_types[left_name] = str(row.get("entity1_type", "other"))
+        if right_name and right_name not in node_types:
+            node_types[right_name] = str(row.get("entity2_type", "other"))
+
+    lines = [
+        "digraph Relations {",
+        "rankdir=LR;",
+        'node [shape=ellipse, style=filled, fillcolor="#111c34",'
+        ' color="#1f2d49", fontcolor="#e6edf7"];',
+        'edge [color="#8bd3ff", fontcolor="#8ea0bf"];',
+    ]
+
+    for entity_name, entity_type in list(node_types.items())[:120]:
+        label = _dot_escape(f"{entity_name}\\n({entity_type})")
+        lines.append(f'"{_dot_escape(entity_name)}" [label="{label}"];')
+
+    for _, row in preview_df.iterrows():
+        left_name = str(row.get("entity1_name", "")).strip()
+        right_name = str(row.get("entity2_name", "")).strip()
+        if not left_name or not right_name:
+            continue
+        rel_text = short_text(str(row.get("relation_text", "")), 24)
+        conf = float(row.get("confidence", 0.0) or 0.0)
+        source_count = int(row.get("source_count", 0) or 0)
+        edge_label = _dot_escape(f"{rel_text} | {conf:.2f} | {source_count}")
+        penwidth = 1.0 + min(3.0, conf * 2.0) + min(2.0, source_count * 0.15)
+        lines.append(
+            f'"{_dot_escape(left_name)}" -> "{_dot_escape(right_name)}" '
+            f'[label="{edge_label}", penwidth={penwidth:.2f}];'
+        )
+
+    lines.append("}")
+    dot_graph = "\n".join(lines)
+
+    try:
+        st.graphviz_chart(dot_graph, use_container_width=True)
+    except Exception as e:
+        st.warning(f"图谱渲染失败，已降级为列表展示: {str(e)[:100]}")
+
+    st.markdown("### 关系详情")
+    for _, row in preview_df.head(20).iterrows():
+        left_name = str(row.get("entity1_name", "N/A"))
+        right_name = str(row.get("entity2_name", "N/A"))
+        relation_text = str(row.get("relation_text", ""))
+        confidence = float(row.get("confidence", 0.0) or 0.0)
+        source_count = int(row.get("source_count", 0) or 0)
+        with st.expander(f"{left_name} → {right_name} ({confidence:.2f})"):
+            st.write(f"关系描述: {relation_text}")
+            st.write(f"来源数: {source_count}")
+            st.write(f"最后出现: {str(row.get('last_seen', 'N/A'))[:16]}")
+            if bool(row.get("watchlist_related")):
+                st.caption("该关系与最近哨兵告警实体存在交集。")
+            source_article_ids = row.get("source_article_ids", [])
+            if not isinstance(source_article_ids, list):
+                source_article_ids = parse_json_field(source_article_ids, list)
+            if source_article_ids:
+                st.caption(f"样本文章ID: {', '.join([str(i) for i in source_article_ids[:8]])}")
 
 
 def update_entities(supabase, cluster_id: int, entities: list, category: str):
@@ -1385,6 +1890,10 @@ def main():
     # 根据页面渲染内容
     if page == "🏠 概览首页":
         render_overview(supabase, hours, category)
+    elif page == "🛰️ 哨兵态势":
+        render_monitor(supabase, hours)
+    elif page == "🕸️ 关系图谱":
+        render_graph(supabase, hours)
     elif page == "🔥 热点详情":
         render_hotspots(supabase, hours, category)
     elif page == "📡 信号中心":
