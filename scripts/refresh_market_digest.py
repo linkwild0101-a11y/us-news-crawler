@@ -76,13 +76,15 @@ STOCK_SIGNAL_HINTS = [
     "vix",
     "dxy",
 ]
-QUOTE_SYMBOLS = {
-    "spy": "SPY",
-    "qqq": "QQQ",
-    "dia": "DIA",
-    "vix": "^VIX",
-    "us10y": "^TNX",
-    "dxy": "DX-Y.NYB",
+STOOQ_SYMBOLS = {
+    "spy": "spy.us",
+    "qqq": "qqq.us",
+    "dia": "dia.us",
+}
+FRED_SERIES = {
+    "vix": "VIXCLS",
+    "us10y": "DGS10",
+    "dxy": "DTWEXBGS",
 }
 
 
@@ -142,10 +144,9 @@ def _is_stock_signal(row: Dict[str, Any]) -> bool:
     return any(hint.lower() in text for hint in STOCK_SIGNAL_HINTS)
 
 
-def _fetch_market_prices() -> Dict[str, Any]:
-    symbols = ",".join(QUOTE_SYMBOLS.values())
-    endpoint = f"https://query1.finance.yahoo.com/v7/finance/quote?symbols={symbols}"
-    snapshot = {key: None for key in QUOTE_SYMBOLS.keys()}
+def _fetch_stooq_close(symbol: str) -> float | None:
+    """读取 Stooq 日线收盘价（无需认证）。"""
+    endpoint = f"https://stooq.com/q/l/?s={symbol}&i=d"
     try:
         response = requests.get(
             endpoint,
@@ -153,28 +154,60 @@ def _fetch_market_prices() -> Dict[str, Any]:
             headers={"User-Agent": "USMonitor/1.0 market-digest"},
         )
         response.raise_for_status()
-        payload = response.json()
-        results = (
-            payload.get("quoteResponse", {}).get("result", [])
-            if isinstance(payload, dict)
-            else []
+        first_line = next((line.strip() for line in response.text.splitlines() if line.strip()), "")
+        parts = [item.strip() for item in first_line.split(",")]
+        if len(parts) < 7:
+            return None
+        close_value = parts[6]
+        if close_value in ("N/D", ""):
+            return None
+        return round(float(close_value), 4)
+    except Exception:
+        return None
+
+
+def _fetch_fred_latest(series_id: str) -> float | None:
+    """读取 FRED 最新有效值（无需 API key）。"""
+    endpoint = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
+    try:
+        response = requests.get(
+            endpoint,
+            timeout=12,
+            headers={"User-Agent": "USMonitor/1.0 market-digest"},
         )
-        symbol_to_field = {value: key for key, value in QUOTE_SYMBOLS.items()}
-        for row in results:
-            symbol = str(row.get("symbol") or "")
-            field = symbol_to_field.get(symbol)
-            if not field:
+        response.raise_for_status()
+        lines = [line.strip() for line in response.text.splitlines() if line.strip()]
+        if len(lines) <= 1:
+            return None
+        for line in reversed(lines[1:]):
+            parts = [item.strip() for item in line.split(",")]
+            if len(parts) < 2:
                 continue
-            price = row.get("regularMarketPrice")
-            try:
-                value = float(price)
-                if field == "us10y":
-                    value = round(value / 10.0, 3)
-                snapshot[field] = round(value, 4)
-            except Exception:
+            value = parts[1]
+            if value in ("", "."):
                 continue
-    except Exception as e:
-        logger.warning(f"[MARKET_PRICE_FALLBACK] 获取行情失败: {str(e)[:120]}")
+            return round(float(value), 4)
+    except Exception:
+        return None
+    return None
+
+
+def _fetch_market_prices() -> Dict[str, Any]:
+    """市场价格抓取：Stooq + FRED（均无需认证）。"""
+    snapshot = {"spy": None, "qqq": None, "dia": None, "vix": None, "us10y": None, "dxy": None}
+
+    for field, symbol in STOOQ_SYMBOLS.items():
+        value = _fetch_stooq_close(symbol)
+        snapshot[field] = value
+        if value is None:
+            logger.warning(f"[MARKET_PRICE_STOOQ_MISS] symbol={symbol}")
+
+    for field, series_id in FRED_SERIES.items():
+        value = _fetch_fred_latest(series_id)
+        snapshot[field] = value
+        if value is None:
+            logger.warning(f"[MARKET_PRICE_FRED_MISS] series={series_id}")
+
     return snapshot
 
 
