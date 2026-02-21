@@ -15,6 +15,7 @@ export interface MarketSnapshot {
 
 export interface SentinelSignal {
   id: number;
+  cluster_id: number | null;
   sentinel_id: string;
   alert_level: RiskLevel;
   risk_score: number;

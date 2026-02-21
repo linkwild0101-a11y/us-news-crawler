@@ -12,6 +12,7 @@ from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Set, Tuple
 
+import requests
 from supabase import create_client
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -54,6 +55,35 @@ TRACKED_TICKERS = {
     "VIX",
 }
 TOKEN_PATTERN = re.compile(r"\b[A-Z]{2,5}\b")
+STOCK_SIGNAL_HINTS = [
+    "美股",
+    "纳斯达克",
+    "納斯達克",
+    "道琼斯",
+    "道瓊斯",
+    "标普",
+    "標普",
+    "华尔街",
+    "華爾街",
+    "ETF",
+    "earnings",
+    "guidance",
+    "ipo",
+    "fed",
+    "fomc",
+    "treasury",
+    "yield",
+    "vix",
+    "dxy",
+]
+QUOTE_SYMBOLS = {
+    "spy": "SPY",
+    "qqq": "QQQ",
+    "dia": "DIA",
+    "vix": "^VIX",
+    "us10y": "^TNX",
+    "dxy": "DX-Y.NYB",
+}
 
 
 def _init_supabase():
@@ -93,6 +123,59 @@ def _extract_tickers(row: Dict[str, Any]) -> Set[str]:
                 tickers.add(token)
 
     return {item for item in tickers if item in TRACKED_TICKERS}
+
+
+def _is_stock_signal(row: Dict[str, Any]) -> bool:
+    tickers = _extract_tickers(row)
+    if tickers:
+        return True
+
+    text_parts = [
+        str(row.get("sentinel_id") or ""),
+        str(row.get("description") or ""),
+    ]
+    trigger_reasons = row.get("trigger_reasons", [])
+    if isinstance(trigger_reasons, list):
+        text_parts.extend([str(item) for item in trigger_reasons if item])
+
+    text = " ".join(text_parts).lower()
+    return any(hint.lower() in text for hint in STOCK_SIGNAL_HINTS)
+
+
+def _fetch_market_prices() -> Dict[str, Any]:
+    symbols = ",".join(QUOTE_SYMBOLS.values())
+    endpoint = f"https://query1.finance.yahoo.com/v7/finance/quote?symbols={symbols}"
+    snapshot = {key: None for key in QUOTE_SYMBOLS.keys()}
+    try:
+        response = requests.get(
+            endpoint,
+            timeout=12,
+            headers={"User-Agent": "USMonitor/1.0 market-digest"},
+        )
+        response.raise_for_status()
+        payload = response.json()
+        results = (
+            payload.get("quoteResponse", {}).get("result", [])
+            if isinstance(payload, dict)
+            else []
+        )
+        symbol_to_field = {value: key for key, value in QUOTE_SYMBOLS.items()}
+        for row in results:
+            symbol = str(row.get("symbol") or "")
+            field = symbol_to_field.get(symbol)
+            if not field:
+                continue
+            price = row.get("regularMarketPrice")
+            try:
+                value = float(price)
+                if field == "us10y":
+                    value = round(value / 10.0, 3)
+                snapshot[field] = round(value, 4)
+            except Exception:
+                continue
+    except Exception as e:
+        logger.warning(f"[MARKET_PRICE_FALLBACK] 获取行情失败: {str(e)[:120]}")
+    return snapshot
 
 
 def _highest_level(levels: List[str]) -> str:
@@ -187,25 +270,39 @@ def refresh_market_digest(hours: int = 24, limit: int = 400) -> Dict[str, Any]:
 
     logger.info(f"[MARKET_DIGEST_START] hours={hours} limit={limit}")
 
-    signals = _load_recent_signals(supabase, cutoff_iso, limit)
+    all_signals = _load_recent_signals(supabase, cutoff_iso, limit)
     clusters = _load_recent_clusters(supabase, cutoff_iso, limit)
+    signals = [row for row in all_signals if _is_stock_signal(row)]
 
-    risk_level, daily_brief = _build_daily_brief(signals, clusters)
+    stock_cluster_ids = {
+        int(row.get("cluster_id"))
+        for row in signals
+        if row.get("cluster_id") not in (None, "")
+        and str(row.get("cluster_id")).isdigit()
+    }
+    stock_clusters = [
+        row for row in clusters if int(row.get("id", 0) or 0) in stock_cluster_ids
+    ]
+
+    risk_level, daily_brief = _build_daily_brief(signals, stock_clusters)
+    prices = _fetch_market_prices()
 
     today = datetime.now(timezone.utc).date().isoformat()
     snapshot_payload = {
         "snapshot_date": today,
-        "spy": None,
-        "qqq": None,
-        "dia": None,
-        "vix": None,
-        "us10y": None,
-        "dxy": None,
+        "spy": prices.get("spy"),
+        "qqq": prices.get("qqq"),
+        "dia": prices.get("dia"),
+        "vix": prices.get("vix"),
+        "us10y": prices.get("us10y"),
+        "dxy": prices.get("dxy"),
         "risk_level": risk_level,
         "daily_brief": daily_brief,
         "source_payload": {
-            "signal_count": len(signals),
+            "signal_count": len(all_signals),
+            "stock_signal_count": len(signals),
             "cluster_count": len(clusters),
+            "stock_cluster_count": len(stock_clusters),
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "window_hours": hours,
         },
@@ -214,7 +311,11 @@ def refresh_market_digest(hours: int = 24, limit: int = 400) -> Dict[str, Any]:
     supabase.table("market_snapshot_daily").upsert(snapshot_payload).execute()
     logger.info(f"[MARKET_DIGEST_SNAPSHOT] date={today} risk={risk_level}")
 
-    cluster_map = {int(item.get("id", 0)): item for item in clusters if item.get("id")}
+    cluster_map = {
+        int(item.get("id", 0)): item
+        for item in stock_clusters
+        if item.get("id")
+    }
 
     bucket: Dict[str, Dict[str, Any]] = defaultdict(
         lambda: {
@@ -292,13 +393,16 @@ def refresh_market_digest(hours: int = 24, limit: int = 400) -> Dict[str, Any]:
     logger.info(
         "[MARKET_DIGEST_DONE] "
         f"snapshot_risk={risk_level} ticker_rows={len(digest_rows)} "
-        f"signals={len(signals)} clusters={len(clusters)}"
+        f"stock_signals={len(signals)} all_signals={len(all_signals)} "
+        f"stock_clusters={len(stock_clusters)} all_clusters={len(clusters)}"
     )
 
     return {
         "risk_level": risk_level,
-        "signals": len(signals),
+        "signals": len(all_signals),
+        "stock_signals": len(signals),
         "clusters": len(clusters),
+        "stock_clusters": len(stock_clusters),
         "ticker_rows": len(digest_rows),
     }
 

@@ -19,6 +19,86 @@ const LEVEL_ORDER: Record<RiskLevel, number> = {
 };
 
 const FALLBACK_TICKERS = ["SPY", "QQQ", "DIA", "IWM", "XLF", "XLK", "XLE", "XLV"];
+const STOCK_TICKERS = new Set([
+  "SPY",
+  "QQQ",
+  "DIA",
+  "IWM",
+  "VTI",
+  "VOO",
+  "XLF",
+  "XLK",
+  "XLE",
+  "XLV",
+  "XLI",
+  "XLP",
+  "XLY",
+  "XLU",
+  "XLRE",
+  "SMH",
+  "SOXX",
+  "TLT",
+  "DXY",
+  "VIX",
+  "AAPL",
+  "MSFT",
+  "NVDA",
+  "AMZN",
+  "GOOGL",
+  "META",
+  "TSLA"
+]);
+const STOCK_HINTS = [
+  "美股",
+  "纳斯达克",
+  "納斯達克",
+  "道琼斯",
+  "道瓊斯",
+  "标普",
+  "標普",
+  "华尔街",
+  "華爾街",
+  "ETF",
+  "EARNINGS",
+  "RATE CUT",
+  "RATE HIKE",
+  "FED",
+  "FOMC",
+  "TREASURY",
+  "YIELD",
+  "DXY",
+  "VIX"
+];
+const STOCK_CLUSTER_HINTS = [
+  "美股",
+  "美國股市",
+  "财报",
+  "財報",
+  "业绩",
+  "業績",
+  "股价",
+  "股價",
+  "估值",
+  "加息",
+  "降息",
+  "纳斯达克",
+  "納斯達克",
+  "标普",
+  "標普",
+  "道琼斯",
+  "道瓊斯",
+  "华尔街",
+  "華爾街",
+  "ETF",
+  "EARNINGS",
+  "GUIDANCE",
+  "IPO",
+  "FED",
+  "FOMC",
+  "TREASURY",
+  "YIELD"
+];
+const TICKER_PATTERN = /\b[A-Z]{2,5}\b/g;
 
 function toIsoString(value: unknown): string {
   if (typeof value === "string" && value.trim()) {
@@ -61,6 +141,59 @@ function toStringArray(value: unknown): string[] {
     .slice(0, 5);
 }
 
+function collectTickerTokens(text: string): string[] {
+  const matches = text.toUpperCase().match(TICKER_PATTERN) || [];
+  return matches.filter((token) => STOCK_TICKERS.has(token));
+}
+
+function textContainsStockHint(text: string): boolean {
+  const upper = text.toUpperCase();
+  return STOCK_HINTS.some((hint) => upper.includes(hint.toUpperCase()));
+}
+
+function isStockSignal(row: {
+  sentinel_id: string;
+  description: string;
+  trigger_reasons: string[];
+  details: unknown;
+}): boolean {
+  const details = typeof row.details === "object" && row.details ? row.details : {};
+  const relatedTickers = Array.isArray((details as Record<string, unknown>).related_tickers)
+    ? ((details as Record<string, unknown>).related_tickers as unknown[])
+    : [];
+  for (const item of relatedTickers) {
+    if (STOCK_TICKERS.has(String(item || "").toUpperCase())) {
+      return true;
+    }
+  }
+
+  const payload = [row.sentinel_id, row.description, ...row.trigger_reasons].join(" ");
+  if (collectTickerTokens(payload).length > 0) {
+    return true;
+  }
+  return textContainsStockHint(payload);
+}
+
+function isStockCluster(row: {
+  primary_title: string;
+  summary: string;
+}): boolean {
+  const payload = `${row.primary_title} ${row.summary}`;
+  if (collectTickerTokens(payload).length > 0) {
+    return true;
+  }
+  const upper = payload.toUpperCase();
+  return STOCK_CLUSTER_HINTS.some((hint) => upper.includes(hint.toUpperCase()));
+}
+
+function isStockRelationText(text: string): boolean {
+  if (collectTickerTokens(text).length > 0) {
+    return true;
+  }
+  const upper = text.toUpperCase();
+  return STOCK_CLUSTER_HINTS.some((hint) => upper.includes(hint.toUpperCase()));
+}
+
 function buildReadonlyClient(): SupabaseClient | null {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -91,14 +224,14 @@ function baseSnapshot(): MarketSnapshot {
     us10y: null,
     dxy: null,
     risk_level: "L1",
-    daily_brief: "暂无聚合市场快照，已回退到实时信号视图。",
+    daily_brief: "暂无美股聚合快照，已回退到股票相关信号视图。",
     updated_at: now
   };
 }
 
 function deriveBriefFromSignals(signals: SentinelSignal[]): string {
   if (!signals.length) {
-    return "最近24小时暂无 L1-L4 哨兵告警。";
+    return "最近24小时暂无与美股相关的 L1-L4 告警。";
   }
 
   const high = signals.filter((item) => item.alert_level === "L4" || item.alert_level === "L3").length;
@@ -106,12 +239,12 @@ function deriveBriefFromSignals(signals: SentinelSignal[]): string {
   const latest = signals[0]?.description || "监控系统已捕获新的风险线索。";
 
   if (high > 0) {
-    return `最近24小时出现 ${high} 条高风险告警，建议优先关注 L3/L4。${latest}`;
+    return `最近24小时出现 ${high} 条美股高风险告警，建议优先关注 L3/L4。${latest}`;
   }
   if (medium > 0) {
-    return `最近24小时出现 ${medium} 条中风险告警，建议持续跟踪。${latest}`;
+    return `最近24小时出现 ${medium} 条美股中风险告警，建议持续跟踪。${latest}`;
   }
-  return `系统已捕获 ${signals.length} 条低风险告警，市场情绪整体可控。${latest}`;
+  return `系统已捕获 ${signals.length} 条美股低风险告警，市场情绪整体可控。${latest}`;
 }
 
 async function querySentinelSignals(client: SupabaseClient): Promise<SentinelSignal[]> {
@@ -119,26 +252,42 @@ async function querySentinelSignals(client: SupabaseClient): Promise<SentinelSig
     const { data, error } = await client
       .from("analysis_signals")
       .select(
-        "id,sentinel_id,alert_level,risk_score,description,trigger_reasons,evidence_links,created_at"
+        "id,cluster_id,sentinel_id,alert_level,risk_score,description,trigger_reasons,"
+        + "evidence_links,details,created_at"
       )
       .eq("signal_type", "watchlist_alert")
       .order("created_at", { ascending: false })
-      .limit(24);
+      .limit(60);
 
     if (error) {
       throw error;
     }
 
-    return (data || []).map((row) => ({
+    const rawRows = (data || []) as unknown as Array<Record<string, unknown>>;
+    const rows = rawRows.map((row) => ({
       id: Number(row.id || 0),
+      cluster_id: row.cluster_id === null || row.cluster_id === undefined ? null : Number(row.cluster_id),
       sentinel_id: String(row.sentinel_id || "unknown_sentinel"),
       alert_level: toLevel(row.alert_level),
       risk_score: toScore(row.risk_score),
       description: String(row.description || "哨兵告警"),
       trigger_reasons: toStringArray(row.trigger_reasons),
       evidence_links: toStringArray(row.evidence_links),
+      details: row.details,
       created_at: toIsoString(row.created_at)
     }));
+
+    return rows
+      .filter((row) =>
+        isStockSignal({
+          sentinel_id: row.sentinel_id,
+          description: row.description,
+          trigger_reasons: row.trigger_reasons,
+          details: row.details
+        })
+      )
+      .slice(0, 24)
+      .map(({ details: _details, ...signal }) => signal);
   } catch (error) {
     console.warn("[FRONTEND_SIGNAL_QUERY_FALLBACK]", error);
     return [];
@@ -155,6 +304,9 @@ async function queryMarketSnapshot(
   client: SupabaseClient,
   signals: SentinelSignal[]
 ): Promise<MarketSnapshot> {
+  const derivedRisk = calculateTopRisk(signals);
+  const derivedBrief = deriveBriefFromSignals(signals);
+
   try {
     const { data, error } = await client
       .from("market_snapshot_daily")
@@ -171,8 +323,8 @@ async function queryMarketSnapshot(
 
     if (!data) {
       const snapshot = baseSnapshot();
-      snapshot.risk_level = calculateTopRisk(signals);
-      snapshot.daily_brief = deriveBriefFromSignals(signals);
+      snapshot.risk_level = derivedRisk;
+      snapshot.daily_brief = derivedBrief;
       return snapshot;
     }
 
@@ -184,15 +336,15 @@ async function queryMarketSnapshot(
       vix: toNumber(data.vix),
       us10y: toNumber(data.us10y),
       dxy: toNumber(data.dxy),
-      risk_level: toLevel(data.risk_level),
-      daily_brief: String(data.daily_brief || deriveBriefFromSignals(signals)),
+      risk_level: derivedRisk,
+      daily_brief: derivedBrief,
       updated_at: toIsoString(data.updated_at)
     };
   } catch (error) {
     console.warn("[FRONTEND_MARKET_SNAPSHOT_FALLBACK]", error);
     const snapshot = baseSnapshot();
-    snapshot.risk_level = calculateTopRisk(signals);
-    snapshot.daily_brief = deriveBriefFromSignals(signals);
+    snapshot.risk_level = derivedRisk;
+    snapshot.daily_brief = derivedBrief;
     return snapshot;
   }
 }
@@ -242,26 +394,62 @@ async function queryTickerDigest(
   }
 }
 
-async function queryHotClusters(client: SupabaseClient): Promise<HotCluster[]> {
+async function queryHotClusters(
+  client: SupabaseClient,
+  signals: SentinelSignal[]
+): Promise<HotCluster[]> {
+  const stockClusterIds = Array.from(
+    new Set(
+      signals
+        .map((signal) => signal.cluster_id)
+        .filter((clusterId): clusterId is number => typeof clusterId === "number" && clusterId > 0)
+    )
+  );
+
+  const toCluster = (row: Record<string, unknown>): HotCluster => ({
+    id: Number(row.id || 0),
+    category: String(row.category || "unknown"),
+    primary_title: String(row.primary_title || "Untitled"),
+    summary: String(row.summary || "暂无摘要"),
+    article_count: Number(row.article_count || 0),
+    created_at: toIsoString(row.created_at)
+  });
+
   try {
+    if (stockClusterIds.length > 0) {
+      const { data, error } = await client
+        .from("analysis_clusters")
+        .select("id,category,primary_title,summary,article_count,created_at")
+        .in("id", stockClusterIds.slice(0, 40))
+        .order("created_at", { ascending: false })
+        .limit(20);
+
+      if (error) {
+        throw error;
+      }
+
+      return (data || []).map((row) => toCluster(row as Record<string, unknown>));
+    }
+
     const { data, error } = await client
       .from("analysis_clusters")
       .select("id,category,primary_title,summary,article_count,created_at")
       .order("created_at", { ascending: false })
-      .limit(20);
+      .limit(60);
 
     if (error) {
       throw error;
     }
 
-    return (data || []).map((row) => ({
-      id: Number(row.id || 0),
-      category: String(row.category || "unknown"),
-      primary_title: String(row.primary_title || "Untitled"),
-      summary: String(row.summary || "暂无摘要"),
-      article_count: Number(row.article_count || 0),
-      created_at: toIsoString(row.created_at)
-    }));
+    return (data || [])
+      .filter((row) =>
+        isStockCluster({
+          primary_title: String(row.primary_title || ""),
+          summary: String(row.summary || "")
+        })
+      )
+      .slice(0, 20)
+      .map((row) => toCluster(row as Record<string, unknown>));
   } catch (error) {
     console.warn("[FRONTEND_CLUSTER_QUERY_FALLBACK]", error);
     return [];
@@ -304,18 +492,22 @@ async function queryEntityRelations(client: SupabaseClient): Promise<EntityRelat
       }
     }
 
-    return (relationRows || []).map((row) => {
-      const entity1Id = Number(row.entity1_id || 0);
-      const entity2Id = Number(row.entity2_id || 0);
-      return {
-        id: Number(row.id || 0),
-        entity1_name: entityNameMap.get(entity1Id) || `Entity#${entity1Id}`,
-        entity2_name: entityNameMap.get(entity2Id) || `Entity#${entity2Id}`,
-        relation_text: String(row.relation_text || "关联"),
-        confidence: Number(row.confidence || 0),
-        last_seen: toIsoString(row.last_seen)
-      };
-    });
+    return (relationRows || [])
+      .map((row) => {
+        const entity1Id = Number(row.entity1_id || 0);
+        const entity2Id = Number(row.entity2_id || 0);
+        return {
+          id: Number(row.id || 0),
+          entity1_name: entityNameMap.get(entity1Id) || `Entity#${entity1Id}`,
+          entity2_name: entityNameMap.get(entity2Id) || `Entity#${entity2Id}`,
+          relation_text: String(row.relation_text || "关联"),
+          confidence: Number(row.confidence || 0),
+          last_seen: toIsoString(row.last_seen)
+        };
+      })
+      .filter((row) =>
+        isStockRelationText(`${row.entity1_name} ${row.entity2_name} ${row.relation_text}`)
+      );
   } catch (error) {
     console.warn("[FRONTEND_RELATION_QUERY_FALLBACK]", error);
     return [];
@@ -358,7 +550,7 @@ export async function getDashboardData(): Promise<DashboardData> {
   const [marketSnapshot, tickerDigest, hotClusters, relations] = await Promise.all([
     queryMarketSnapshot(client, sentinelSignals),
     queryTickerDigest(client, sentinelSignals),
-    queryHotClusters(client),
+    queryHotClusters(client, sentinelSignals),
     queryEntityRelations(client)
   ]);
 
