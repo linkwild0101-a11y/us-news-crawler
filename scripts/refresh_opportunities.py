@@ -242,18 +242,37 @@ def _sentiment_bias(text: str) -> float:
 
 
 def _load_signals(supabase, cutoff_iso: str, limit: int) -> List[Dict[str, Any]]:
-    rows = (
-        supabase.table("analysis_signals")
-        .select(
-            "id,signal_type,cluster_id,sentinel_id,alert_level,risk_score,description,"
-            "trigger_reasons,evidence_links,details,created_at"
+    """读取信号，兼容旧库缺少 details 字段。"""
+    try:
+        rows = (
+            supabase.table("analysis_signals")
+            .select(
+                "id,signal_type,cluster_id,sentinel_id,alert_level,risk_score,description,"
+                "trigger_reasons,evidence_links,details,created_at"
+            )
+            .gte("created_at", cutoff_iso)
+            .order("created_at", desc=True)
+            .limit(limit)
+            .execute()
         )
-        .gte("created_at", cutoff_iso)
-        .order("created_at", desc=True)
-        .limit(limit)
-        .execute()
-    )
-    return rows.data or []
+        return rows.data or []
+    except Exception as e:
+        logger.warning(
+            "[OPPORTUNITY_SCHEMA_FALLBACK] analysis_signals 缺少 details 字段，"
+            f"降级查询: {str(e)[:120]}"
+        )
+        rows = (
+            supabase.table("analysis_signals")
+            .select(
+                "id,signal_type,cluster_id,sentinel_id,alert_level,risk_score,description,"
+                "trigger_reasons,evidence_links,created_at"
+            )
+            .gte("created_at", cutoff_iso)
+            .order("created_at", desc=True)
+            .limit(limit)
+            .execute()
+        )
+        return rows.data or []
 
 
 def _load_clusters(supabase, cutoff_iso: str, limit: int) -> Dict[int, Dict[str, Any]]:
