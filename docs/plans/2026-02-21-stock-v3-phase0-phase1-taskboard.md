@@ -15,6 +15,13 @@
 3. 建立数据源健康度基础能力（source health）
 4. 不影响当前 V2 主链路稳定运行
 
+## 执行进展（2026-02-21）
+
+- [x] P0-1 冻结 V2 基线（tag: `stock-v2-baseline-2026-02-21`）
+- [x] P0-2 接入 V3 feature flags（默认关闭）
+- [x] P0-3 周报/Gate 模板落盘
+- [ ] Phase 1 任务执行中
+
 ---
 
 ## 2. 看板规则
@@ -255,4 +262,3 @@ python3 scripts/stock_pipeline_v2.py --mode incremental --hours 168 --article-li
 1. `offline-eval-protocol-v1.md`
 2. `model-promotion-gate-v1.md`
 3. Champion/Challenger 对照运行（7 天）
-
