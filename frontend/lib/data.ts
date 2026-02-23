@@ -1,8 +1,10 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 import {
+  AiDebateView,
   DashboardData,
   DataQualitySnapshot,
+  EvidenceItem,
   EntityRelationItem,
   HotCluster,
   MarketRegime,
@@ -11,9 +13,15 @@ import {
   RiskLevel,
   SentinelSignal,
   SourceMix,
+  TransmissionPath,
   XSourceRadarItem,
   TickerSignalDigest
 } from "@/lib/types";
+import {
+  readAiDebateViewFlag,
+  readEvidenceLayerFlag,
+  readTransmissionLayerFlag
+} from "@/lib/feature-flags";
 
 const LEVEL_ORDER: Record<RiskLevel, number> = {
   L0: 0,
@@ -269,6 +277,39 @@ function toSourceMix(value: unknown): SourceMix | null {
     top_x_handles: handles,
     latest_x_at: toIsoString(row.latest_x_at),
     latest_news_at: toIsoString(row.latest_news_at)
+  };
+}
+
+function toObjectArray(value: unknown): Array<Record<string, unknown>> {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  const filtered = value.filter((item) => item && typeof item === "object" && !Array.isArray(item));
+  return filtered as Array<Record<string, unknown>>;
+}
+
+function buildAiDebateView(opportunity: OpportunityItem): AiDebateView | null {
+  const proCase = String(opportunity.why_now || "").trim();
+  const counterCase = String(opportunity.counter_view || "").trim();
+  const uncertainties = (opportunity.uncertainty_flags || [])
+    .map((item) => String(item || "").trim())
+    .filter((item) => item.length > 0);
+
+  if (!proCase && !counterCase && uncertainties.length === 0) {
+    return null;
+  }
+
+  const checks = [
+    "先核对原文关键数字和发布时间是否一致。",
+    "确认是否存在24小时内反向催化。",
+    "结合仓位与风险限额决定执行节奏。"
+  ];
+
+  return {
+    pro_case: proCase || "当前信号与催化结构支持该方向。",
+    counter_case: counterCase || "若出现反向宏观/行业催化，当前观点可能失效。",
+    uncertainties: uncertainties.length > 0 ? uncertainties : ["证据存在时效与来源偏差风险。"],
+    pre_trade_checks: checks
   };
 }
 
@@ -566,23 +607,48 @@ async function queryV2Signals(client: SupabaseClient): Promise<SentinelSignal[]>
 }
 
 async function queryV2Opportunities(client: SupabaseClient): Promise<OpportunityItem[]> {
-  try {
+  const selectWithEvidence = (
+    "id,ticker,side,horizon,opportunity_score,confidence,risk_level,why_now,invalid_if,"
+    + "catalysts,source_signal_ids,source_event_ids,source_mix,evidence_ids,path_ids,"
+    + "uncertainty_flags,counter_view,expires_at,as_of"
+  );
+  const selectLegacy = (
+    "id,ticker,side,horizon,opportunity_score,confidence,risk_level,why_now,invalid_if,"
+    + "catalysts,source_signal_ids,source_event_ids,source_mix,expires_at,as_of"
+  );
+
+  async function runQuery(selectClause: string): Promise<Array<Record<string, unknown>>> {
     const { data, error } = await client
       .from("stock_opportunities_v2")
-      .select(
-        "id,ticker,side,horizon,opportunity_score,confidence,risk_level,why_now,invalid_if,"
-        + "catalysts,source_signal_ids,source_event_ids,source_mix,evidence_ids,path_ids,"
-        + "uncertainty_flags,counter_view,expires_at,as_of"
-      )
+      .select(selectClause)
       .eq("is_active", true)
       .order("opportunity_score", { ascending: false })
       .limit(40);
-
     if (error) {
       throw error;
     }
+    return (data || []) as unknown as Array<Record<string, unknown>>;
+  }
 
-    const rows = (data || []) as unknown as Array<Record<string, unknown>>;
+  try {
+    let rows: Array<Record<string, unknown>> = [];
+    try {
+      rows = await runQuery(selectWithEvidence);
+    } catch (firstError) {
+      const errorText = String(firstError || "");
+      if (
+        errorText.includes("evidence_ids")
+        || errorText.includes("path_ids")
+        || errorText.includes("counter_view")
+        || errorText.includes("uncertainty_flags")
+      ) {
+        console.warn("[FRONTEND_V2_OPP_SELECT_FALLBACK]", firstError);
+        rows = await runQuery(selectLegacy);
+      } else {
+        throw firstError;
+      }
+    }
+
     const now = new Date().toISOString();
     return rows
       .map((row) => {
@@ -691,6 +757,127 @@ async function queryV2Snapshot(client: SupabaseClient): Promise<V2SnapshotRow | 
   } catch (error) {
     console.warn("[FRONTEND_V2_SNAPSHOT_FALLBACK]", error);
     return null;
+  }
+}
+
+async function queryV2EvidenceMap(
+  client: SupabaseClient,
+  opportunityIds: number[]
+): Promise<Map<number, EvidenceItem[]>> {
+  if (opportunityIds.length === 0) {
+    return new Map();
+  }
+  try {
+    const { data, error } = await client
+      .from("stock_evidence_v2")
+      .select(
+        "id,opportunity_id,ticker,source_type,source_ref,source_url,source_name,published_at,"
+        + "quote_snippet,numeric_facts,confidence,as_of"
+      )
+      .eq("is_active", true)
+      .in("opportunity_id", opportunityIds)
+      .order("confidence", { ascending: false })
+      .limit(1200);
+
+    if (error) {
+      throw error;
+    }
+
+    const map = new Map<number, EvidenceItem[]>();
+    for (const row of (data || []) as unknown as Array<Record<string, unknown>>) {
+      const oppId = Number(row.opportunity_id || 0);
+      if (!Number.isFinite(oppId) || oppId <= 0) {
+        continue;
+      }
+      const item: EvidenceItem = {
+        id: Number(row.id || 0),
+        opportunity_id: oppId,
+        ticker: String(row.ticker || "").toUpperCase(),
+        source_type: String(row.source_type || "article"),
+        source_ref: String(row.source_ref || ""),
+        source_url: String(row.source_url || ""),
+        source_name: String(row.source_name || ""),
+        published_at: toIsoString(row.published_at),
+        quote_snippet: String(row.quote_snippet || ""),
+        numeric_facts: toObjectArray(row.numeric_facts),
+        confidence: toScore(row.confidence),
+        as_of: toIsoString(row.as_of)
+      };
+      const existing = map.get(oppId) || [];
+      existing.push(item);
+      map.set(oppId, existing);
+    }
+    for (const [oppId, rows] of map.entries()) {
+      map.set(oppId, rows.slice(0, 6));
+    }
+    return map;
+  } catch (error) {
+    console.warn("[FRONTEND_V2_EVIDENCE_FALLBACK]", error);
+    return new Map();
+  }
+}
+
+async function queryV2TransmissionMap(
+  client: SupabaseClient,
+  opportunityIds: number[]
+): Promise<Map<number, TransmissionPath[]>> {
+  if (opportunityIds.length === 0) {
+    return new Map();
+  }
+  try {
+    const { data, error } = await client
+      .from("stock_transmission_paths_v2")
+      .select(
+        "id,opportunity_id,path_key,ticker,macro_factor,industry,direction,strength,reason,"
+        + "evidence_ids,as_of"
+      )
+      .eq("is_active", true)
+      .in("opportunity_id", opportunityIds)
+      .order("strength", { ascending: false })
+      .limit(800);
+
+    if (error) {
+      throw error;
+    }
+
+    const map = new Map<number, TransmissionPath[]>();
+    for (const row of (data || []) as unknown as Array<Record<string, unknown>>) {
+      const oppId = Number(row.opportunity_id || 0);
+      if (!Number.isFinite(oppId) || oppId <= 0) {
+        continue;
+      }
+      const directionText = String(row.direction || "NEUTRAL").toUpperCase();
+      const direction: TransmissionPath["direction"] = directionText === "LONG"
+        ? "LONG"
+        : directionText === "SHORT"
+          ? "SHORT"
+          : "NEUTRAL";
+      const item: TransmissionPath = {
+        id: Number(row.id || 0),
+        opportunity_id: oppId,
+        path_key: String(row.path_key || ""),
+        ticker: String(row.ticker || "").toUpperCase(),
+        macro_factor: String(row.macro_factor || "宏观因子"),
+        industry: String(row.industry || "Unknown"),
+        direction,
+        strength: Math.max(0, Math.min(1, Number(row.strength || 0))),
+        reason: String(row.reason || ""),
+        evidence_ids: Array.isArray(row.evidence_ids)
+          ? row.evidence_ids.map((item) => Number(item || 0)).filter((item) => item > 0)
+          : [],
+        as_of: toIsoString(row.as_of)
+      };
+      const existing = map.get(oppId) || [];
+      existing.push(item);
+      map.set(oppId, existing);
+    }
+    for (const [oppId, rows] of map.entries()) {
+      map.set(oppId, rows.slice(0, 3));
+    }
+    return map;
+  } catch (error) {
+    console.warn("[FRONTEND_V2_PATH_FALLBACK]", error);
+    return new Map();
   }
 }
 
@@ -1314,15 +1501,43 @@ async function queryV2Relations(client: SupabaseClient): Promise<EntityRelationI
 }
 
 async function getDashboardDataFromV2(client: SupabaseClient): Promise<DashboardData | null> {
-  const [sentinelSignals, opportunities, marketRegime, v2Snapshot] = await Promise.all([
+  const evidenceEnabled = readEvidenceLayerFlag();
+  const transmissionEnabled = readTransmissionLayerFlag();
+  const aiDebateEnabled = readAiDebateViewFlag();
+
+  const [sentinelSignals, rawOpportunities, marketRegime, v2Snapshot] = await Promise.all([
     queryV2Signals(client),
     queryV2Opportunities(client),
     queryV2Regime(client),
     queryV2Snapshot(client)
   ]);
 
-  if (!v2Snapshot && sentinelSignals.length === 0 && opportunities.length === 0) {
+  if (!v2Snapshot && sentinelSignals.length === 0 && rawOpportunities.length === 0) {
     return null;
+  }
+
+  let opportunities = rawOpportunities;
+  if (rawOpportunities.length > 0 && (evidenceEnabled || transmissionEnabled || aiDebateEnabled)) {
+    const opportunityIds = rawOpportunities
+      .map((item) => Number(item.id || 0))
+      .filter((item) => Number.isFinite(item) && item > 0);
+
+    const [evidenceMap, pathMap] = await Promise.all([
+      evidenceEnabled ? queryV2EvidenceMap(client, opportunityIds) : Promise.resolve(new Map()),
+      transmissionEnabled ? queryV2TransmissionMap(client, opportunityIds) : Promise.resolve(new Map())
+    ]);
+
+    opportunities = rawOpportunities.map((item) => {
+      const evidenceRows = evidenceEnabled ? (evidenceMap.get(item.id) || []) : [];
+      const pathRows = transmissionEnabled ? (pathMap.get(item.id) || []) : [];
+      const debateView = aiDebateEnabled ? buildAiDebateView(item) : null;
+      return {
+        ...item,
+        evidences: evidenceRows,
+        transmission_paths: pathRows,
+        ai_debate_view: debateView
+      };
+    });
   }
 
   const tickerDigest = buildTickerDigestFromV2(sentinelSignals, opportunities);

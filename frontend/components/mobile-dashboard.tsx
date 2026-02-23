@@ -4,14 +4,21 @@ import { useMemo, useState } from "react";
 
 import { MetricHint } from "@/components/metric-hint";
 import { MetricDictionaryCenter } from "@/components/metric-dictionary-center";
-import { readDashboardV3ExplainFlag } from "@/lib/feature-flags";
+import {
+  readAiDebateViewFlag,
+  readDashboardV3ExplainFlag,
+  readEvidenceLayerFlag,
+  readTransmissionLayerFlag
+} from "@/lib/feature-flags";
 import { METRIC_EXPLANATIONS, MetricKey } from "@/lib/metric-explanations";
 import {
+  AiDebateView,
   DashboardData,
   OpportunityItem,
   RiskLevel,
   SentinelSignal,
   SourceMix,
+  TransmissionPath,
   TickerSignalDigest
 } from "@/lib/types";
 
@@ -153,6 +160,118 @@ function rankOpportunities(items: OpportunityItem[]): OpportunityItem[] {
   });
 }
 
+function estimateEvidenceCompleteness(item: OpportunityItem): {
+  label: "高" | "中" | "低";
+  className: string;
+} {
+  const evidences = item.evidences || [];
+  const evidenceCount = evidences.length || (item.evidence_ids || []).length;
+  const sourceCount = new Set(
+    evidences
+      .map((row) => row.source_name.trim().toLowerCase())
+      .filter((name) => name.length > 0)
+  ).size;
+  const numericFactCount = evidences.reduce((sum, row) => sum + row.numeric_facts.length, 0);
+
+  if (evidenceCount >= 4 && sourceCount >= 2 && numericFactCount >= 2) {
+    return {
+      label: "高",
+      className: "text-riskLow bg-emerald-500/10 border-emerald-300/30"
+    };
+  }
+  if (evidenceCount >= 2) {
+    return {
+      label: "中",
+      className: "text-riskMid bg-amber-500/10 border-amber-300/30"
+    };
+  }
+  return {
+    label: "低",
+    className: "text-riskHigh bg-red-500/10 border-red-400/30"
+  };
+}
+
+function estimateTransmissionStrength(item: OpportunityItem): {
+  label: "强" | "中" | "弱";
+  className: string;
+} {
+  const rows = item.transmission_paths || [];
+  if (!rows.length) {
+    return {
+      label: "弱",
+      className: "text-textMuted bg-slate-500/10 border-slate-400/30"
+    };
+  }
+  const avg = rows.reduce((sum, row) => sum + row.strength, 0) / rows.length;
+  if (avg >= 0.7) {
+    return {
+      label: "强",
+      className: "text-riskLow bg-emerald-500/10 border-emerald-300/30"
+    };
+  }
+  if (avg >= 0.5) {
+    return {
+      label: "中",
+      className: "text-riskMid bg-amber-500/10 border-amber-300/30"
+    };
+  }
+  return {
+    label: "弱",
+    className: "text-textMuted bg-slate-500/10 border-slate-400/30"
+  };
+}
+
+function toDebateView(item: OpportunityItem): AiDebateView {
+  const direct = item.ai_debate_view;
+  if (direct) {
+    return direct;
+  }
+  return {
+    pro_case: item.why_now || "当前信号与催化结构支持该方向。",
+    counter_case: item.counter_view || "若出现反向宏观催化，该观点可能失效。",
+    uncertainties: item.uncertainty_flags?.length
+      ? item.uncertainty_flags
+      : ["证据时效或来源结构可能影响结论稳定性。"],
+    pre_trade_checks: [
+      "核对原文关键段落和数字事实。",
+      "确认近24小时是否有反向催化。",
+      "结合仓位与风控阈值再执行。"
+    ]
+  };
+}
+
+function collectOriginalLinks(item: OpportunityItem): Array<{ label: string; url: string }> {
+  const seen = new Set<string>();
+  const links: Array<{ label: string; url: string }> = [];
+  const evidenceRows = item.evidences || [];
+  for (const row of evidenceRows) {
+    const url = row.source_url.trim();
+    if (!url || seen.has(url)) {
+      continue;
+    }
+    seen.add(url);
+    const sourceName = row.source_name.trim() || row.source_type || "source";
+    links.push({
+      label: `${sourceName} · ${formatTime(row.published_at)}`,
+      url
+    });
+    if (links.length >= 8) {
+      break;
+    }
+  }
+  return links;
+}
+
+function transmissionDirectionClass(direction: TransmissionPath["direction"]): string {
+  if (direction === "LONG") {
+    return "text-riskLow";
+  }
+  if (direction === "SHORT") {
+    return "text-riskHigh";
+  }
+  return "text-textMuted";
+}
+
 function LabelWithHint({ label, hintKey }: { label: string; hintKey: MetricKey }) {
   return (
     <span className="inline-flex items-center">
@@ -199,6 +318,10 @@ function OpportunityCard({
   onOpenEvidence: (item: OpportunityItem) => void;
 }) {
   const sourceBadge = resolveSourceBadge(item.source_mix);
+  const evidenceBadge = estimateEvidenceCompleteness(item);
+  const transmissionBadge = estimateTransmissionStrength(item);
+  const evidenceCount = (item.evidences || []).length || (item.evidence_ids || []).length;
+  const pathCount = (item.transmission_paths || []).length || (item.path_ids || []).length;
   return (
     <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
       <div className="mb-3 flex items-start justify-between gap-3">
@@ -235,9 +358,23 @@ function OpportunityCard({
       </div>
 
       <p className="text-sm leading-6 text-textMain">{item.why_now}</p>
+      {item.counter_view && (
+        <p className="mt-1 text-xs leading-5 text-textMuted">
+          反方视角：{item.counter_view}
+        </p>
+      )}
       <p className="mt-2 text-xs leading-5 text-textMuted">
         <LabelWithHint label="失效条件" hintKey="invalid_if" />: {item.invalid_if}
       </p>
+
+      <div className="mt-3 flex flex-wrap gap-2 text-xs">
+        <span className={`rounded-md border px-2 py-1 ${evidenceBadge.className}`}>
+          证据完整度 {evidenceBadge.label} · {evidenceCount}
+        </span>
+        <span className={`rounded-md border px-2 py-1 ${transmissionBadge.className}`}>
+          传导链 {transmissionBadge.label} · {pathCount}
+        </span>
+      </div>
 
       {item.catalysts.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
@@ -276,12 +413,26 @@ function OpportunityCard({
 
 function EvidenceDrawer({
   item,
-  onClose
+  onClose,
+  enableEvidenceLayer,
+  enableTransmissionLayer,
+  enableAiDebateView,
+  onAddToReview,
+  reviewQueued
 }: {
   item: OpportunityItem;
   onClose: () => void;
+  enableEvidenceLayer: boolean;
+  enableTransmissionLayer: boolean;
+  enableAiDebateView: boolean;
+  onAddToReview: (item: OpportunityItem) => void;
+  reviewQueued: boolean;
 }) {
   const sourceBadge = resolveSourceBadge(item.source_mix);
+  const debate = toDebateView(item);
+  const evidenceRows = (enableEvidenceLayer ? item.evidences : []) || [];
+  const pathRows = (enableTransmissionLayer ? item.transmission_paths : []) || [];
+  const originalLinks = collectOriginalLinks(item);
   return (
     <div className="fixed inset-0 z-40 bg-black/70 px-3 py-4 backdrop-blur-sm md:px-6 md:py-8">
       <div className="mx-auto max-h-full max-w-xl overflow-y-auto rounded-2xl border border-slate-700 bg-panel p-4">
@@ -302,47 +453,139 @@ function EvidenceDrawer({
         </div>
 
         <article className="rounded-lg border border-slate-700/80 bg-card/40 p-3">
-          <p className="text-xs text-textMuted">Why-Now</p>
-          <p className="mt-1 text-sm leading-6 text-textMain">{item.why_now}</p>
-        </article>
-
-        <article className="mt-3 rounded-lg border border-slate-700/80 bg-card/40 p-3">
-          <p className="text-xs text-textMuted">
-            <LabelWithHint label="失效条件" hintKey="invalid_if" />
-          </p>
-          <p className="mt-1 text-sm leading-6 text-textMain">{item.invalid_if}</p>
-        </article>
-
-        <article className="mt-3 rounded-lg border border-slate-700/80 bg-card/40 p-3">
-          <p className="text-xs text-textMuted">催化列表</p>
-          {item.catalysts.length > 0 ? (
-            <div className="mt-2 flex flex-wrap gap-2">
-              {item.catalysts.map((catalyst) => (
-                <span
-                  key={`${item.id}-${catalyst}`}
-                  className="rounded-md border border-slate-600/70 bg-card/70 px-2 py-1 text-xs text-textMuted"
-                >
-                  {catalyst}
-                </span>
+          <div className="flex items-start justify-between gap-3">
+            <p className="text-xs text-textMuted">1) 关键证据段落</p>
+            <button
+              type="button"
+              onClick={() => onAddToReview(item)}
+              className="rounded-md border border-slate-600 px-2 py-1 text-[11px] text-textMuted hover:text-textMain"
+            >
+              {reviewQueued ? "已加入复核清单" : "加入复核清单"}
+            </button>
+          </div>
+          {evidenceRows.length > 0 ? (
+            <div className="mt-2 space-y-2">
+              {evidenceRows.map((row) => (
+                <div key={row.id} className="rounded-md border border-slate-700/80 bg-card/70 p-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-[11px] text-textMuted">
+                      {row.source_name || row.source_type} · {formatTime(row.published_at)}
+                    </p>
+                    <span className="text-[11px] text-textMuted">
+                      置信 {Math.round(row.confidence * 100)}%
+                    </span>
+                  </div>
+                  <p className="mt-1 text-sm leading-6 text-textMain">{row.quote_snippet}</p>
+                  {row.numeric_facts.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {row.numeric_facts.slice(0, 3).map((fact, index) => (
+                        <span
+                          key={`${row.id}-${index}`}
+                          className="rounded border border-slate-600/70 bg-card/80 px-1.5 py-0.5 text-[10px] text-textMuted"
+                        >
+                          {String(fact.raw || fact.value || "--")}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {row.source_url && (
+                    <a
+                      className="mt-2 inline-flex rounded border border-slate-600 px-2 py-1 text-[11px] text-textMuted hover:text-textMain"
+                      href={row.source_url}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      查看原文
+                    </a>
+                  )}
+                </div>
               ))}
             </div>
           ) : (
-            <p className="mt-1 text-sm text-textMuted">暂无催化细节。</p>
+            <p className="mt-1 text-sm text-textMuted">暂无结构化证据，建议直接查看原文链接。</p>
           )}
         </article>
 
         <article className="mt-3 rounded-lg border border-slate-700/80 bg-card/40 p-3">
-          <p className="text-xs text-textMuted">信源贡献</p>
+          <p className="text-xs text-textMuted">2) 宏观→行业→个股 传导链</p>
+          {pathRows.length > 0 ? (
+            <div className="mt-2 space-y-2">
+              {pathRows.map((row) => (
+                <div key={row.id} className="rounded-md border border-slate-700/80 bg-card/70 p-2">
+                  <p className="text-sm text-textMain">
+                    {row.macro_factor}
+                    <span className="mx-1 text-textMuted">→</span>
+                    {row.industry}
+                    <span className="mx-1 text-textMuted">→</span>
+                    {item.ticker}
+                  </p>
+                  <p className="mt-1 text-xs text-textMuted">
+                    <span className={transmissionDirectionClass(row.direction)}>
+                      {row.direction}
+                    </span>
+                    {" · 强度 "}
+                    {Math.round(row.strength * 100)}
+                    {" · 证据 "}
+                    {row.evidence_ids.length}
+                  </p>
+                  {row.reason && <p className="mt-1 text-xs text-textMuted">{row.reason}</p>}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-1 text-sm text-textMuted">暂无传导链，先按证据与催化审阅。</p>
+          )}
+        </article>
+
+        <article className="mt-3 rounded-lg border border-slate-700/80 bg-card/40 p-3">
+          <p className="text-xs text-textMuted">3) AI 参考建议（非投资建议）</p>
+          <p className="mt-1 text-sm leading-6 text-textMain">
+            <strong className="font-semibold">正方：</strong>
+            {enableAiDebateView ? debate.pro_case : item.why_now}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-textMain">
+            <strong className="font-semibold">反方：</strong>
+            {enableAiDebateView ? debate.counter_case : (item.counter_view || "暂无反方摘要")}
+          </p>
+          <div className="mt-2">
+            <p className="text-xs text-textMuted">不确定性</p>
+            <ul className="mt-1 space-y-1 text-sm text-textMain">
+              {(enableAiDebateView ? debate.uncertainties : item.uncertainty_flags || []).slice(0, 4).map((line) => (
+                <li key={line}>- {line}</li>
+              ))}
+            </ul>
+          </div>
+          <p className="mt-2 text-xs text-textMuted">
+            <LabelWithHint label="失效条件" hintKey="invalid_if" />: {item.invalid_if}
+          </p>
+        </article>
+
+        <article className="mt-3 rounded-lg border border-slate-700/80 bg-card/40 p-3">
+          <p className="text-xs text-textMuted">4) 原文入口</p>
           <p className="mt-1 text-sm text-textMain">
             <span className={`mr-2 inline-flex rounded-md border px-2 py-0.5 text-[10px] ${sourceBadge.className}`}>
               <LabelWithHint label={sourceBadge.label} hintKey="source_mix_badge" />
             </span>
             {formatSourceMixLine(item.source_mix)}
           </p>
-        </article>
-
-        <article className="mt-3 rounded-lg border border-slate-700/80 bg-card/40 p-3">
-          <p className="text-xs text-textMuted">证据映射</p>
+          {originalLinks.length > 0 ? (
+            <div className="mt-2 space-y-2">
+              {originalLinks.map((link) => (
+                <a
+                  key={link.url}
+                  className="block rounded-md border border-slate-600/80 px-2 py-1 text-xs text-textMuted hover:text-textMain"
+                  href={link.url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-1 text-sm text-textMuted">暂无可直达原文链接。</p>
+          )}
+          <p className="mt-2 text-xs text-textMuted">证据映射</p>
           <p className="mt-1 text-sm text-textMain">
             信号ID: {item.source_signal_ids.length ? item.source_signal_ids.join(", ") : "无"}
           </p>
@@ -359,7 +602,11 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
   const [activeTab, setActiveTab] = useState<DashboardTab>("opportunities");
   const [dictOpen, setDictOpen] = useState(false);
   const [selectedOpportunity, setSelectedOpportunity] = useState<OpportunityItem | null>(null);
+  const [reviewQueuedMap, setReviewQueuedMap] = useState<Record<number, boolean>>({});
   const showV3ExplainBadge = readDashboardV3ExplainFlag();
+  const enableEvidenceLayer = readEvidenceLayerFlag();
+  const enableTransmissionLayer = readTransmissionLayerFlag();
+  const enableAiDebateView = readAiDebateViewFlag();
 
   const rankedTicker = useMemo(() => rankTicker(data.tickerDigest), [data.tickerDigest]);
   const opportunities = useMemo(() => rankOpportunities(data.opportunities), [data.opportunities]);
@@ -369,6 +616,29 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
   const topClusters = data.hotClusters.slice(0, 12);
   const topRelations = data.relations.slice(0, 10);
   const xRadar = data.xSourceRadar.slice(0, 8);
+
+  function handleAddToReviewQueue(item: OpportunityItem): void {
+    const storageKey = "stock_review_queue_v1";
+    try {
+      const raw = window.localStorage.getItem(storageKey);
+      const parsed = raw ? JSON.parse(raw) : [];
+      const list = Array.isArray(parsed) ? parsed : [];
+      const next = [
+        {
+          id: item.id,
+          ticker: item.ticker,
+          side: item.side,
+          horizon: item.horizon,
+          as_of: item.as_of
+        },
+        ...list.filter((row) => Number((row as { id?: unknown }).id || 0) !== item.id)
+      ].slice(0, 120);
+      window.localStorage.setItem(storageKey, JSON.stringify(next));
+    } catch (error) {
+      console.warn("[FRONTEND_REVIEW_QUEUE_FALLBACK]", error);
+    }
+    setReviewQueuedMap((prev) => ({ ...prev, [item.id]: true }));
+  }
 
   return (
     <div className="mx-auto min-h-screen max-w-6xl bg-bg px-4 pb-24 pt-4 text-textMain md:px-6 md:pb-10">
@@ -670,7 +940,15 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
       </nav>
 
       {selectedOpportunity && (
-        <EvidenceDrawer item={selectedOpportunity} onClose={() => setSelectedOpportunity(null)} />
+        <EvidenceDrawer
+          item={selectedOpportunity}
+          onClose={() => setSelectedOpportunity(null)}
+          enableEvidenceLayer={enableEvidenceLayer}
+          enableTransmissionLayer={enableTransmissionLayer}
+          enableAiDebateView={enableAiDebateView}
+          onAddToReview={handleAddToReviewQueue}
+          reviewQueued={Boolean(reviewQueuedMap[selectedOpportunity.id])}
+        />
       )}
 
       <MetricDictionaryCenter open={dictOpen} onClose={() => setDictOpen(false)} />
