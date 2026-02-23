@@ -11,6 +11,7 @@ import {
   OpportunityItem,
   RiskLevel,
   SentinelSignal,
+  SourceMix,
   TickerSignalDigest
 } from "@/lib/types";
 
@@ -100,6 +101,36 @@ function levelWeight(level: RiskLevel): number {
   return 0;
 }
 
+function resolveSourceBadge(sourceMix?: SourceMix | null): { label: string; className: string } {
+  if (!sourceMix || sourceMix.x_count <= 0) {
+    return {
+      label: "News",
+      className: "text-sky-300 bg-sky-500/10 border-sky-300/30"
+    };
+  }
+  if (sourceMix.mixed_sources || sourceMix.article_count > 0) {
+    return {
+      label: "Mixed",
+      className: "text-violet-300 bg-violet-500/10 border-violet-300/30"
+    };
+  }
+  return {
+    label: "X",
+    className: "text-fuchsia-300 bg-fuchsia-500/10 border-fuchsia-300/30"
+  };
+}
+
+function formatSourceMixLine(sourceMix?: SourceMix | null): string {
+  if (!sourceMix || sourceMix.x_count <= 0) {
+    return "主要来自新闻源";
+  }
+  const percent = Math.round(sourceMix.x_ratio * 100);
+  const handles = sourceMix.top_x_handles.length > 0
+    ? `；Top X: ${sourceMix.top_x_handles.map((name) => `@${name}`).join(", ")}`
+    : "";
+  return `X占比 ${percent}%（${sourceMix.x_count}/${sourceMix.source_total}）${handles}`;
+}
+
 function rankTicker(items: TickerSignalDigest[]): TickerSignalDigest[] {
   return [...items].sort((a, b) => {
     const riskDiff = levelWeight(b.risk_level) - levelWeight(a.risk_level);
@@ -132,15 +163,24 @@ function LabelWithHint({ label, hintKey }: { label: string; hintKey: MetricKey }
 }
 
 function SignalCard({ signal }: { signal: SentinelSignal }) {
+  const sourceBadge = resolveSourceBadge(signal.source_mix);
   return (
     <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
       <div className="mb-2 flex items-center justify-between gap-2">
-        <span className="text-xs text-textMuted">{signal.sentinel_id}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-textMuted">{signal.sentinel_id}</span>
+          <span className={`rounded-md border px-2 py-0.5 text-[10px] ${sourceBadge.className}`}>
+            <LabelWithHint label={sourceBadge.label} hintKey="source_mix_badge" />
+          </span>
+        </div>
         <span className={`rounded-md border px-2 py-0.5 text-xs font-semibold ${levelClass(signal.alert_level)}`}>
           {signal.alert_level} · {Math.round(signal.risk_score * 100)}
         </span>
       </div>
       <p className="text-sm text-textMain">{signal.description}</p>
+      <p className="mt-2 text-xs text-textMuted">
+        <LabelWithHint label="来源构成" hintKey="x_source_ratio" />: {formatSourceMixLine(signal.source_mix)}
+      </p>
       {signal.trigger_reasons.length > 0 && (
         <p className="mt-2 text-xs text-textMuted">
           <LabelWithHint label="触发" hintKey="trigger_reasons" />: {signal.trigger_reasons.slice(0, 2).join("；")}
@@ -158,6 +198,7 @@ function OpportunityCard({
   item: OpportunityItem;
   onOpenEvidence: (item: OpportunityItem) => void;
 }) {
+  const sourceBadge = resolveSourceBadge(item.source_mix);
   return (
     <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
       <div className="mb-3 flex items-start justify-between gap-3">
@@ -212,6 +253,12 @@ function OpportunityCard({
       )}
 
       <div className="mt-3 text-xs text-textMuted">
+        <span className={`mr-2 inline-flex rounded-md border px-2 py-0.5 ${sourceBadge.className}`}>
+          <LabelWithHint label={sourceBadge.label} hintKey="source_mix_badge" />
+        </span>
+        <LabelWithHint label="来源构成" hintKey="x_source_ratio" /> {formatSourceMixLine(item.source_mix)}
+      </div>
+      <div className="mt-2 text-xs text-textMuted">
         信号证据 {item.source_signal_ids.length} · 聚类证据 {item.source_cluster_ids.length} · 到期
         {" "}
         {formatTime(item.expires_at)}
@@ -234,6 +281,7 @@ function EvidenceDrawer({
   item: OpportunityItem;
   onClose: () => void;
 }) {
+  const sourceBadge = resolveSourceBadge(item.source_mix);
   return (
     <div className="fixed inset-0 z-40 bg-black/70 px-3 py-4 backdrop-blur-sm md:px-6 md:py-8">
       <div className="mx-auto max-h-full max-w-xl overflow-y-auto rounded-2xl border border-slate-700 bg-panel p-4">
@@ -281,6 +329,16 @@ function EvidenceDrawer({
           ) : (
             <p className="mt-1 text-sm text-textMuted">暂无催化细节。</p>
           )}
+        </article>
+
+        <article className="mt-3 rounded-lg border border-slate-700/80 bg-card/40 p-3">
+          <p className="text-xs text-textMuted">信源贡献</p>
+          <p className="mt-1 text-sm text-textMain">
+            <span className={`mr-2 inline-flex rounded-md border px-2 py-0.5 text-[10px] ${sourceBadge.className}`}>
+              <LabelWithHint label={sourceBadge.label} hintKey="source_mix_badge" />
+            </span>
+            {formatSourceMixLine(item.source_mix)}
+          </p>
         </article>
 
         <article className="mt-3 rounded-lg border border-slate-700/80 bg-card/40 p-3">

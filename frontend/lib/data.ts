@@ -10,6 +10,7 @@ import {
   OpportunityItem,
   RiskLevel,
   SentinelSignal,
+  SourceMix,
   TickerSignalDigest
 } from "@/lib/types";
 
@@ -237,6 +238,37 @@ function toNumberMap(value: unknown): Record<string, number> {
     }
   }
   return result;
+}
+
+function toSourceMix(value: unknown): SourceMix | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return null;
+  }
+  const row = value as Record<string, unknown>;
+  const xCount = Math.max(0, Number(row.x_count || 0));
+  const articleCount = Math.max(0, Number(row.article_count || 0));
+  const otherCount = Math.max(0, Number(row.other_count || 0));
+  const sourceTotalRaw = Number(row.source_total || xCount + articleCount + otherCount);
+  const sourceTotal = Math.max(1, Number.isFinite(sourceTotalRaw) ? sourceTotalRaw : 1);
+  const ratioRaw = Number(row.x_ratio || 0);
+  const xRatio = Number.isFinite(ratioRaw) ? Math.max(0, Math.min(1, ratioRaw)) : 0;
+  const handles = Array.isArray(row.top_x_handles)
+    ? row.top_x_handles
+      .map((item) => String(item || "").trim())
+      .filter((item) => item.length > 0)
+      .slice(0, 3)
+    : [];
+  return {
+    x_count: Math.round(xCount),
+    article_count: Math.round(articleCount),
+    other_count: Math.round(otherCount),
+    source_total: Math.round(sourceTotal),
+    x_ratio: xRatio,
+    mixed_sources: Boolean(row.mixed_sources),
+    top_x_handles: handles,
+    latest_x_at: toIsoString(row.latest_x_at),
+    latest_news_at: toIsoString(row.latest_news_at)
+  };
 }
 
 function stableIdFromText(text: string): number {
@@ -492,7 +524,10 @@ async function queryV2Signals(client: SupabaseClient): Promise<SentinelSignal[]>
   try {
     const { data, error } = await client
       .from("stock_signals_v2")
-      .select("id,ticker,level,signal_score,explanation,trigger_factors,source_event_ids,as_of")
+      .select(
+        "id,ticker,level,signal_score,explanation,trigger_factors,"
+        + "source_event_ids,source_mix,as_of"
+      )
       .eq("is_active", true)
       .order("signal_score", { ascending: false })
       .limit(30);
@@ -519,6 +554,7 @@ async function queryV2Signals(client: SupabaseClient): Promise<SentinelSignal[]>
             .slice(0, 5)
             .map((id) => `event:${id}`)
           : [],
+        source_mix: toSourceMix(row.source_mix),
         created_at: toIsoString(row.as_of)
       };
     });
@@ -534,7 +570,7 @@ async function queryV2Opportunities(client: SupabaseClient): Promise<Opportunity
       .from("stock_opportunities_v2")
       .select(
         "id,ticker,side,horizon,opportunity_score,confidence,risk_level,why_now,invalid_if,"
-        + "catalysts,source_signal_ids,source_event_ids,expires_at,as_of"
+        + "catalysts,source_signal_ids,source_event_ids,source_mix,expires_at,as_of"
       )
       .eq("is_active", true)
       .order("opportunity_score", { ascending: false })
@@ -572,6 +608,7 @@ async function queryV2Opportunities(client: SupabaseClient): Promise<Opportunity
               .filter((item) => item > 0)
             : [],
           source_cluster_ids: [],
+          source_mix: toSourceMix(row.source_mix),
           expires_at: toIsoString(row.expires_at),
           as_of: toIsoString(row.as_of)
         };

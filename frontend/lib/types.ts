@@ -1,5 +1,17 @@
 export type RiskLevel = "L0" | "L1" | "L2" | "L3" | "L4";
 
+export interface SourceMix {
+  x_count: number;
+  article_count: number;
+  other_count: number;
+  source_total: number;
+  x_ratio: number;
+  mixed_sources: boolean;
+  top_x_handles: string[];
+  latest_x_at: string;
+  latest_news_at: string;
+}
+
 export interface MarketSnapshot {
   snapshot_date: string;
   spy: number | null;
@@ -22,6 +34,7 @@ export interface SentinelSignal {
   description: string;
   trigger_reasons: string[];
   evidence_links: string[];
+  source_mix?: SourceMix | null;
   created_at: string;
 }
 
@@ -66,6 +79,7 @@ export interface OpportunityItem {
   factor_breakdown: Record<string, number>;
   source_signal_ids: number[];
   source_cluster_ids: number[];
+  source_mix?: SourceMix | null;
   expires_at: string;
   as_of: string;
 }

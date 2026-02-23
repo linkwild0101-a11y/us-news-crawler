@@ -581,7 +581,10 @@ class StockPipelineV2:
         cutoff_iso = (_now_utc() - timedelta(hours=lookback_hours)).isoformat()
         event_rows = (
             self.supabase.table("stock_events_v2")
-            .select("id,event_type,direction,strength,summary,published_at,as_of")
+            .select(
+                "id,event_type,direction,strength,summary,published_at,as_of,"
+                "source_type,source_ref,details"
+            )
             .eq("is_active", True)
             .gte("as_of", cutoff_iso)
             .order("as_of", desc=True)
@@ -610,6 +613,8 @@ class StockPipelineV2:
             event_row = event_map.get(event_id)
             if not event_row:
                 continue
+            details = event_row.get("details")
+            detail_map = details if isinstance(details, dict) else {}
             bundle.append(
                 {
                     "event_id": event_id,
@@ -621,6 +626,9 @@ class StockPipelineV2:
                     "strength": _safe_float(event_row.get("strength"), 0.45),
                     "summary": str(event_row.get("summary") or ""),
                     "published_at": _to_iso(event_row.get("published_at")),
+                    "source_type": str(event_row.get("source_type") or "article").strip().lower(),
+                    "source_ref": str(event_row.get("source_ref") or "")[:256],
+                    "source_handle": str(detail_map.get("handle") or "").strip(),
                 }
             )
         return bundle
@@ -645,8 +653,12 @@ class StockPipelineV2:
             pos = 0.0
             neg = 0.0
             counts: Counter[str] = Counter()
+            source_counts: Counter[str] = Counter()
+            x_handles: Counter[str] = Counter()
             source_event_ids: List[int] = []
             sorted_rows = sorted(rows, key=lambda item: item.get("published_at", ""), reverse=True)
+            latest_x_at = ""
+            latest_news_at = ""
 
             for row in sorted_rows[:24]:
                 value = row["strength"] * row["weight"] * row["map_confidence"]
@@ -656,6 +668,17 @@ class StockPipelineV2:
                     neg += value
                 source_event_ids.append(int(row["event_id"]))
                 counts[str(row["event_type"])] += 1
+                source_type = str(row.get("source_type") or "article").strip().lower()
+                source_counts[source_type] += 1
+                published_at = _to_iso(row.get("published_at"))
+                if source_type == "x_grok":
+                    if not latest_x_at:
+                        latest_x_at = published_at
+                    handle = str(row.get("source_handle") or "").strip()
+                    if handle:
+                        x_handles[handle] += 1
+                elif source_type == "article" and not latest_news_at:
+                    latest_news_at = published_at
 
             event_count = len(rows)
             net = pos - neg
@@ -669,7 +692,30 @@ class StockPipelineV2:
                 {"event_type": name, "count": count}
                 for name, count in counts.most_common(3)
             ]
+            x_count = int(source_counts.get("x_grok", 0))
+            article_count = int(source_counts.get("article", 0))
+            other_count = max(0, sum(source_counts.values()) - x_count - article_count)
+            source_total = max(1, x_count + article_count + other_count)
+            x_ratio = round(x_count / source_total, 4)
+            top_x_handles = [name for name, _ in x_handles.most_common(3)]
+            source_mix = {
+                "x_count": x_count,
+                "article_count": article_count,
+                "other_count": other_count,
+                "source_total": source_total,
+                "x_ratio": x_ratio,
+                "mixed_sources": bool(x_count > 0 and article_count > 0),
+                "top_x_handles": top_x_handles,
+                "latest_x_at": latest_x_at,
+                "latest_news_at": latest_news_at,
+            }
+
             explanation = str(sorted_rows[0].get("summary") or f"{ticker} 事件聚合")[:220]
+            if x_count > 0:
+                explanation = (
+                    f"{explanation} | X贡献 {x_count}/{source_total}"
+                    f"({int(round(x_ratio * 100))}%)"
+                )[:220]
 
             signal_rows.append(
                 {
@@ -683,6 +729,7 @@ class StockPipelineV2:
                     "llm_used": bool(self.llm_client),
                     "explanation": explanation,
                     "source_event_ids": source_event_ids[:20],
+                    "source_mix": source_mix,
                     "expires_at": (now + timedelta(hours=expire_hours)).isoformat(),
                     "as_of": now.isoformat(),
                     "run_id": run_id,
@@ -751,8 +798,23 @@ class StockPipelineV2:
             signal_score = _safe_float(signal.get("signal_score"), 0.0)
             confidence = _safe_float(signal.get("confidence"), 0.5)
             macro_boost = regime_score if side == "LONG" else -regime_score
+            source_mix_raw = signal.get("source_mix")
+            source_mix = source_mix_raw if isinstance(source_mix_raw, dict) else {}
+            x_ratio = _clamp(_safe_float(source_mix.get("x_ratio"), 0.0), 0.0, 1.0)
+            x_count = max(0, int(_safe_float(source_mix.get("x_count"), 0.0)))
+            source_total = max(1, int(_safe_float(source_mix.get("source_total"), 0.0)))
+            mixed_sources = bool(source_mix.get("mixed_sources"))
             horizon = "A" if signal_score >= 65 else "B"
-            opp_score = _clamp(signal_score * 0.82 + (macro_boost + 1.0) * 9.0, 0.0, 100.0)
+            source_boost = 0.0
+            if x_count > 0:
+                source_boost += 1.2 + x_ratio * 1.8
+            if mixed_sources:
+                source_boost += 1.5
+            opp_score = _clamp(
+                signal_score * 0.82 + (macro_boost + 1.0) * 9.0 + source_boost,
+                0.0,
+                100.0,
+            )
             opp_conf = _clamp(confidence * 0.82 + 0.13, 0.4, 0.95)
             expiry = now + timedelta(hours=72 if horizon == "A" else 24 * 14)
 
@@ -760,6 +822,12 @@ class StockPipelineV2:
                 invalid_if = "若风险偏好转弱且相关事件显著减少，则机会失效。"
             else:
                 invalid_if = "若风险偏好快速修复且负面事件衰减，则机会失效。"
+            x_note = ""
+            if x_count > 0:
+                x_note = (
+                    f" X贡献 {x_count}/{source_total}"
+                    f"（{int(round(x_ratio * 100))}%）。"
+                )
 
             rows.append(
                 {
@@ -773,11 +841,13 @@ class StockPipelineV2:
                     "why_now": (
                         f"{signal['ticker']} 当前信号分 {signal_score:.1f}，方向 {side}，"
                         f"市场状态 {regime.get('risk_state', 'neutral')}。"
+                        f"{x_note}"
                     ),
                     "invalid_if": invalid_if,
                     "catalysts": signal.get("trigger_factors") or [],
                     "source_signal_ids": [],
                     "source_event_ids": signal.get("source_event_ids") or [],
+                    "source_mix": source_mix,
                     "expires_at": expiry.isoformat(),
                     "as_of": now.isoformat(),
                     "run_id": run_id,
@@ -791,7 +861,18 @@ class StockPipelineV2:
         if not rows:
             return 0
         self.supabase.table(table_name).update({"is_active": False}).eq("is_active", True).execute()
-        self.supabase.table(table_name).insert(rows).execute()
+        try:
+            self.supabase.table(table_name).insert(rows).execute()
+        except Exception as e:
+            if "source_mix" in str(e):
+                fallback_rows = [
+                    {key: value for key, value in row.items() if key != "source_mix"}
+                    for row in rows
+                ]
+                self.supabase.table(table_name).insert(fallback_rows).execute()
+                logger.warning(f"[V2_SOURCE_MIX_COLUMN_MISSING] table={table_name}")
+            else:
+                raise
         return len(rows)
 
     def _build_snapshot(
@@ -805,6 +886,36 @@ class StockPipelineV2:
         risk_badge = "L1"
         if signals:
             risk_badge = max([str(item.get("level") or "L1") for item in signals])
+        x_signal_count = 0
+        x_mixed_count = 0
+        x_event_total = 0
+        x_ratio_sum = 0.0
+        x_ratio_rows = 0
+        x_handles: Counter[str] = Counter()
+
+        for row in signals:
+            source_mix = row.get("source_mix")
+            if not isinstance(source_mix, dict):
+                continue
+            x_count = max(0, int(_safe_float(source_mix.get("x_count"), 0.0)))
+            if x_count <= 0:
+                continue
+            x_signal_count += 1
+            x_event_total += x_count
+            x_ratio = _clamp(_safe_float(source_mix.get("x_ratio"), 0.0), 0.0, 1.0)
+            x_ratio_sum += x_ratio
+            x_ratio_rows += 1
+            if bool(source_mix.get("mixed_sources")):
+                x_mixed_count += 1
+            handles = source_mix.get("top_x_handles")
+            if isinstance(handles, list):
+                for handle in handles:
+                    h = str(handle or "").strip()
+                    if h:
+                        x_handles[h] += 1
+
+        x_ratio_avg = round(x_ratio_sum / max(1, x_ratio_rows), 4)
+        x_top_handles = [name for name, _ in x_handles.most_common(3)]
         return {
             "snapshot_time": now.isoformat(),
             "top_opportunities": [
@@ -829,12 +940,18 @@ class StockPipelineV2:
             "market_brief": (
                 f"Stock V2 已生成 {len(opportunities)} 个机会、{len(signals)} 条信号，"
                 f"市场状态 {regime.get('risk_state', 'neutral')}。"
+                f" X相关信号 {x_signal_count} 条，平均占比 {int(round(x_ratio_avg * 100))}% 。"
             ),
             "risk_badge": risk_badge,
             "data_health": {
                 "opportunities": len(opportunities),
                 "signals": len(signals),
                 "risk_state": regime.get("risk_state", "neutral"),
+                "x_signal_count": x_signal_count,
+                "x_mixed_signal_count": x_mixed_count,
+                "x_event_total": x_event_total,
+                "x_ratio_avg": x_ratio_avg,
+                "x_top_handles": x_top_handles,
                 "generated_at": now.isoformat(),
             },
             "as_of": now.isoformat(),

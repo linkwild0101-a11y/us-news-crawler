@@ -119,6 +119,21 @@ export const METRIC_EXPLANATIONS = {
     definition: "导致信号成立的核心原因摘要（如财报、宏观、政策等）。",
     category: "信号"
   },
+  source_mix_badge: {
+    title: "信源徽章",
+    definition: "标识当前信号/机会主要来自 News、X 或两者混合（Mixed）。",
+    tip: "Mixed 通常代表交叉验证更充分，可优先关注。",
+    category: "信号",
+    aliases: ["source mix", "X", "news", "mixed"]
+  },
+  x_source_ratio: {
+    title: "X 来源占比",
+    definition: "在该信号/机会关联事件中，来自 X 信源的比例。",
+    calc: "x_ratio = x_count / source_total。",
+    tip: "占比越高越依赖社交源，建议结合新闻源确认后再执行。",
+    category: "信号",
+    aliases: ["x ratio", "x占比", "来源构成"]
+  },
   cluster_article_count: {
     title: "文章数",
     definition: "该热点事件簇覆盖的文章数量。",
