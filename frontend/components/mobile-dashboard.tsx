@@ -87,8 +87,10 @@ function formatTime(value: string): string {
   if (Number.isNaN(date.getTime())) {
     return value;
   }
-  return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(
-    date.getMinutes()
+  // Use fixed UTC+8 display so SSR/CSR render the same timestamp text.
+  const utc8 = new Date(date.getTime() + 8 * 60 * 60 * 1000);
+  return `${utc8.getUTCMonth() + 1}/${utc8.getUTCDate()} ${utc8.getUTCHours()}:${String(
+    utc8.getUTCMinutes()
   ).padStart(2, "0")}`;
 }
 
