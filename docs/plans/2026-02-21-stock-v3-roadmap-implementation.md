@@ -48,23 +48,23 @@
 
 ## Phase 2（W4-W6）评估与治理
 
-- [ ] 离线评估协议（Hit Rate、Top-K、校准）
-- [ ] Champion/Challenger 并行评分
-- [ ] 漂移监控规则与告警阈值
-- [ ] 评分卡与晋级门槛
+- [x] 离线评估协议（Hit Rate、Top-K、校准）
+- [x] Champion/Challenger 并行评分
+- [x] 漂移监控规则与告警阈值
+- [x] 评分卡与晋级门槛
 
 ## Phase 3（W7-W9）组合闭环与 Paper Trading
 
 - [ ] 组合约束引擎（敞口/集中度/风险预算）
-- [ ] Paper Trading 流程
-- [ ] 机会生命周期状态机（生成→跟踪→失效→复盘）
-- [ ] 归因报表（信号贡献/宏观过滤贡献/LLM贡献）
+- [x] Paper Trading 流程
+- [x] 机会生命周期状态机（生成→跟踪→失效→复盘）
+- [x] 归因报表（信号贡献/宏观过滤贡献/LLM贡献）
 
 ## Phase 4（W10-W12）前端决策体验升级
 
-- [ ] 指标字典中心（Tooltip 已有，升级为可搜索中心）
+- [x] 指标字典中心（Tooltip 已有，升级为可搜索中心）
 - [ ] Why-Now 证据链详情页
-- [ ] 订阅告警设计（ticker/方向/等级）
+- [x] 订阅告警设计（ticker/方向/等级）
 - [ ] 运营与值班手册
 
 ---
@@ -109,8 +109,8 @@
 ### 任务
 - [ ] 离线标签构造方案（收益窗口 + 方向标签）
 - [ ] 评估指标与统计口径（LONG/SHORT 分开）
-- [ ] Champion/Challenger A/B 对照模板
-- [ ] Drift 监控（分布、密度、集中度）
+- [x] Champion/Challenger A/B 对照模板
+- [x] Drift 监控（分布、密度、集中度）
 
 ### 交付物
 - [ ] `docs/specs/offline-eval-protocol-v1.md`
@@ -124,8 +124,8 @@
 ### 任务
 - [ ] 组合约束参数化（净敞口、行业上限、单票上限）
 - [ ] 交易规则模板（入场/减仓/退出）
-- [ ] Paper Trading 执行日志与绩效报表
-- [ ] 失败样本复盘模板
+- [x] Paper Trading 执行日志与绩效报表
+- [x] 失败样本复盘模板
 
 ### 交付物
 - [ ] `docs/specs/portfolio-constraints-v1.md`
@@ -137,7 +137,7 @@
 让“为什么能做、什么时候失效”一眼可懂。
 
 ### 任务
-- [ ] 指标字典中心（搜索 + 版本号 + 字段来源）
+- [x] 指标字典中心（搜索 + 版本号 + 字段来源）
 - [ ] 证据链页（事件→信号→机会→失效条件）
 - [ ] 风险提示组件统一化（与现有 tooltip 对齐）
 - [ ] 数据新鲜度/质量徽章
@@ -289,7 +289,7 @@
 3. [x] 完成 `research_runs` 与 `source_health_daily` migration 草案
 4. [x] 在现有 workflow 增加 run summary 骨架（不改主逻辑）
 5. [x] 约定模型晋级门槛并冻结（v1 文档）
-6. [ ] 产出第一版评分卡模板（CSV/Markdown）
+6. [x] 产出第一版评分卡模板（CSV/Markdown）
 
 ---
 

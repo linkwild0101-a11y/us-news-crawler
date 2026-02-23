@@ -178,7 +178,12 @@ class StockPipelineV2:
             "[FEATURE_FLAGS] "
             f"ENABLE_STOCK_V3_RUN_LOG={self.flags.enable_stock_v3_run_log} "
             f"ENABLE_STOCK_V3_EVAL={self.flags.enable_stock_v3_eval} "
-            f"ENABLE_STOCK_V3_PAPER={self.flags.enable_stock_v3_paper}"
+            f"ENABLE_STOCK_V3_PAPER={self.flags.enable_stock_v3_paper} "
+            f"ENABLE_STOCK_V3_CHALLENGER={self.flags.enable_stock_v3_challenger} "
+            f"ENABLE_STOCK_V3_DRIFT={self.flags.enable_stock_v3_drift} "
+            f"ENABLE_STOCK_V3_LIFECYCLE={self.flags.enable_stock_v3_lifecycle} "
+            f"ENABLE_STOCK_V3_SUBSCRIPTION_ALERT="
+            f"{self.flags.enable_stock_v3_subscription_alert}"
         )
 
     def _build_v3_params(self, params: Dict[str, Any]) -> Dict[str, Any]:
@@ -188,6 +193,12 @@ class StockPipelineV2:
         merged["flag_enable_stock_v3_run_log"] = self.flags.enable_stock_v3_run_log
         merged["flag_enable_stock_v3_eval"] = self.flags.enable_stock_v3_eval
         merged["flag_enable_stock_v3_paper"] = self.flags.enable_stock_v3_paper
+        merged["flag_enable_stock_v3_challenger"] = self.flags.enable_stock_v3_challenger
+        merged["flag_enable_stock_v3_drift"] = self.flags.enable_stock_v3_drift
+        merged["flag_enable_stock_v3_lifecycle"] = self.flags.enable_stock_v3_lifecycle
+        merged["flag_enable_stock_v3_subscription_alert"] = (
+            self.flags.enable_stock_v3_subscription_alert
+        )
         return merged
 
     def _v3_log_run_start(

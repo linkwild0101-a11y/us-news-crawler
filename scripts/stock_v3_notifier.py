@@ -7,7 +7,7 @@ import argparse
 import json
 import logging
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from urllib import request
@@ -191,6 +191,127 @@ def _load_latest_eval_metrics(supabase) -> Dict[str, Any]:
     }
 
 
+def _load_latest_drift_metrics(supabase) -> Dict[str, Any]:
+    try:
+        rows = (
+            supabase.table("signal_drift_snapshots")
+            .select("run_id,metric_name,status,drift_value,as_of")
+            .order("as_of", desc=True)
+            .limit(24)
+            .execute()
+            .data
+            or []
+        )
+    except Exception:
+        return {}
+    if not rows:
+        return {}
+
+    newest_run_id = str(rows[0].get("run_id") or "")
+    scoped = [row for row in rows if str(row.get("run_id") or "") == newest_run_id]
+    warn_count = sum(1 for row in scoped if str(row.get("status") or "") == "warn")
+    critical_count = sum(1 for row in scoped if str(row.get("status") or "") == "critical")
+    max_drift = 0.0
+    for row in scoped:
+        try:
+            max_drift = max(max_drift, float(row.get("drift_value") or 0.0))
+        except Exception:
+            pass
+
+    overall = "normal"
+    if critical_count > 0:
+        overall = "critical"
+    elif warn_count > 0:
+        overall = "warn"
+    return {
+        "drift_run_id": newest_run_id,
+        "drift_overall_status": overall,
+        "drift_warn_count": warn_count,
+        "drift_critical_count": critical_count,
+        "drift_max_abs": round(max_drift, 6),
+    }
+
+
+def _load_latest_champion_summary(supabase) -> Dict[str, Any]:
+    try:
+        rows = (
+            supabase.table("signal_model_scorecards")
+            .select("run_id,winner,promote_candidate,score_delta,as_of")
+            .order("as_of", desc=True)
+            .limit(400)
+            .execute()
+            .data
+            or []
+        )
+    except Exception:
+        return {}
+    if not rows:
+        return {}
+
+    newest_run_id = str(rows[0].get("run_id") or "")
+    scoped = [row for row in rows if str(row.get("run_id") or "") == newest_run_id]
+    total = len(scoped)
+    challenger_win = sum(1 for row in scoped if str(row.get("winner") or "") == "challenger")
+    promote_count = sum(1 for row in scoped if bool(row.get("promote_candidate")))
+    avg_delta = 0.0
+    if total > 0:
+        avg_delta = sum(float(row.get("score_delta") or 0.0) for row in scoped) / total
+    return {
+        "cc_run_id": newest_run_id,
+        "cc_total": total,
+        "cc_challenger_win": challenger_win,
+        "cc_promote_candidate": promote_count,
+        "cc_avg_delta": round(avg_delta, 4),
+    }
+
+
+def _load_latest_lifecycle_summary(supabase) -> Dict[str, Any]:
+    try:
+        row = (
+            supabase.table("opportunity_lifecycle_snapshots")
+            .select(
+                "run_id,snapshot_date,generated_count,active_count,long_count,short_count,"
+                "expiring_24h_count,expired_24h_count,paper_closed_24h_count,paper_win_rate_24h"
+            )
+            .order("as_of", desc=True)
+            .limit(1)
+            .maybe_single()
+            .execute()
+            .data
+            or {}
+        )
+        return row
+    except Exception:
+        return {}
+
+
+def _load_subscription_summary(supabase) -> Dict[str, Any]:
+    cutoff = (_now_utc() - timedelta(hours=24)).isoformat()
+    try:
+        rows = (
+            supabase.table("stock_alert_delivery_logs")
+            .select("status,sent_at")
+            .gte("sent_at", cutoff)
+            .order("sent_at", desc=True)
+            .limit(500)
+            .execute()
+            .data
+            or []
+        )
+    except Exception:
+        return {}
+    if not rows:
+        return {}
+    sent = sum(1 for row in rows if str(row.get("status") or "") == "sent")
+    failed = sum(1 for row in rows if str(row.get("status") or "") == "failed")
+    skipped = sum(1 for row in rows if str(row.get("status") or "") == "skipped")
+    return {
+        "sub_sent_24h": sent,
+        "sub_failed_24h": failed,
+        "sub_skipped_24h": skipped,
+    }
+
+
 def _should_send(state: Dict[str, Any], key: str) -> bool:
     sent = state.setdefault("events", {})
     if key in sent:
@@ -225,6 +346,10 @@ def send_run_notification(
     health = _load_source_health_summary(supabase)
     paper = _load_latest_paper_metrics(supabase)
     eval_metrics = _load_latest_eval_metrics(supabase)
+    drift_metrics = _load_latest_drift_metrics(supabase)
+    cc_metrics = _load_latest_champion_summary(supabase)
+    lifecycle = _load_latest_lifecycle_summary(supabase)
+    sub_metrics = _load_subscription_summary(supabase)
 
     lines = [f"【Stock V3运行通知】run_id={run_id}"]
     if job_status.lower() != "success":
@@ -255,6 +380,36 @@ def send_run_notification(
             f"realized={paper.get('realized_pnl', 0)}, "
             f"unrealized={paper.get('unrealized_pnl', 0)}, "
             f"win_rate={paper.get('win_rate', 0)}"
+        )
+
+    if drift_metrics:
+        lines.append(
+            f"drift: status={drift_metrics.get('drift_overall_status')}, "
+            f"warn/critical={drift_metrics.get('drift_warn_count')}/"
+            f"{drift_metrics.get('drift_critical_count')}, "
+            f"max_abs={drift_metrics.get('drift_max_abs')}"
+        )
+
+    if cc_metrics:
+        lines.append(
+            f"champion_vs_challenger: winner={cc_metrics.get('cc_challenger_win')}/"
+            f"{cc_metrics.get('cc_total')} challenger, "
+            f"promote={cc_metrics.get('cc_promote_candidate')}, "
+            f"avg_delta={cc_metrics.get('cc_avg_delta')}"
+        )
+
+    if lifecycle:
+        lines.append(
+            f"lifecycle: active={lifecycle.get('active_count', 0)}, "
+            f"generated={lifecycle.get('generated_count', 0)}, "
+            f"expiring24h={lifecycle.get('expiring_24h_count', 0)}, "
+            f"expired24h={lifecycle.get('expired_24h_count', 0)}"
+        )
+
+    if sub_metrics:
+        lines.append(
+            f"subscription_24h: sent/failed/skipped={sub_metrics.get('sub_sent_24h', 0)}/"
+            f"{sub_metrics.get('sub_failed_24h', 0)}/{sub_metrics.get('sub_skipped_24h', 0)}"
         )
 
     payload = _build_text_payload(lines)

@@ -32,6 +32,10 @@ jobs:
       ENABLE_STOCK_V3_RUN_LOG: ${{ vars.ENABLE_STOCK_V3_RUN_LOG || 'false' }}
       ENABLE_STOCK_V3_EVAL: ${{ vars.ENABLE_STOCK_V3_EVAL || 'false' }}
       ENABLE_STOCK_V3_PAPER: ${{ vars.ENABLE_STOCK_V3_PAPER || 'false' }}
+      ENABLE_STOCK_V3_CHALLENGER: ${{ vars.ENABLE_STOCK_V3_CHALLENGER || 'false' }}
+      ENABLE_STOCK_V3_DRIFT: ${{ vars.ENABLE_STOCK_V3_DRIFT || 'false' }}
+      ENABLE_STOCK_V3_LIFECYCLE: ${{ vars.ENABLE_STOCK_V3_LIFECYCLE || 'false' }}
+      ENABLE_STOCK_V3_SUBSCRIPTION_ALERT: ${{ vars.ENABLE_STOCK_V3_SUBSCRIPTION_ALERT || 'false' }}
 
     steps:
       - uses: actions/checkout@v3
@@ -136,8 +140,55 @@ jobs:
             --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-paper" \
             --topn 12
 
+      - name: Run Stock V3 champion/challenger (optional)
+        if: ${{ env.ENABLE_STOCK_V3_CHALLENGER == 'true' }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_champion_challenger_v3.py \
+            --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-cc" \
+            --lookback-hours 168 \
+            --limit 1500 \
+            --promote-margin 0.03
+
+      - name: Run Stock V3 drift monitor (optional)
+        if: ${{ env.ENABLE_STOCK_V3_DRIFT == 'true' }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_drift_monitor_v3.py \
+            --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-drift" \
+            --window-hours 24 \
+            --baseline-days 7 \
+            --limit 4500
+
+      - name: Build Stock V3 lifecycle report (optional)
+        if: ${{ env.ENABLE_STOCK_V3_LIFECYCLE == 'true' }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_lifecycle_report_v3.py \
+            --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-lifecycle" \
+            --window-hours 24 \
+            --limit 8000
+
       - name: Collect source health snapshot (V3 optional)
-        if: ${{ env.ENABLE_STOCK_V3_RUN_LOG == 'true' || env.ENABLE_STOCK_V3_EVAL == 'true' || env.ENABLE_STOCK_V3_PAPER == 'true' }}
+        if: ${{ env.ENABLE_STOCK_V3_RUN_LOG == 'true' || env.ENABLE_STOCK_V3_EVAL == 'true' || env.ENABLE_STOCK_V3_PAPER == 'true' || env.ENABLE_STOCK_V3_CHALLENGER == 'true' || env.ENABLE_STOCK_V3_DRIFT == 'true' || env.ENABLE_STOCK_V3_LIFECYCLE == 'true' || env.ENABLE_STOCK_V3_SUBSCRIPTION_ALERT == 'true' }}
         continue-on-error: true
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -162,6 +213,22 @@ jobs:
             --duration-sec "$duration" \
             --health-date "$(date -u +%F)" \
             --health-run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
+      - name: Dispatch Stock V3 subscription alerts (optional)
+        if: ${{ env.ENABLE_STOCK_V3_SUBSCRIPTION_ALERT == 'true' }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_subscription_alert_v3.py \
+            --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-subalert" \
+            --sub-limit 60 \
+            --opp-limit 200
 
       - name: Notify Feishu (Stock V3)
         if: ${{ always() }}

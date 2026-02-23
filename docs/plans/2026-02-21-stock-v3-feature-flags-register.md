@@ -14,6 +14,18 @@
 3. `ENABLE_STOCK_V3_PAPER=false`
    - 作用: 控制 paper trading 相关旁路逻辑
    - 生效范围: 分析工作流与后端脚本进程环境
+4. `ENABLE_STOCK_V3_CHALLENGER=false`
+   - 作用: 控制 Champion/Challenger 对照评分步骤
+   - 生效范围: 分析工作流与后端脚本进程环境
+5. `ENABLE_STOCK_V3_DRIFT=false`
+   - 作用: 控制漂移监控与自动告警步骤
+   - 生效范围: 分析工作流与后端脚本进程环境
+6. `ENABLE_STOCK_V3_LIFECYCLE=false`
+   - 作用: 控制机会生命周期日报生成步骤
+   - 生效范围: 分析工作流与后端脚本进程环境
+7. `ENABLE_STOCK_V3_SUBSCRIPTION_ALERT=false`
+   - 作用: 控制订阅告警投递步骤
+   - 生效范围: 分析工作流与后端脚本进程环境
 
 ## 2. 前端 Flag（默认关闭）
 
@@ -28,6 +40,10 @@
      - `ENABLE_STOCK_V3_RUN_LOG`
      - `ENABLE_STOCK_V3_EVAL`
      - `ENABLE_STOCK_V3_PAPER`
+     - `ENABLE_STOCK_V3_CHALLENGER`
+     - `ENABLE_STOCK_V3_DRIFT`
+     - `ENABLE_STOCK_V3_LIFECYCLE`
+     - `ENABLE_STOCK_V3_SUBSCRIPTION_ALERT`
 2. Cloudflare Pages（前端）
    - 通过项目环境变量注入：
      - `NEXT_PUBLIC_DASHBOARD_V3_EXPLAIN`
@@ -42,5 +58,5 @@
 
 - 后端 flag 解析模块已新增：`scripts/feature_flags.py`
 - V2 pipeline 已接入 flag 读取（仅日志，不改变业务行为）
-- workflow 已注入后端 flags（默认 `false`）
+- workflow 已注入后端 flags（默认 `false`，包含 eval/paper/challenger/drift/lifecycle/subscription）
 - 前端已新增 V3 explain flag 读取（默认 `false`）

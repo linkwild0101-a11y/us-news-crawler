@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 import { MetricHint } from "@/components/metric-hint";
+import { MetricDictionaryCenter } from "@/components/metric-dictionary-center";
 import { readDashboardV3ExplainFlag } from "@/lib/feature-flags";
 import { METRIC_EXPLANATIONS, MetricKey } from "@/lib/metric-explanations";
 import {
@@ -195,6 +196,7 @@ function OpportunityCard({ item }: { item: OpportunityItem }) {
 
 export function MobileDashboard({ data }: { data: DashboardData }) {
   const [activeTab, setActiveTab] = useState<DashboardTab>("opportunities");
+  const [dictOpen, setDictOpen] = useState(false);
   const showV3ExplainBadge = readDashboardV3ExplainFlag();
 
   const rankedTicker = useMemo(() => rankTicker(data.tickerDigest), [data.tickerDigest]);
@@ -225,9 +227,18 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
               </p>
             )}
           </div>
-          <span className={`rounded-md border px-2 py-1 text-xs font-semibold ${levelClass(data.marketSnapshot.risk_level)}`}>
-            <LabelWithHint label={`风险 ${data.marketSnapshot.risk_level}`} hintKey="dashboard_risk_level" />
-          </span>
+          <div className="flex items-start gap-2">
+            <button
+              type="button"
+              onClick={() => setDictOpen(true)}
+              className="rounded-md border border-slate-600 px-2 py-1 text-xs text-textMuted hover:text-textMain"
+            >
+              指标字典
+            </button>
+            <span className={`rounded-md border px-2 py-1 text-xs font-semibold ${levelClass(data.marketSnapshot.risk_level)}`}>
+              <LabelWithHint label={`风险 ${data.marketSnapshot.risk_level}`} hintKey="dashboard_risk_level" />
+            </span>
+          </div>
         </div>
       </header>
 
@@ -447,6 +458,8 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
           </button>
         ))}
       </nav>
+
+      <MetricDictionaryCenter open={dictOpen} onClose={() => setDictOpen(false)} />
     </div>
   );
 }

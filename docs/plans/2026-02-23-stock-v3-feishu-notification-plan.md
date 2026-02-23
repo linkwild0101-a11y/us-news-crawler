@@ -61,3 +61,13 @@
 1. 接入卡片消息（富文本 + 链接按钮）
 2. 增加订阅维度（ticker/方向/等级）
 3. 增加静默时段与交易时段策略
+
+## 6. 当前落地状态（2026-02-23）
+
+- 已落地：
+  1. Workflow `always()` 运行通知（`scripts/stock_v3_notifier.py`）
+  2. 运行摘要包含 source health、eval、paper、drift、champion/challenger、lifecycle 指标
+  3. 订阅告警产品化 v1（`scripts/stock_subscription_alert_v3.py`，支持 ticker/方向/等级、冷却窗口）
+- 待增强：
+  1. 飞书富文本卡片模板
+  2. 交易时段静默策略（按美股盘前/盘中/盘后）
