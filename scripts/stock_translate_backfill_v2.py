@@ -8,6 +8,7 @@ import logging
 import os
 import sys
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
@@ -250,6 +251,14 @@ class StockV2TranslationBackfill:
         translated = 0
         updated = 0
         worker_count = min(self.workers, len(candidates))
+        started_at = time.perf_counter()
+        total_candidates = len(candidates)
+        milestones = {
+            max(1, int(total_candidates * 0.25)),
+            max(1, int(total_candidates * 0.5)),
+            max(1, int(total_candidates * 0.75)),
+            total_candidates,
+        }
 
         with ThreadPoolExecutor(max_workers=worker_count) as executor:
             futures = {executor.submit(self._prepare_update, row): row.event_id for row in candidates}
@@ -275,9 +284,13 @@ class StockV2TranslationBackfill:
                         f"[STOCK_V2_TRANSLATE_UPDATE_FAILED] event_id={target_event_id} error={str(e)[:120]}"
                     )
 
-                if idx % 50 == 0:
+                if idx in milestones:
+                    elapsed = time.perf_counter() - started_at
+                    eta = (elapsed / idx) * (total_candidates - idx) if idx else 0.0
                     logger.info(
-                        f"[STOCK_V2_TRANSLATE_PROGRESS] done={idx}/{len(candidates)} updated={updated}"
+                        "[STOCK_V2_TRANSLATE_PROGRESS] "
+                        f"done={idx}/{total_candidates} updated={updated} "
+                        f"elapsed={elapsed:.1f}s eta={eta:.1f}s"
                     )
 
         logger.info(

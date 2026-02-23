@@ -15,7 +15,14 @@ from openai import OpenAI
 
 # 配置日志 - 同时输出到控制台和文件
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+_VERBOSE_LOGS = os.getenv("LLM_VERBOSE_LOGS", "false").strip().lower() in (
+    "1",
+    "true",
+    "yes",
+    "on",
+)
+_LOG_LEVEL = logging.INFO if _VERBOSE_LOGS else logging.WARNING
+logger.setLevel(_LOG_LEVEL)
 
 # 清除现有的处理器
 if logger.handlers:
@@ -28,7 +35,7 @@ formatter = logging.Formatter(
 
 # 控制台处理器
 console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.INFO)
+console_handler.setLevel(_LOG_LEVEL)
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
@@ -38,7 +45,7 @@ log_file = os.path.join(log_dir, "..", "logs", "llm_client.log")
 os.makedirs(os.path.dirname(log_file), exist_ok=True)
 
 file_handler = logging.FileHandler(log_file, mode="a", encoding="utf-8")
-file_handler.setLevel(logging.INFO)
+file_handler.setLevel(_LOG_LEVEL)
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 

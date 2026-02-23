@@ -10,6 +10,7 @@ import logging
 import os
 import re
 import sys
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
@@ -603,6 +604,19 @@ class StockPipelineV2:
 
         used_count = 0
         worker_count = min(self.llm_workers, len(llm_candidates))
+        total_candidates = len(llm_candidates)
+        started_at = time.perf_counter()
+        milestones = {
+            max(1, int(total_candidates * 0.25)),
+            max(1, int(total_candidates * 0.5)),
+            max(1, int(total_candidates * 0.75)),
+            total_candidates,
+        }
+        completed = 0
+        logger.info(
+            "[V2_LLM_PROGRESS_START] "
+            f"candidates={total_candidates} workers={worker_count}"
+        )
 
         with ThreadPoolExecutor(max_workers=worker_count) as executor:
             future_map = {
@@ -617,6 +631,7 @@ class StockPipelineV2:
             }
             for future in as_completed(future_map):
                 event_idx = future_map[future]
+                completed += 1
                 try:
                     direction, strength, summary, llm_used, title_zh, summary_zh = future.result()
                 except Exception:
@@ -632,6 +647,24 @@ class StockPipelineV2:
                 row["details"] = details
                 if llm_used:
                     used_count += 1
+                if completed in milestones:
+                    elapsed = time.perf_counter() - started_at
+                    eta = (
+                        (elapsed / completed) * (total_candidates - completed)
+                        if completed
+                        else 0.0
+                    )
+                    logger.info(
+                        "[V2_LLM_PROGRESS] "
+                        f"done={completed}/{total_candidates} "
+                        f"used={used_count} elapsed={elapsed:.1f}s eta={eta:.1f}s"
+                    )
+        elapsed = time.perf_counter() - started_at
+        logger.info(
+            "[V2_LLM_PROGRESS_DONE] "
+            f"done={total_candidates}/{total_candidates} "
+            f"used={used_count} elapsed={elapsed:.1f}s"
+        )
         return used_count
 
     def _upsert_events(
