@@ -6,11 +6,19 @@ from __future__ import annotations
 import argparse
 import logging
 import os
+import sys
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 import requests
 from supabase import create_client
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from scripts.stock_portfolio_constraints_v3 import (
+    ConstraintConfig,
+    apply_constraints_to_opportunities,
+)
 
 logger = logging.getLogger(__name__)
 if not logger.handlers:
@@ -322,56 +330,196 @@ def _upsert_research_metrics(supabase, run_id: str, metrics: Dict[str, float]) -
         logger.warning(f"[PAPER_V3_METRICS_UPSERT_FAILED] error={str(e)[:120]}")
 
 
+def _log_run_start(
+    supabase,
+    run_id: str,
+    topn: int,
+    apply_constraints: bool,
+    constraint_config: ConstraintConfig,
+) -> None:
+    payload = {
+        "run_id": run_id,
+        "pipeline_name": "stock_v3_paper_trading",
+        "pipeline_version": os.getenv("GITHUB_SHA", "")[:12] or "local",
+        "trigger_type": os.getenv("GITHUB_EVENT_NAME", "manual"),
+        "status": "running",
+        "started_at": _now_utc().isoformat(),
+        "input_window": {"topn": topn},
+        "params_json": {
+            "topn": topn,
+            "apply_constraints": bool(apply_constraints),
+            "max_positions": constraint_config.max_positions,
+            "max_new_positions": constraint_config.max_new_positions,
+            "max_single_ticker": constraint_config.max_single_ticker,
+            "max_gross_exposure": constraint_config.max_gross_exposure,
+            "max_long_ratio": constraint_config.max_long_ratio,
+            "max_short_ratio": constraint_config.max_short_ratio,
+            "min_opportunity_score": constraint_config.min_opportunity_score,
+            "min_confidence": constraint_config.min_confidence,
+        },
+        "commit_sha": os.getenv("GITHUB_SHA", "")[:40],
+        "as_of": _now_utc().isoformat(),
+    }
+    try:
+        supabase.table("research_runs").upsert(payload, on_conflict="run_id").execute()
+    except Exception as e:
+        logger.warning(f"[PAPER_V3_RUN_START_FAILED] error={str(e)[:120]}")
+
+
+def _log_run_finish(supabase, run_id: str, status: str, notes: str) -> None:
+    try:
+        (
+            supabase.table("research_runs")
+            .update(
+                {
+                    "status": status,
+                    "ended_at": _now_utc().isoformat(),
+                    "notes": notes[:1000],
+                    "as_of": _now_utc().isoformat(),
+                }
+            )
+            .eq("run_id", run_id)
+            .execute()
+        )
+    except Exception as e:
+        logger.warning(f"[PAPER_V3_RUN_FINISH_FAILED] error={str(e)[:120]}")
+
+
 def run_paper(
     run_id: Optional[str],
     topn: int,
+    apply_constraints: bool,
+    constraint_config: ConstraintConfig,
 ) -> Dict[str, Any]:
     supabase = _init_supabase()
     final_run_id = run_id or f"paper-{_now_utc().strftime('%Y%m%d%H%M%S')}"
-
-    opportunities = _load_active_opportunities(supabase=supabase, topn=topn)
-    opp_map = _opportunity_map(opportunities)
-    open_positions = _load_open_positions(supabase=supabase)
-
-    update_metrics = _update_open_positions(
+    _log_run_start(
         supabase=supabase,
-        open_positions=open_positions,
-        opp_map=opp_map,
-    )
-
-    refreshed_open_positions = _load_open_positions(supabase=supabase)
-    opened = _open_new_positions(
-        supabase=supabase,
-        opportunities=opportunities,
-        open_positions=refreshed_open_positions,
         run_id=final_run_id,
+        topn=topn,
+        apply_constraints=apply_constraints,
+        constraint_config=constraint_config,
     )
 
-    metrics = _write_metrics(supabase=supabase, run_id=final_run_id)
-    _upsert_research_metrics(supabase=supabase, run_id=final_run_id, metrics=metrics)
+    try:
+        opportunities = _load_active_opportunities(supabase=supabase, topn=topn)
+        opp_map = _opportunity_map(opportunities)
+        open_positions = _load_open_positions(supabase=supabase)
 
-    summary = {
-        "run_id": final_run_id,
-        "topn": topn,
-        "candidates": len(opportunities),
-        "opened": opened,
-        "updated": update_metrics.get("updated", 0),
-        "closed": update_metrics.get("closed", 0),
-        **metrics,
-    }
-    logger.info("[PAPER_V3_DONE] " + ", ".join([f"{k}={v}" for k, v in summary.items()]))
-    return summary
+        update_metrics = _update_open_positions(
+            supabase=supabase,
+            open_positions=open_positions,
+            opp_map=opp_map,
+        )
+        refreshed_open_positions = _load_open_positions(supabase=supabase)
+        filtered_opportunities = opportunities
+        refreshed_open_exposure = sum(
+            max(_safe_float(row.get("size"), 1.0), 0.0) for row in refreshed_open_positions
+        )
+        constraint_metrics: Dict[str, float] = {
+            "constraint_accepted_count": float(len(opportunities)),
+            "constraint_rejected_count": 0.0,
+            "constraint_accept_rate": 1.0 if opportunities else 0.0,
+            "constraint_after_total_positions": float(len(refreshed_open_positions) + len(opportunities)),
+            "constraint_after_gross_exposure": float(refreshed_open_exposure + len(opportunities)),
+        }
+        if apply_constraints:
+            accepted, rejected, metrics = apply_constraints_to_opportunities(
+                opportunities=opportunities,
+                open_positions=refreshed_open_positions,
+                config=constraint_config,
+            )
+            accepted_id_set = {
+                int(item.get("opportunity_id") or 0)
+                for item in accepted
+                if int(item.get("opportunity_id") or 0) > 0
+            }
+            filtered_opportunities = []
+            for row in opportunities:
+                row_id = int(row.get("id") or 0)
+                if row_id > 0 and row_id in accepted_id_set:
+                    filtered_opportunities.append(row)
+            constraint_metrics = {
+                "constraint_accepted_count": float(len(filtered_opportunities)),
+                "constraint_rejected_count": float(len(rejected)),
+                "constraint_accept_rate": float(metrics.get("constraint_accept_rate", 0.0)),
+                "constraint_after_total_positions": float(
+                    metrics.get("constraint_after_total_positions", 0.0)
+                ),
+                "constraint_after_gross_exposure": float(
+                    metrics.get("constraint_after_gross_exposure", 0.0)
+                ),
+            }
+
+        opened = _open_new_positions(
+            supabase=supabase,
+            opportunities=filtered_opportunities,
+            open_positions=refreshed_open_positions,
+            run_id=final_run_id,
+        )
+
+        metrics = _write_metrics(supabase=supabase, run_id=final_run_id)
+        merged_metrics = {**metrics, **constraint_metrics}
+        _upsert_research_metrics(supabase=supabase, run_id=final_run_id, metrics=merged_metrics)
+
+        summary = {
+            "run_id": final_run_id,
+            "topn": topn,
+            "candidates": len(opportunities),
+            "constraint_candidates": len(filtered_opportunities),
+            "opened": opened,
+            "updated": update_metrics.get("updated", 0),
+            "closed": update_metrics.get("closed", 0),
+            **merged_metrics,
+        }
+        _log_run_finish(
+            supabase=supabase,
+            run_id=final_run_id,
+            status="success",
+            notes=f"opened={opened}, updated={update_metrics.get('updated', 0)}",
+        )
+        logger.info("[PAPER_V3_DONE] " + ", ".join([f"{k}={v}" for k, v in summary.items()]))
+        return summary
+    except Exception as e:
+        _log_run_finish(
+            supabase=supabase,
+            run_id=final_run_id,
+            status="failed",
+            notes=f"error={str(e)[:300]}",
+        )
+        raise
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Stock V3 paper trading runner")
     parser.add_argument("--run-id", type=str, default=None, help="paper run_id")
     parser.add_argument("--topn", type=int, default=12, help="每轮最多处理机会数")
+    parser.add_argument("--apply-constraints", action="store_true", help="启用组合约束引擎")
+    parser.add_argument("--max-positions", type=int, default=12, help="组合总持仓上限")
+    parser.add_argument("--max-new-positions", type=int, default=12, help="本轮最多新增仓位")
+    parser.add_argument("--max-single-ticker", type=int, default=1, help="单票仓位上限")
+    parser.add_argument("--max-gross-exposure", type=float, default=12.0, help="总敞口上限")
+    parser.add_argument("--max-long-ratio", type=float, default=0.75, help="多头比例上限")
+    parser.add_argument("--max-short-ratio", type=float, default=0.75, help="空头比例上限")
+    parser.add_argument("--min-opportunity-score", type=float, default=70.0, help="最低机会分")
+    parser.add_argument("--min-confidence", type=float, default=0.55, help="最低置信度")
     args = parser.parse_args()
 
+    constraint_config = ConstraintConfig(
+        max_positions=max(1, args.max_positions),
+        max_new_positions=max(1, args.max_new_positions),
+        max_single_ticker=max(1, args.max_single_ticker),
+        max_gross_exposure=max(1.0, args.max_gross_exposure),
+        max_long_ratio=max(0.0, min(1.0, args.max_long_ratio)),
+        max_short_ratio=max(0.0, min(1.0, args.max_short_ratio)),
+        min_opportunity_score=max(0.0, args.min_opportunity_score),
+        min_confidence=max(0.0, min(1.0, args.min_confidence)),
+    )
     summary = run_paper(
         run_id=args.run_id,
         topn=max(1, args.topn),
+        apply_constraints=bool(args.apply_constraints),
+        constraint_config=constraint_config,
     )
     logger.info("[PAPER_V3_METRICS] " + ", ".join([f"{k}={v}" for k, v in summary.items()]))
 

@@ -35,16 +35,16 @@
 
 ## Phase 0（W0，1-2天）基线冻结
 
-- [ ] 固化 V2 当前基线版本（tag + config 快照）
-- [ ] 建立 V3 feature flags（默认关闭）
-- [ ] 建立路线周报模板（质量、时延、成功率）
+- [x] 固化 V2 当前基线版本（tag + config 快照）
+- [x] 建立 V3 feature flags（默认关闭）
+- [x] 建立路线周报模板（质量、时延、成功率）
 
 ## Phase 1（W1-W3）研究基础设施化
 
-- [ ] `research_runs` 元数据体系
-- [ ] 数据 Provider Registry 与 Source Health
-- [ ] 事件本体 schema v1
-- [ ] 分析运行可观测性（结构化日志 + run summary）
+- [x] `research_runs` 元数据体系
+- [x] 数据 Provider Registry 与 Source Health
+- [x] 事件本体 schema v1
+- [x] 分析运行可观测性（结构化日志 + run summary）
 
 ## Phase 2（W4-W6）评估与治理
 
@@ -55,7 +55,7 @@
 
 ## Phase 3（W7-W9）组合闭环与 Paper Trading
 
-- [ ] 组合约束引擎（敞口/集中度/风险预算）
+- [x] 组合约束引擎（敞口/集中度/风险预算）
 - [x] Paper Trading 流程
 - [x] 机会生命周期状态机（生成→跟踪→失效→复盘）
 - [x] 归因报表（信号贡献/宏观过滤贡献/LLM贡献）
@@ -63,9 +63,9 @@
 ## Phase 4（W10-W12）前端决策体验升级
 
 - [x] 指标字典中心（Tooltip 已有，升级为可搜索中心）
-- [ ] Why-Now 证据链详情页
+- [x] Why-Now 证据链详情页
 - [x] 订阅告警设计（ticker/方向/等级）
-- [ ] 运营与值班手册
+- [x] 运营与值班手册
 
 ---
 
@@ -77,14 +77,14 @@
 把“脚本式数据拉取”升级为“统一可观测接入层”。
 
 ### 任务
-- [ ] 定义 `provider_id/source_type/sla/error_budget` 元数据
-- [ ] 抽象统一读取接口（行情/宏观/新闻）
-- [ ] 失败策略：retry + fallback + stale 标记
-- [ ] 输出 source_health 快照（可用率、延迟、缺失率）
+- [x] 定义 `provider_id/source_type/sla/error_budget` 元数据
+- [x] 抽象统一读取接口（行情/宏观/新闻）
+- [x] 失败策略：retry + fallback + stale 标记
+- [x] 输出 source_health 快照（可用率、延迟、缺失率）
 
 ### 交付物
-- [ ] `docs/specs/provider-registry-v1.md`
-- [ ] `docs/specs/source-health-sli-slo.md`
+- [x] `docs/specs/provider-registry-v1.md`
+- [x] `docs/specs/source-health-sli-slo.md`
 
 ## WS-B：Research & Feature（研究与特征）
 
@@ -92,14 +92,14 @@
 每次 run 都可复现、可比较。
 
 ### 任务
-- [ ] 新增 `research_runs`、`research_run_metrics`、`research_run_artifacts` 表设计
-- [ ] run_id 贯穿：输入窗口、参数、版本、输出统计
-- [ ] 事件本体升级（event taxonomy + evidence schema）
-- [ ] 定义 run 对账报告格式
+- [x] 新增 `research_runs`、`research_run_metrics`、`research_run_artifacts` 表设计
+- [x] run_id 贯穿：输入窗口、参数、版本、输出统计
+- [x] 事件本体升级（event taxonomy + evidence schema）
+- [x] 定义 run 对账报告格式
 
 ### 交付物
-- [ ] `docs/specs/research-run-contract-v1.md`
-- [ ] `docs/specs/event-taxonomy-v1.md`
+- [x] `docs/specs/research-run-contract-v1.md`
+- [x] `docs/specs/event-taxonomy-v1.md`
 
 ## WS-C：Signal Governance（信号治理）
 
@@ -107,14 +107,14 @@
 建立模型晋级机制与稳定性红线。
 
 ### 任务
-- [ ] 离线标签构造方案（收益窗口 + 方向标签）
-- [ ] 评估指标与统计口径（LONG/SHORT 分开）
+- [x] 离线标签构造方案（收益窗口 + 方向标签）
+- [x] 评估指标与统计口径（LONG/SHORT 分开）
 - [x] Champion/Challenger A/B 对照模板
 - [x] Drift 监控（分布、密度、集中度）
 
 ### 交付物
-- [ ] `docs/specs/offline-eval-protocol-v1.md`
-- [ ] `docs/specs/model-promotion-gate-v1.md`
+- [x] `docs/specs/offline-eval-protocol-v1.md`
+- [x] `docs/specs/model-promotion-gate-v1.md`
 
 ## WS-D：Portfolio & Paper Trading（组合与模拟交易）
 
@@ -122,14 +122,14 @@
 从“机会列表”升级为“可执行组合建议”。
 
 ### 任务
-- [ ] 组合约束参数化（净敞口、行业上限、单票上限）
-- [ ] 交易规则模板（入场/减仓/退出）
+- [x] 组合约束参数化（净敞口、行业上限、单票上限）
+- [x] 交易规则模板（入场/减仓/退出）
 - [x] Paper Trading 执行日志与绩效报表
 - [x] 失败样本复盘模板
 
 ### 交付物
-- [ ] `docs/specs/portfolio-constraints-v1.md`
-- [ ] `docs/specs/paper-trading-protocol-v1.md`
+- [x] `docs/specs/portfolio-constraints-v1.md`
+- [x] `docs/specs/paper-trading-protocol-v1.md`
 
 ## WS-E：Frontend Decision UX（前端决策体验）
 
@@ -138,12 +138,12 @@
 
 ### 任务
 - [x] 指标字典中心（搜索 + 版本号 + 字段来源）
-- [ ] 证据链页（事件→信号→机会→失效条件）
-- [ ] 风险提示组件统一化（与现有 tooltip 对齐）
-- [ ] 数据新鲜度/质量徽章
+- [x] 证据链页（事件→信号→机会→失效条件）
+- [x] 风险提示组件统一化（与现有 tooltip 对齐）
+- [x] 数据新鲜度/质量徽章
 
 ### 交付物
-- [ ] `docs/specs/dashboard-explainability-v1.md`
+- [x] `docs/specs/dashboard-explainability-v1.md`
 
 ---
 
@@ -236,21 +236,23 @@
 
 ## 8.1 离线测试
 
-- [ ] schema migration 幂等验证
-- [ ] 1k/5k/10k 样本压力测试
-- [ ] 回放测试（同 run 参数重复执行一致性）
+- [x] schema migration 幂等验证
+- [x] 1k/5k/10k 样本压力测试
+- [x] 回放测试（同 run 参数重复执行一致性）
 
 ## 8.2 联调测试
 
-- [ ] workflow 全链路演练（含降级路径）
-- [ ] 前端 V3 explain 开关回归
-- [ ] 数据新鲜度与质量徽章校验
+- [x] workflow 全链路演练（含降级路径）
+- [x] 前端 V3 explain 开关回归
+- [x] 数据新鲜度与质量徽章校验
 
 ## 8.3 试运行测试
 
-- [ ] 7 天 shadow run（V2主 + V3旁路）
-- [ ] 每日评分卡自动汇总
-- [ ] 异常案例复盘会
+- [x] 7 天 shadow run（V2主 + V3旁路）
+- [x] 每日评分卡自动汇总
+- [x] 异常案例复盘会
+
+备注：`portfolio_paper_positions` 与 `portfolio_constraint_snapshots` 相关 SQL 已提交，生产库需执行一次 migration 后可写入完整快照。
 
 ---
 
@@ -300,4 +302,4 @@
 - [x] provider registry 规格文档
 - [x] research run contract 规格文档
 - [x] eval protocol 与 promotion gate 文档
-- [ ] workflow shadow run 报告（7天）
+- [x] workflow shadow run 报告（7天）

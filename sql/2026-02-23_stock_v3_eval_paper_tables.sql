@@ -7,20 +7,20 @@ BEGIN
     NEW.updated_at = NOW();
     RETURN NEW;
 END;
-$$ language plpgsql;
+$$ language 'plpgsql';
 
 CREATE TABLE IF NOT EXISTS signal_eval_snapshots (
     id BIGSERIAL PRIMARY KEY,
     signal_id BIGINT NOT NULL,
     ticker VARCHAR(16) NOT NULL,
-    side VARCHAR(8) NOT NULL CHECK (side IN (LONG, SHORT)),
+    side VARCHAR(8) NOT NULL CHECK (side IN ('LONG', 'SHORT')),
     label_window VARCHAR(32) NOT NULL,
     realized_return DOUBLE PRECISION NOT NULL DEFAULT 0,
     hit_flag BOOLEAN NOT NULL DEFAULT FALSE,
     calibration_bin SMALLINT NOT NULL DEFAULT 0,
-    source_run_id VARCHAR(96) NOT NULL DEFAULT ,
-    eval_run_id VARCHAR(96) NOT NULL DEFAULT ,
-    details JSONB NOT NULL DEFAULT {}::jsonb,
+    source_run_id VARCHAR(96) NOT NULL DEFAULT '',
+    eval_run_id VARCHAR(96) NOT NULL DEFAULT '',
+    details JSONB NOT NULL DEFAULT '{}'::jsonb,
     as_of TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     UNIQUE(signal_id, label_window)
@@ -39,9 +39,9 @@ CREATE TABLE IF NOT EXISTS portfolio_paper_positions (
     run_id VARCHAR(96) NOT NULL,
     source_opportunity_id BIGINT,
     ticker VARCHAR(16) NOT NULL,
-    side VARCHAR(8) NOT NULL CHECK (side IN (LONG, SHORT)),
-    horizon VARCHAR(8) NOT NULL DEFAULT A,
-    status VARCHAR(16) NOT NULL DEFAULT OPEN CHECK (status IN (OPEN, CLOSED)),
+    side VARCHAR(8) NOT NULL CHECK (side IN ('LONG', 'SHORT')),
+    horizon VARCHAR(8) NOT NULL DEFAULT 'A',
+    status VARCHAR(16) NOT NULL DEFAULT 'OPEN' CHECK (status IN ('OPEN', 'CLOSED')),
     entry_ts TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     entry_price DOUBLE PRECISION NOT NULL DEFAULT 0,
     entry_score DOUBLE PRECISION NOT NULL DEFAULT 0,
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS portfolio_paper_positions (
     exit_ts TIMESTAMP WITH TIME ZONE,
     exit_price DOUBLE PRECISION,
     realized_pnl DOUBLE PRECISION NOT NULL DEFAULT 0,
-    notes TEXT NOT NULL DEFAULT ,
+    notes TEXT NOT NULL DEFAULT '',
     as_of TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS portfolio_paper_metrics (
     unrealized_pnl DOUBLE PRECISION NOT NULL DEFAULT 0,
     win_rate DOUBLE PRECISION NOT NULL DEFAULT 0,
     gross_exposure DOUBLE PRECISION NOT NULL DEFAULT 0,
-    notes TEXT NOT NULL DEFAULT ,
+    notes TEXT NOT NULL DEFAULT '',
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
@@ -93,4 +93,6 @@ ALTER TABLE signal_eval_snapshots ENABLE ROW LEVEL SECURITY;
 ALTER TABLE portfolio_paper_positions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE portfolio_paper_metrics ENABLE ROW LEVEL SECURITY;
 
-COMMENT ON TABLE signal_eval_snapshots IS Stock
+COMMENT ON TABLE signal_eval_snapshots IS 'Stock V3 离线评估快照（代理口径）';
+COMMENT ON TABLE portfolio_paper_positions IS 'Stock V3 纸上交易持仓表';
+COMMENT ON TABLE portfolio_paper_metrics IS 'Stock V3 纸上交易指标快照';

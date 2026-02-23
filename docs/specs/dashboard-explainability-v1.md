@@ -16,12 +16,13 @@
 - 用户可见文本优先中文
 - 英文证据无中文时显示“翻译处理中”
 - event_type 使用中文标签映射展示
+- 机会卡提供 `Why-Now 证据链详情抽屉`，展示 why_now / invalid_if / catalysts / source ids
+- 指标字典中心与悬停 tooltip 字段保持一致（单一口径）
 
 ## 3. 质量徽章（建议）
 
-- `fresh`: 新鲜数据
-- `degraded`: 部分源降级
-- `critical`: 关键源异常
+- 数据新鲜度：`fresh <= 30m`，`stale <= 120m`，`critical > 120m`
+- 源健康度：`critical > 0` 为红，`degraded > 0` 为黄，否则绿
 
 ## 4. 回退策略
 

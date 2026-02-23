@@ -83,9 +83,19 @@ export interface DashboardData {
   opportunities: OpportunityItem[];
   marketRegime: MarketRegime | null;
   marketSnapshot: MarketSnapshot;
+  dataQuality: DataQualitySnapshot;
   sentinelSignals: SentinelSignal[];
   tickerDigest: TickerSignalDigest[];
   hotClusters: HotCluster[];
   relations: EntityRelationItem[];
   dataUpdatedAt: string;
+}
+
+export interface DataQualitySnapshot {
+  freshness_minutes: number;
+  freshness_level: "fresh" | "stale" | "critical";
+  source_health_status: "healthy" | "degraded" | "critical";
+  source_health_healthy: number;
+  source_health_degraded: number;
+  source_health_critical: number;
 }

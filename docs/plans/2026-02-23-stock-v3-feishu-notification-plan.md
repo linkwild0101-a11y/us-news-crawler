@@ -68,6 +68,7 @@
   1. Workflow `always()` 运行通知（`scripts/stock_v3_notifier.py`）
   2. 运行摘要包含 source health、eval、paper、drift、champion/challenger、lifecycle 指标
   3. 订阅告警产品化 v1（`scripts/stock_subscription_alert_v3.py`，支持 ticker/方向/等级、冷却窗口）
+  4. V3 评分卡/Shadow/验证脚本已可产出并可作为通知附件来源
 - 待增强：
   1. 飞书富文本卡片模板
   2. 交易时段静默策略（按美股盘前/盘中/盘后）

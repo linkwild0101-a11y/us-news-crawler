@@ -36,6 +36,10 @@ jobs:
       ENABLE_STOCK_V3_DRIFT: ${{ vars.ENABLE_STOCK_V3_DRIFT || 'false' }}
       ENABLE_STOCK_V3_LIFECYCLE: ${{ vars.ENABLE_STOCK_V3_LIFECYCLE || 'false' }}
       ENABLE_STOCK_V3_SUBSCRIPTION_ALERT: ${{ vars.ENABLE_STOCK_V3_SUBSCRIPTION_ALERT || 'false' }}
+      ENABLE_STOCK_V3_CONSTRAINTS: ${{ vars.ENABLE_STOCK_V3_CONSTRAINTS || 'false' }}
+      ENABLE_STOCK_V3_SCORECARD: ${{ vars.ENABLE_STOCK_V3_SCORECARD || 'false' }}
+      ENABLE_STOCK_V3_SHADOW_REPORT: ${{ vars.ENABLE_STOCK_V3_SHADOW_REPORT || 'false' }}
+      ENABLE_STOCK_V3_VALIDATION: ${{ vars.ENABLE_STOCK_V3_VALIDATION || 'false' }}
 
     steps:
       - uses: actions/checkout@v3
@@ -138,7 +142,30 @@ jobs:
         run: |
           python -u scripts/stock_paper_trading_v3.py \
             --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-paper" \
-            --topn 12
+            --topn 12 \
+            --apply-constraints
+
+      - name: Run Stock V3 portfolio constraints snapshot (optional)
+        if: ${{ env.ENABLE_STOCK_V3_CONSTRAINTS == 'true' }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_portfolio_constraints_v3.py \
+            --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-constraint" \
+            --limit 220 \
+            --max-positions 12 \
+            --max-new-positions 12 \
+            --max-single-ticker 1 \
+            --max-gross-exposure 12 \
+            --max-long-ratio 0.75 \
+            --max-short-ratio 0.75 \
+            --min-opportunity-score 70 \
+            --min-confidence 0.55
 
       - name: Run Stock V3 champion/challenger (optional)
         if: ${{ env.ENABLE_STOCK_V3_CHALLENGER == 'true' }}
@@ -188,7 +215,7 @@ jobs:
             --limit 8000
 
       - name: Collect source health snapshot (V3 optional)
-        if: ${{ env.ENABLE_STOCK_V3_RUN_LOG == 'true' || env.ENABLE_STOCK_V3_EVAL == 'true' || env.ENABLE_STOCK_V3_PAPER == 'true' || env.ENABLE_STOCK_V3_CHALLENGER == 'true' || env.ENABLE_STOCK_V3_DRIFT == 'true' || env.ENABLE_STOCK_V3_LIFECYCLE == 'true' || env.ENABLE_STOCK_V3_SUBSCRIPTION_ALERT == 'true' }}
+        if: ${{ env.ENABLE_STOCK_V3_RUN_LOG == 'true' || env.ENABLE_STOCK_V3_EVAL == 'true' || env.ENABLE_STOCK_V3_PAPER == 'true' || env.ENABLE_STOCK_V3_CHALLENGER == 'true' || env.ENABLE_STOCK_V3_DRIFT == 'true' || env.ENABLE_STOCK_V3_LIFECYCLE == 'true' || env.ENABLE_STOCK_V3_SUBSCRIPTION_ALERT == 'true' || env.ENABLE_STOCK_V3_CONSTRAINTS == 'true' || env.ENABLE_STOCK_V3_SCORECARD == 'true' || env.ENABLE_STOCK_V3_SHADOW_REPORT == 'true' || env.ENABLE_STOCK_V3_VALIDATION == 'true' }}
         continue-on-error: true
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -200,6 +227,40 @@ jobs:
           python -u scripts/source_health_collector_v3.py \
             --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
             --hours 24
+
+      - name: Build Stock V3 daily scorecard (optional)
+        if: ${{ env.ENABLE_STOCK_V3_SCORECARD == 'true' }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_daily_scorecard_v3.py \
+            --days 1 \
+            --md-dir docs/reports \
+            --csv-dir data/reports
+
+      - name: Build Stock V3 shadow run report (optional)
+        if: ${{ env.ENABLE_STOCK_V3_SHADOW_REPORT == 'true' }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_shadow_run_report_v3.py \
+            --days 7 \
+            --output docs/reports/stock_v3_shadow_run_7d.md
+
+      - name: Run Stock V3 validation suite (optional)
+        if: ${{ env.ENABLE_STOCK_V3_VALIDATION == 'true' && github.event_name == 'workflow_dispatch' }}
+        continue-on-error: true
+        env:
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_v3_validation_suite.py \
+            --output docs/reports/stock_v3_validation_report.md
 
       - name: Summarize Stock V2 metrics
         env:
@@ -213,6 +274,16 @@ jobs:
             --duration-sec "$duration" \
             --health-date "$(date -u +%F)" \
             --health-run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
+      - name: Upload Stock V3 reports artifact (optional)
+        if: ${{ env.ENABLE_STOCK_V3_SCORECARD == 'true' || env.ENABLE_STOCK_V3_SHADOW_REPORT == 'true' || env.ENABLE_STOCK_V3_VALIDATION == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: stock-v3-reports-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            docs/reports/*.md
+            data/reports/*.csv
+          if-no-files-found: ignore
 
       - name: Dispatch Stock V3 subscription alerts (optional)
         if: ${{ env.ENABLE_STOCK_V3_SUBSCRIPTION_ALERT == 'true' }}

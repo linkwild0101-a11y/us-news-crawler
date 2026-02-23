@@ -26,6 +26,18 @@
 7. `ENABLE_STOCK_V3_SUBSCRIPTION_ALERT=false`
    - 作用: 控制订阅告警投递步骤
    - 生效范围: 分析工作流与后端脚本进程环境
+8. `ENABLE_STOCK_V3_CONSTRAINTS=false`
+   - 作用: 控制组合约束快照步骤（`stock_portfolio_constraints_v3.py`）
+   - 生效范围: 分析工作流与后端脚本进程环境
+9. `ENABLE_STOCK_V3_SCORECARD=false`
+   - 作用: 控制每日评分卡输出（`stock_daily_scorecard_v3.py`）
+   - 生效范围: 分析工作流与后端脚本进程环境
+10. `ENABLE_STOCK_V3_SHADOW_REPORT=false`
+   - 作用: 控制 shadow-run 报告输出（`stock_shadow_run_report_v3.py`）
+   - 生效范围: 分析工作流与后端脚本进程环境
+11. `ENABLE_STOCK_V3_VALIDATION=false`
+   - 作用: 控制验证套件（幂等/压测/回放一致性）执行
+   - 生效范围: 分析工作流与后端脚本进程环境
 
 ## 2. 前端 Flag（默认关闭）
 
@@ -44,6 +56,10 @@
      - `ENABLE_STOCK_V3_DRIFT`
      - `ENABLE_STOCK_V3_LIFECYCLE`
      - `ENABLE_STOCK_V3_SUBSCRIPTION_ALERT`
+     - `ENABLE_STOCK_V3_CONSTRAINTS`
+     - `ENABLE_STOCK_V3_SCORECARD`
+     - `ENABLE_STOCK_V3_SHADOW_REPORT`
+     - `ENABLE_STOCK_V3_VALIDATION`
 2. Cloudflare Pages（前端）
    - 通过项目环境变量注入：
      - `NEXT_PUBLIC_DASHBOARD_V3_EXPLAIN`
@@ -59,4 +75,5 @@
 - 后端 flag 解析模块已新增：`scripts/feature_flags.py`
 - V2 pipeline 已接入 flag 读取（仅日志，不改变业务行为）
 - workflow 已注入后端 flags（默认 `false`，包含 eval/paper/challenger/drift/lifecycle/subscription）
+- workflow 已注入后端 flags（默认 `false`，包含 constraints/scorecard/shadow/validation）
 - 前端已新增 V3 explain flag 读取（默认 `false`）

@@ -174,6 +174,22 @@ export const METRIC_EXPLANATIONS = {
     tip: "可用于观察告警覆盖与静默策略是否合理。",
     category: "通知",
     aliases: ["subscription", "alert", "飞书"]
+  },
+  data_freshness_badge: {
+    title: "数据新鲜度徽章",
+    definition: "显示当前看板数据离最新刷新时间的分钟数与等级。",
+    calc: "fresh<=30分钟，stale<=120分钟，critical>120分钟。",
+    tip: "当新鲜度为 critical 时，建议先确认抓取/分析链路是否异常。",
+    category: "治理",
+    aliases: ["freshness", "新鲜度", "滞后"]
+  },
+  source_health_badge: {
+    title: "数据质量徽章",
+    definition: "按 source health 日快照汇总 H/D/C 状态。",
+    calc: "critical>0 为红色，degraded>0 为黄色，否则绿色。",
+    tip: "quality 徽章异常时，优先检查源站与降级逻辑。",
+    category: "治理",
+    aliases: ["source health", "质量", "HDC"]
   }
 } as const satisfies Record<string, MetricExplanation>;
 

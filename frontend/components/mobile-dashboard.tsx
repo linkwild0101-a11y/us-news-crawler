@@ -47,6 +47,26 @@ function horizonClass(horizon: OpportunityItem["horizon"]): string {
   return "text-textMuted bg-slate-500/10 border-slate-300/30";
 }
 
+function freshnessBadgeClass(level: DashboardData["dataQuality"]["freshness_level"]): string {
+  if (level === "fresh") {
+    return "text-riskLow bg-emerald-500/10 border-emerald-300/30";
+  }
+  if (level === "stale") {
+    return "text-riskMid bg-amber-500/10 border-amber-300/30";
+  }
+  return "text-riskHigh bg-red-500/10 border-red-400/30";
+}
+
+function sourceHealthBadgeClass(status: DashboardData["dataQuality"]["source_health_status"]): string {
+  if (status === "healthy") {
+    return "text-riskLow bg-emerald-500/10 border-emerald-300/30";
+  }
+  if (status === "degraded") {
+    return "text-riskMid bg-amber-500/10 border-amber-300/30";
+  }
+  return "text-riskHigh bg-red-500/10 border-red-400/30";
+}
+
 function formatNumber(value: number | null, digits = 2): string {
   if (value === null || Number.isNaN(value)) {
     return "--";
@@ -131,7 +151,13 @@ function SignalCard({ signal }: { signal: SentinelSignal }) {
   );
 }
 
-function OpportunityCard({ item }: { item: OpportunityItem }) {
+function OpportunityCard({
+  item,
+  onOpenEvidence
+}: {
+  item: OpportunityItem;
+  onOpenEvidence: (item: OpportunityItem) => void;
+}) {
   return (
     <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
       <div className="mb-3 flex items-start justify-between gap-3">
@@ -190,13 +216,91 @@ function OpportunityCard({ item }: { item: OpportunityItem }) {
         {" "}
         {formatTime(item.expires_at)}
       </div>
+      <button
+        type="button"
+        onClick={() => onOpenEvidence(item)}
+        className="mt-3 rounded-md border border-slate-600 px-2 py-1 text-xs text-textMuted hover:text-textMain"
+      >
+        查看 Why-Now 证据链
+      </button>
     </article>
+  );
+}
+
+function EvidenceDrawer({
+  item,
+  onClose
+}: {
+  item: OpportunityItem;
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-40 bg-black/70 px-3 py-4 backdrop-blur-sm md:px-6 md:py-8">
+      <div className="mx-auto max-h-full max-w-xl overflow-y-auto rounded-2xl border border-slate-700 bg-panel p-4">
+        <div className="mb-3 flex items-start justify-between gap-3">
+          <div>
+            <h3 className="text-base font-semibold">
+              {item.ticker} · {item.side} · H{item.horizon}
+            </h3>
+            <p className="mt-1 text-xs text-textMuted">更新 {formatTime(item.as_of)}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md border border-slate-600 px-2 py-1 text-xs text-textMuted"
+          >
+            关闭
+          </button>
+        </div>
+
+        <article className="rounded-lg border border-slate-700/80 bg-card/40 p-3">
+          <p className="text-xs text-textMuted">Why-Now</p>
+          <p className="mt-1 text-sm leading-6 text-textMain">{item.why_now}</p>
+        </article>
+
+        <article className="mt-3 rounded-lg border border-slate-700/80 bg-card/40 p-3">
+          <p className="text-xs text-textMuted">
+            <LabelWithHint label="失效条件" hintKey="invalid_if" />
+          </p>
+          <p className="mt-1 text-sm leading-6 text-textMain">{item.invalid_if}</p>
+        </article>
+
+        <article className="mt-3 rounded-lg border border-slate-700/80 bg-card/40 p-3">
+          <p className="text-xs text-textMuted">催化列表</p>
+          {item.catalysts.length > 0 ? (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {item.catalysts.map((catalyst) => (
+                <span
+                  key={`${item.id}-${catalyst}`}
+                  className="rounded-md border border-slate-600/70 bg-card/70 px-2 py-1 text-xs text-textMuted"
+                >
+                  {catalyst}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-1 text-sm text-textMuted">暂无催化细节。</p>
+          )}
+        </article>
+
+        <article className="mt-3 rounded-lg border border-slate-700/80 bg-card/40 p-3">
+          <p className="text-xs text-textMuted">证据映射</p>
+          <p className="mt-1 text-sm text-textMain">
+            信号ID: {item.source_signal_ids.length ? item.source_signal_ids.join(", ") : "无"}
+          </p>
+          <p className="mt-1 text-sm text-textMain">
+            聚类ID: {item.source_cluster_ids.length ? item.source_cluster_ids.join(", ") : "无"}
+          </p>
+        </article>
+      </div>
+    </div>
   );
 }
 
 export function MobileDashboard({ data }: { data: DashboardData }) {
   const [activeTab, setActiveTab] = useState<DashboardTab>("opportunities");
   const [dictOpen, setDictOpen] = useState(false);
+  const [selectedOpportunity, setSelectedOpportunity] = useState<OpportunityItem | null>(null);
   const showV3ExplainBadge = readDashboardV3ExplainFlag();
 
   const rankedTicker = useMemo(() => rankTicker(data.tickerDigest), [data.tickerDigest]);
@@ -221,6 +325,28 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
               )}
             </h1>
             <p className="mt-1 text-xs text-textMuted">数据更新时间: {formatTime(data.dataUpdatedAt)}</p>
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+              <span
+                className={`rounded-md border px-2 py-0.5 font-semibold ${freshnessBadgeClass(data.dataQuality.freshness_level)}`}
+              >
+                <LabelWithHint
+                  label={`新鲜度 ${data.dataQuality.freshness_minutes}m`}
+                  hintKey="data_freshness_badge"
+                />
+              </span>
+              <span
+                className={`rounded-md border px-2 py-0.5 font-semibold ${sourceHealthBadgeClass(data.dataQuality.source_health_status)}`}
+              >
+                <LabelWithHint
+                  label={
+                    `质量 H/D/C ${data.dataQuality.source_health_healthy}/`
+                    + `${data.dataQuality.source_health_degraded}/`
+                    + `${data.dataQuality.source_health_critical}`
+                  }
+                  hintKey="source_health_badge"
+                />
+              </span>
+            </div>
             {data.marketRegime?.summary && (
               <p className="mt-2 text-xs text-textMuted">
                 <LabelWithHint label="市场状态" hintKey="market_state_summary" />: {data.marketRegime.summary}
@@ -298,7 +424,11 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
           {opportunities.length > 0 ? (
             <div className="grid gap-3 lg:grid-cols-2">
               {opportunities.map((item) => (
-                <OpportunityCard key={item.id} item={item} />
+                <OpportunityCard
+                  key={item.id}
+                  item={item}
+                  onOpenEvidence={(selected) => setSelectedOpportunity(selected)}
+                />
               ))}
             </div>
           ) : (
@@ -458,6 +588,10 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
           </button>
         ))}
       </nav>
+
+      {selectedOpportunity && (
+        <EvidenceDrawer item={selectedOpportunity} onClose={() => setSelectedOpportunity(null)} />
+      )}
 
       <MetricDictionaryCenter open={dictOpen} onClose={() => setDictOpen(false)} />
     </div>

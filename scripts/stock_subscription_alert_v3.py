@@ -320,6 +320,44 @@ def _upsert_run_metrics(supabase, run_id: str, metrics: Dict[str, float]) -> Non
         logger.warning(f"[SUB_ALERT_METRICS_UPSERT_FAILED] error={str(e)[:120]}")
 
 
+def _log_run_start(supabase, run_id: str, sub_limit: int, opp_limit: int) -> None:
+    payload = {
+        "run_id": run_id,
+        "pipeline_name": "stock_v3_subscription_alert",
+        "pipeline_version": os.getenv("GITHUB_SHA", "")[:12] or "local",
+        "trigger_type": os.getenv("GITHUB_EVENT_NAME", "manual"),
+        "status": "running",
+        "started_at": _now_utc().isoformat(),
+        "input_window": {"sub_limit": sub_limit, "opp_limit": opp_limit},
+        "params_json": {"sub_limit": sub_limit, "opp_limit": opp_limit},
+        "commit_sha": os.getenv("GITHUB_SHA", "")[:40],
+        "as_of": _now_utc().isoformat(),
+    }
+    try:
+        supabase.table("research_runs").upsert(payload, on_conflict="run_id").execute()
+    except Exception as e:
+        logger.warning(f"[SUB_ALERT_RUN_START_FAILED] error={str(e)[:120]}")
+
+
+def _log_run_finish(supabase, run_id: str, status: str, notes: str) -> None:
+    try:
+        (
+            supabase.table("research_runs")
+            .update(
+                {
+                    "status": status,
+                    "ended_at": _now_utc().isoformat(),
+                    "notes": notes[:1000],
+                    "as_of": _now_utc().isoformat(),
+                }
+            )
+            .eq("run_id", run_id)
+            .execute()
+        )
+    except Exception as e:
+        logger.warning(f"[SUB_ALERT_RUN_FINISH_FAILED] error={str(e)[:120]}")
+
+
 def run_subscription_alerts(
     run_id: Optional[str],
     sub_limit: int,
@@ -329,46 +367,67 @@ def run_subscription_alerts(
     supabase = _init_supabase()
     final_run_id = run_id or f"sub-alert-{_now_utc().strftime('%Y%m%d%H%M%S')}"
     default_webhook = os.getenv("FEISHU_WEBHOOK_URL", "").strip()
-
-    subscriptions = _load_active_subscriptions(supabase=supabase, limit=sub_limit)
-    opportunities = _load_active_opportunities(supabase=supabase, limit=opp_limit)
-    aggregate = {
-        "run_id": final_run_id,
-        "subscriptions": len(subscriptions),
-        "opportunities": len(opportunities),
-        "candidate": 0,
-        "sent": 0,
-        "skipped": 0,
-        "failed": 0,
-    }
-
-    for sub in subscriptions:
-        sub_metrics = _dispatch_subscription(
-            supabase=supabase,
-            run_id=final_run_id,
-            sub=sub,
-            opportunities=opportunities,
-            default_webhook=default_webhook,
-            dry_run=dry_run,
-        )
-        aggregate["candidate"] += sub_metrics["candidate"]
-        aggregate["sent"] += sub_metrics["sent"]
-        aggregate["skipped"] += sub_metrics["skipped"]
-        aggregate["failed"] += sub_metrics["failed"]
-
-    _upsert_run_metrics(
+    _log_run_start(
         supabase=supabase,
         run_id=final_run_id,
-        metrics={
-            "subscription_sub_total": float(aggregate["subscriptions"]),
-            "subscription_candidate_total": float(aggregate["candidate"]),
-            "subscription_sent_total": float(aggregate["sent"]),
-            "subscription_skipped_total": float(aggregate["skipped"]),
-            "subscription_failed_total": float(aggregate["failed"]),
-        },
+        sub_limit=sub_limit,
+        opp_limit=opp_limit,
     )
-    logger.info("[SUB_ALERT_V3_DONE] " + ", ".join([f"{k}={v}" for k, v in aggregate.items()]))
-    return aggregate
+
+    try:
+        subscriptions = _load_active_subscriptions(supabase=supabase, limit=sub_limit)
+        opportunities = _load_active_opportunities(supabase=supabase, limit=opp_limit)
+        aggregate = {
+            "run_id": final_run_id,
+            "subscriptions": len(subscriptions),
+            "opportunities": len(opportunities),
+            "candidate": 0,
+            "sent": 0,
+            "skipped": 0,
+            "failed": 0,
+        }
+
+        for sub in subscriptions:
+            sub_metrics = _dispatch_subscription(
+                supabase=supabase,
+                run_id=final_run_id,
+                sub=sub,
+                opportunities=opportunities,
+                default_webhook=default_webhook,
+                dry_run=dry_run,
+            )
+            aggregate["candidate"] += sub_metrics["candidate"]
+            aggregate["sent"] += sub_metrics["sent"]
+            aggregate["skipped"] += sub_metrics["skipped"]
+            aggregate["failed"] += sub_metrics["failed"]
+
+        _upsert_run_metrics(
+            supabase=supabase,
+            run_id=final_run_id,
+            metrics={
+                "subscription_sub_total": float(aggregate["subscriptions"]),
+                "subscription_candidate_total": float(aggregate["candidate"]),
+                "subscription_sent_total": float(aggregate["sent"]),
+                "subscription_skipped_total": float(aggregate["skipped"]),
+                "subscription_failed_total": float(aggregate["failed"]),
+            },
+        )
+        _log_run_finish(
+            supabase=supabase,
+            run_id=final_run_id,
+            status="success",
+            notes=f"sent={aggregate['sent']}, failed={aggregate['failed']}",
+        )
+        logger.info("[SUB_ALERT_V3_DONE] " + ", ".join([f"{k}={v}" for k, v in aggregate.items()]))
+        return aggregate
+    except Exception as e:
+        _log_run_finish(
+            supabase=supabase,
+            run_id=final_run_id,
+            status="failed",
+            notes=f"error={str(e)[:300]}",
+        )
+        raise
 
 
 def main() -> None:

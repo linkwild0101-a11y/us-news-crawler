@@ -2,6 +2,7 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 import {
   DashboardData,
+  DataQualitySnapshot,
   EntityRelationItem,
   HotCluster,
   MarketRegime,
@@ -131,9 +132,36 @@ function hasChinese(text: string): boolean {
   return /[\u4e00-\u9fff]/.test(text);
 }
 
+function toZhTextOrPending(text: string, fallback = "翻译处理中"): string {
+  const normalized = text.trim();
+  if (!normalized) {
+    return fallback;
+  }
+  return hasChinese(normalized) ? normalized : fallback;
+}
+
 function toZhClusterCategory(eventType: string): string {
   const key = String(eventType || "news").toLowerCase();
   return EVENT_TYPE_LABELS[key] || "新闻";
+}
+
+function toZhClusterLabel(value: unknown): string {
+  const text = String(value || "").trim();
+  if (!text) {
+    return "新闻";
+  }
+  if (hasChinese(text)) {
+    return text;
+  }
+  return toZhClusterCategory(text);
+}
+
+function parseTimestampMs(value: string): number | null {
+  const ts = Date.parse(value);
+  if (!Number.isFinite(ts)) {
+    return null;
+  }
+  return ts;
 }
 
 function toNumber(value: unknown): number | null {
@@ -218,6 +246,77 @@ function stableIdFromText(text: string): number {
   }
   const positive = Math.abs(hash);
   return positive === 0 ? 1 : positive;
+}
+
+function buildDataQualitySnapshot(
+  dataUpdatedAt: string,
+  sourceHealth: { healthy: number; degraded: number; critical: number }
+): DataQualitySnapshot {
+  const updatedTs = parseTimestampMs(dataUpdatedAt);
+  const nowTs = Date.now();
+  const freshnessMinutes = updatedTs === null
+    ? 9999
+    : Math.max(0, Math.round((nowTs - updatedTs) / 60000));
+  let freshnessLevel: DataQualitySnapshot["freshness_level"] = "critical";
+  if (freshnessMinutes <= 30) {
+    freshnessLevel = "fresh";
+  } else if (freshnessMinutes <= 120) {
+    freshnessLevel = "stale";
+  }
+
+  let sourceHealthStatus: DataQualitySnapshot["source_health_status"] = "healthy";
+  if (sourceHealth.critical > 0) {
+    sourceHealthStatus = "critical";
+  } else if (sourceHealth.degraded > 0) {
+    sourceHealthStatus = "degraded";
+  }
+
+  return {
+    freshness_minutes: freshnessMinutes,
+    freshness_level: freshnessLevel,
+    source_health_status: sourceHealthStatus,
+    source_health_healthy: sourceHealth.healthy,
+    source_health_degraded: sourceHealth.degraded,
+    source_health_critical: sourceHealth.critical
+  };
+}
+
+async function querySourceHealth(
+  client: SupabaseClient
+): Promise<{ healthy: number; degraded: number; critical: number }> {
+  const fallback = { healthy: 0, degraded: 0, critical: 0 };
+  const lookbackIso = new Date(Date.now() - 72 * 3600 * 1000).toISOString();
+  try {
+    const { data, error } = await client
+      .from("source_health_daily")
+      .select("source_id,status,as_of")
+      .gte("as_of", lookbackIso)
+      .order("as_of", { ascending: false })
+      .limit(120);
+    if (error) {
+      throw error;
+    }
+
+    const latestBySource = new Map<string, string>();
+    for (const row of (data || []) as unknown as Array<Record<string, unknown>>) {
+      const sourceId = String(row.source_id || "").trim();
+      const status = String(row.status || "healthy").trim().toLowerCase();
+      if (!sourceId || latestBySource.has(sourceId)) {
+        continue;
+      }
+      latestBySource.set(sourceId, status);
+    }
+    if (latestBySource.size === 0) {
+      return fallback;
+    }
+    const healthy = Array.from(latestBySource.values()).filter((item) => item === "healthy").length;
+    const degraded = Array.from(latestBySource.values()).filter((item) => item === "degraded").length;
+    const critical = Array.from(latestBySource.values()).filter((item) => item === "critical").length;
+    return { healthy, degraded, critical };
+  } catch (error) {
+    console.warn("[FRONTEND_SOURCE_HEALTH_FALLBACK]", error);
+    return fallback;
+  }
 }
 
 function collectTickerTokens(text: string): string[] {
@@ -778,9 +877,11 @@ async function queryHotClusters(
 
   const toCluster = (row: Record<string, unknown>): HotCluster => ({
     id: Number(row.id || 0),
-    category: String(row.category || "unknown"),
-    primary_title: String(row.primary_title || "Untitled"),
-    summary: String(row.summary || "暂无摘要"),
+    category: toZhClusterLabel(row.category),
+    primary_title: hasChinese(String(row.primary_title || ""))
+      ? String(row.primary_title || "")
+      : `${toZhClusterLabel(row.category)}事件簇`,
+    summary: toZhTextOrPending(String(row.summary || ""), "翻译处理中"),
     article_count: Number(row.article_count || 0),
     created_at: toIsoString(row.created_at)
   });
@@ -866,11 +967,12 @@ async function queryEntityRelations(client: SupabaseClient): Promise<EntityRelat
       .map((row) => {
         const entity1Id = Number(row.entity1_id || 0);
         const entity2Id = Number(row.entity2_id || 0);
+        const relationText = String(row.relation_text || "关联");
         return {
           id: Number(row.id || 0),
           entity1_name: entityNameMap.get(entity1Id) || `Entity#${entity1Id}`,
           entity2_name: entityNameMap.get(entity2Id) || `Entity#${entity2Id}`,
-          relation_text: String(row.relation_text || "关联"),
+          relation_text: hasChinese(relationText) ? relationText : "关联证据翻译处理中",
           confidence: Number(row.confidence || 0),
           last_seen: toIsoString(row.last_seen)
         };
@@ -1144,33 +1246,41 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
   const topSignalTime = filteredSignals[0]?.created_at || "";
   const topClusterTime = hotClusters[0]?.created_at || "";
   const topRelationTime = relations[0]?.last_seen || "";
+  const dataUpdatedAt = getLatestTimestamp([
+    marketSnapshot.updated_at,
+    v2Snapshot?.snapshot_time || "",
+    topOpportunityTime,
+    topSignalTime,
+    topClusterTime,
+    topRelationTime
+  ]);
+  const sourceHealth = await querySourceHealth(client);
 
   return {
     opportunities,
     marketRegime,
     marketSnapshot,
+    dataQuality: buildDataQualitySnapshot(dataUpdatedAt, sourceHealth),
     sentinelSignals: filteredSignals,
     tickerDigest,
     hotClusters,
     relations,
-    dataUpdatedAt: getLatestTimestamp([
-      marketSnapshot.updated_at,
-      v2Snapshot?.snapshot_time || "",
-      topOpportunityTime,
-      topSignalTime,
-      topClusterTime,
-      topRelationTime
-    ])
+    dataUpdatedAt
   };
 }
 
 function getLatestTimestamp(values: string[]): string {
-  return values.reduce<string>((latest, current) => {
-    if (!current) {
-      return latest;
+  let latestValue = "";
+  let latestTs = -1;
+  for (const value of values) {
+    const currentTs = parseTimestampMs(value);
+    if (currentTs === null || currentTs < latestTs) {
+      continue;
     }
-    return current > latest ? current : latest;
-  }, new Date().toISOString());
+    latestValue = value;
+    latestTs = currentTs;
+  }
+  return latestValue || new Date().toISOString();
 }
 
 export async function getDashboardData(): Promise<DashboardData> {
@@ -1208,6 +1318,7 @@ export async function getDashboardData(): Promise<DashboardData> {
       })),
       marketRegime: null,
       marketSnapshot: baseSnapshot(),
+      dataQuality: buildDataQualitySnapshot(now, { healthy: 0, degraded: 0, critical: 0 }),
       sentinelSignals: [],
       tickerDigest: fallbackTickerRows,
       hotClusters: [],
@@ -1244,21 +1355,24 @@ export async function getDashboardData(): Promise<DashboardData> {
   const topSignalTime = filteredSignals[0]?.created_at || "";
   const topClusterTime = hotClusters[0]?.created_at || "";
   const topRelationTime = relations[0]?.last_seen || "";
+  const dataUpdatedAt = getLatestTimestamp([
+    marketSnapshot.updated_at,
+    topOpportunityTime,
+    topSignalTime,
+    topClusterTime,
+    topRelationTime
+  ]);
+  const sourceHealth = await querySourceHealth(client);
 
   return {
     opportunities,
     marketRegime,
     marketSnapshot,
+    dataQuality: buildDataQualitySnapshot(dataUpdatedAt, sourceHealth),
     sentinelSignals: filteredSignals,
     tickerDigest,
     hotClusters,
     relations,
-    dataUpdatedAt: getLatestTimestamp([
-      marketSnapshot.updated_at,
-      topOpportunityTime,
-      topSignalTime,
-      topClusterTime,
-      topRelationTime
-    ])
+    dataUpdatedAt
   };
 }

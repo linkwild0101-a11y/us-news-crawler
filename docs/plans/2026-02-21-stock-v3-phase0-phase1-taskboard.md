@@ -206,21 +206,21 @@
 
 ## Gate-A（Day 2）
 
-- [ ] V2 baseline 已冻结
-- [ ] V3 flags 已接入且默认关闭
-- [ ] 回滚说明可执行
+- [x] V2 baseline 已冻结
+- [x] V3 flags 已接入且默认关闭
+- [x] 回滚说明可执行
 
 ## Gate-B（Day 6）
 
-- [ ] run metadata 表已可写
-- [ ] incremental run 可记录参数与状态
-- [ ] 关闭 flag 时行为一致
+- [x] run metadata 表已可写
+- [x] incremental run 可记录参数与状态
+- [x] 关闭 flag 时行为一致
 
 ## Gate-C（Day 10）
 
-- [ ] workflow 旁路 job 已稳定运行
-- [ ] source health 可输出快照
-- [ ] 主链路成功率与时延无明显退化
+- [x] workflow 旁路 job 已稳定运行
+- [x] source health 可输出快照
+- [x] 主链路成功率与时延无明显退化
 
 ---
 
