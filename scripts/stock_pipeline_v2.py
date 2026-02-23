@@ -129,6 +129,34 @@ EVENT_RULES: Sequence[Tuple[str, Sequence[str], int]] = (
     ("sector", ("半导体", "semiconductor", "ai", "cloud"), 96),
 )
 
+INDIRECT_MIN_SCORE = 55.0
+INDIRECT_PROMOTE_SCORE = 70.0
+INDIRECT_PROMOTE_MIN_THEME_SOURCES = 2
+INDIRECT_THEME_RULES: Dict[str, Sequence[str]] = {
+    "macro": ("fed", "fomc", "cpi", "pce", "payroll", "通胀", "失业"),
+    "rate_fx": ("yield", "treasury", "rates", "dxy", "美元", "汇率", "利率"),
+    "policy": ("tariff", "sanction", "ban", "regulation", "关税", "制裁", "监管"),
+    "geopolitics": ("war", "conflict", "missile", "中东", "俄乌", "台海"),
+    "commodity": ("oil", "wti", "brent", "gas", "铜", "原油", "天然气"),
+    "supply_chain": ("shipping", "freight", "port", "供应链", "运价", "港口"),
+}
+INDIRECT_THEME_SCOPE: Dict[str, str] = {
+    "macro": "index",
+    "rate_fx": "index",
+    "policy": "sector",
+    "geopolitics": "sector",
+    "commodity": "sector",
+    "supply_chain": "sector",
+}
+INDIRECT_THEME_TICKERS: Dict[str, Sequence[str]] = {
+    "macro": ("SPY", "QQQ", "DIA"),
+    "rate_fx": ("SPY", "QQQ", "TLT", "DIA"),
+    "policy": ("XLF", "XLI", "XLK", "XLE"),
+    "geopolitics": ("XLE", "XLI", "XLF"),
+    "commodity": ("XLE", "XLI", "XLP"),
+    "supply_chain": ("XLI", "XLY", "XLP"),
+}
+
 TICKER_TO_INDUSTRY: Dict[str, str] = {
     "SPY": "Index",
     "QQQ": "Index",
@@ -434,6 +462,221 @@ class StockPipelineV2:
         upper = payload.upper()
         return any(word.upper() in upper for word in STOCK_HINTS)
 
+    def _source_name_from_url(self, url: str, source_id: Any) -> str:
+        parsed = urlparse(url or "")
+        host = (parsed.netloc or "").lower()
+        if host.startswith("www."):
+            host = host[4:]
+        if host:
+            return host[:120]
+        if source_id is not None:
+            return f"source-{source_id}"
+        return "unknown"
+
+    def _build_indirect_candidate(
+        self,
+        article: Dict[str, Any],
+        run_id: str,
+        now_iso: str,
+    ) -> Optional[Dict[str, Any]]:
+        title = str(article.get("title") or "")[:240]
+        content = str(article.get("content") or "")[:2400]
+        category = str(article.get("category") or "")
+        payload = f"{title} {content} {category}".lower()
+        if not payload.strip():
+            return None
+
+        theme_hits: Dict[str, int] = {}
+        for theme, keywords in INDIRECT_THEME_RULES.items():
+            hit_count = sum(1 for keyword in keywords if keyword in payload)
+            if hit_count > 0:
+                theme_hits[theme] = hit_count
+        if not theme_hits:
+            return None
+
+        primary_theme = max(theme_hits, key=theme_hits.get)
+        max_hits = theme_hits[primary_theme]
+        theme_count = len(theme_hits)
+        relevance = _clamp(
+            38 + max_hits * 10 + max(0, theme_count - 1) * 6,
+            0,
+            100,
+        )
+        if any(
+            token in payload
+            for token in ("fed", "fomc", "yield", "dxy", "oil", "tariff", "sanction")
+        ):
+            relevance = _clamp(relevance + 6, 0, 100)
+        if relevance < INDIRECT_MIN_SCORE:
+            return None
+
+        confidence = _clamp(0.35 + max_hits * 0.08 + max(0, theme_count - 1) * 0.04, 0, 1)
+        candidate_tickers = list(INDIRECT_THEME_TICKERS.get(primary_theme, ("SPY", "QQQ", "DIA")))
+        article_id = int(article.get("id") or 0)
+        source_url = str(article.get("url") or "")
+        source_ref = source_url[:220] or f"article:{article_id}"
+        source_name = self._source_name_from_url(source_url, article.get("source_id"))
+        event_key = f"indirect:{article_id}:{_hash_text(title + source_ref)}"
+        summary = title or content[:180] or "间接美股影响事件"
+
+        return {
+            "event_key": event_key[:128],
+            "article_id": article_id,
+            "source_ref": source_ref,
+            "source_url": source_url[:500],
+            "source_name": source_name,
+            "title": title,
+            "summary": summary[:220],
+            "theme": primary_theme,
+            "impact_scope": INDIRECT_THEME_SCOPE.get(primary_theme, "sector"),
+            "candidate_tickers": candidate_tickers[:6],
+            "relevance_score": round(float(relevance), 2),
+            "confidence": round(float(confidence), 4),
+            "promotion_status": "pending",
+            "promotion_reason": "",
+            "published_at": _to_iso(article.get("published_at"), fallback=now_iso),
+            "details": {
+                "theme_hits": theme_hits,
+                "category": category,
+            },
+            "run_id": run_id,
+            "as_of": now_iso,
+            "is_active": True,
+        }
+
+    def _load_recent_indirect_theme_sources(self, lookback_hours: int = 24) -> Dict[str, Set[str]]:
+        cutoff_iso = (_now_utc() - timedelta(hours=lookback_hours)).isoformat()
+        try:
+            rows = (
+                self.supabase.table("stock_indirect_events_v2")
+                .select("theme,source_name")
+                .eq("is_active", True)
+                .gte("as_of", cutoff_iso)
+                .limit(2000)
+                .execute()
+                .data
+                or []
+            )
+        except Exception as e:
+            logger.warning(f"[V2_INDIRECT_THEME_SOURCE_FALLBACK] error={str(e)[:120]}")
+            return {}
+
+        mapping: Dict[str, Set[str]] = defaultdict(set)
+        for row in rows:
+            theme = str(row.get("theme") or "").strip()
+            source_name = str(row.get("source_name") or "").strip().lower()
+            if theme and source_name:
+                mapping[theme].add(source_name)
+        return mapping
+
+    def _promote_indirect_candidates(
+        self,
+        indirect_rows: List[Dict[str, Any]],
+        run_id: str,
+        now_iso: str,
+    ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], int]:
+        if not indirect_rows:
+            return [], [], 0
+
+        theme_sources = self._load_recent_indirect_theme_sources(lookback_hours=24)
+        promoted_events: List[Dict[str, Any]] = []
+        promoted_mappings: List[Dict[str, Any]] = []
+        promoted_count = 0
+
+        for row in indirect_rows:
+            theme = str(row.get("theme") or "")
+            source_name = str(row.get("source_name") or "").strip().lower()
+            if theme and source_name:
+                theme_sources.setdefault(theme, set()).add(source_name)
+            source_count = len(theme_sources.get(theme, set()))
+
+            relevance = _safe_float(row.get("relevance_score"), 0.0)
+            tickers = [
+                str(item or "").upper()
+                for item in (row.get("candidate_tickers") or [])
+                if str(item or "").upper() in TRACKED_TICKERS
+            ]
+            if not tickers:
+                tickers = ["SPY", "QQQ", "DIA"]
+
+            promote = relevance >= INDIRECT_PROMOTE_SCORE and (
+                len(tickers) >= 2 or source_count >= INDIRECT_PROMOTE_MIN_THEME_SOURCES
+            )
+            if not promote:
+                row["promotion_status"] = "pending"
+                row["promotion_reason"] = (
+                    f"score={relevance:.1f}, sources={source_count}, tickers={len(tickers)}"
+                )[:220]
+                continue
+
+            promoted_count += 1
+            row["promotion_status"] = "promoted"
+            row["promotion_reason"] = (
+                f"score={relevance:.1f}, sources={source_count}, tickers={','.join(tickers[:4])}"
+            )[:220]
+
+            event_key = str(row.get("event_key") or f"indirect:{_hash_text(str(row))}")[:128]
+            confidence = _clamp(_safe_float(row.get("confidence"), 0.5), 0.3, 0.95)
+            strength = _clamp(0.35 + relevance / 180, 0.35, 0.9)
+            summary = f"[间接影响] {str(row.get('summary') or '')}".strip()[:220]
+            promoted_events.append(
+                {
+                    "event_key": event_key,
+                    "source_type": "indirect_promoted",
+                    "source_ref": str(row.get("source_ref") or "")[:128],
+                    "event_type": "macro" if theme in ("macro", "rate_fx", "policy") else "sector",
+                    "direction": "NEUTRAL",
+                    "strength": round(strength, 4),
+                    "ttl_hours": 96,
+                    "summary": summary,
+                    "details": {
+                        "article_id": int(row.get("article_id") or 0),
+                        "title": str(row.get("title") or "")[:180],
+                        "category": "indirect",
+                        "source_id": None,
+                        "bias": 0.0,
+                        "llm_used": False,
+                        "title_zh": str(row.get("title") or "")[:180],
+                        "summary_zh": str(row.get("summary") or "")[:220],
+                        "indirect_theme": theme,
+                        "indirect_score": relevance,
+                        "indirect_source_count_24h": source_count,
+                    },
+                    "published_at": _to_iso(row.get("published_at"), fallback=now_iso),
+                    "as_of": now_iso,
+                    "run_id": run_id,
+                    "is_active": True,
+                }
+            )
+
+            for ticker in tickers[:4]:
+                promoted_mappings.append(
+                    {
+                        "event_key": event_key,
+                        "ticker": ticker,
+                        "role": "indirect",
+                        "weight": 0.7,
+                        "confidence": round(confidence, 4),
+                        "as_of": now_iso,
+                        "run_id": run_id,
+                    }
+                )
+
+        return promoted_events, promoted_mappings, promoted_count
+
+    def _upsert_indirect_events(self, rows: List[Dict[str, Any]]) -> int:
+        if not rows:
+            return 0
+        try:
+            self.supabase.table("stock_indirect_events_v2").upsert(
+                rows,
+                on_conflict="event_key",
+            ).execute()
+            return len(rows)
+        except Exception as e:
+            logger.warning(f"[V2_INDIRECT_UPSERT_FALLBACK] error={str(e)[:120]}")
+            return 0
+
     def _classify_event(self, text: str) -> Tuple[str, int]:
         lower = text.lower()
         for event_type, keywords, ttl_hours in EVENT_RULES:
@@ -515,14 +758,19 @@ class StockPipelineV2:
         run_id: str,
         now_iso: str,
         llm_budget: int,
-    ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], int]:
+    ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], int, List[Dict[str, Any]], int]:
         event_rows: List[Dict[str, Any]] = []
         raw_map_rows: List[Dict[str, Any]] = []
         llm_candidates: List[Tuple[int, str, str, str, float]] = []
+        indirect_rows: List[Dict[str, Any]] = []
 
         for article in articles:
             self.stats["articles_seen"] += 1
             if not self._is_stock_article(article):
+                indirect_row = self._build_indirect_candidate(article, run_id=run_id, now_iso=now_iso)
+                if indirect_row:
+                    indirect_rows.append(indirect_row)
+                    self.stats["articles_indirect_related"] += 1
                 continue
             self.stats["articles_stock_related"] += 1
 
@@ -592,7 +840,16 @@ class StockPipelineV2:
                 )
 
         llm_used_count = self._apply_llm_adjustments(event_rows, llm_candidates)
-        return event_rows, raw_map_rows, llm_used_count
+        promoted_events, promoted_mappings, promoted_count = self._promote_indirect_candidates(
+            indirect_rows,
+            run_id=run_id,
+            now_iso=now_iso,
+        )
+        if promoted_events:
+            event_rows.extend(promoted_events)
+            raw_map_rows.extend(promoted_mappings)
+            self.stats["indirect_promoted"] += promoted_count
+        return event_rows, raw_map_rows, llm_used_count, indirect_rows, promoted_count
 
     def _apply_llm_adjustments(
         self,
@@ -1726,6 +1983,8 @@ class StockPipelineV2:
             llm_budget = llm_event_cap
             all_events: List[Dict[str, Any]] = []
             all_mappings: List[Dict[str, Any]] = []
+            all_indirect_rows: List[Dict[str, Any]] = []
+            indirect_promoted_total = 0
 
             while remaining > 0:
                 current_size = min(page_size, remaining)
@@ -1737,7 +1996,7 @@ class StockPipelineV2:
                 if not rows:
                     break
 
-                events, mappings, llm_used = self._build_events(
+                events, mappings, llm_used, indirect_rows, promoted_count = self._build_events(
                     rows,
                     run_id=run_id,
                     now_iso=_now_utc().isoformat(),
@@ -1746,6 +2005,8 @@ class StockPipelineV2:
                 llm_budget -= llm_used
                 all_events.extend(events)
                 all_mappings.extend(mappings)
+                all_indirect_rows.extend(indirect_rows)
+                indirect_promoted_total += promoted_count
 
                 offset += current_size
                 remaining -= len(rows)
@@ -1754,6 +2015,7 @@ class StockPipelineV2:
 
             event_count = 0
             mapping_count = 0
+            indirect_count = self._upsert_indirect_events(all_indirect_rows)
             if all_events:
                 event_count, mapping_count = self._upsert_events(all_events, all_mappings)
             else:
@@ -1764,7 +2026,9 @@ class StockPipelineV2:
                 "[STOCK_V2_INCREMENTAL_DONE] "
                 f"articles_seen={self.stats['articles_seen']} "
                 f"stock_articles={self.stats['articles_stock_related']} "
+                f"indirect_articles={self.stats['articles_indirect_related']} "
                 f"events={event_count} mappings={mapping_count} "
+                f"indirect_rows={indirect_count} promoted={indirect_promoted_total} "
                 f"signals={serve_stats['signals']} opps={serve_stats['opportunities']} "
                 f"evidence={serve_stats.get('evidence', 0)} paths={serve_stats.get('paths', 0)}"
             )
@@ -1772,8 +2036,11 @@ class StockPipelineV2:
                 "run_id": run_id,
                 "articles_seen": self.stats["articles_seen"],
                 "stock_articles": self.stats["articles_stock_related"],
+                "indirect_articles": self.stats["articles_indirect_related"],
                 "events_upserted": event_count,
                 "mappings_upserted": mapping_count,
+                "indirect_rows_written": indirect_count,
+                "indirect_promoted": indirect_promoted_total,
                 "signals_written": serve_stats["signals"],
                 "opportunities_written": serve_stats["opportunities"],
                 "evidence_rows_written": serve_stats.get("evidence", 0),
@@ -1794,6 +2061,7 @@ class StockPipelineV2:
                 metrics={
                     "articles_seen": self.stats["articles_seen"],
                     "stock_articles": self.stats["articles_stock_related"],
+                    "indirect_articles": self.stats["articles_indirect_related"],
                 },
                 notes=str(e),
             )
@@ -1835,6 +2103,8 @@ class StockPipelineV2:
             llm_budget = llm_event_cap
             total_events = 0
             total_mappings = 0
+            total_indirect = 0
+            total_indirect_promoted = 0
 
             while True:
                 if max_articles is not None and processed >= max_articles:
@@ -1850,7 +2120,7 @@ class StockPipelineV2:
                 if not rows:
                     break
 
-                events, mappings, llm_used = self._build_events(
+                events, mappings, llm_used, indirect_rows, promoted_count = self._build_events(
                     rows,
                     run_id=run_id,
                     now_iso=_now_utc().isoformat(),
@@ -1858,6 +2128,8 @@ class StockPipelineV2:
                 )
                 llm_budget -= llm_used
 
+                total_indirect += self._upsert_indirect_events(indirect_rows)
+                total_indirect_promoted += promoted_count
                 event_count, mapping_count = self._upsert_events(events, mappings)
                 total_events += event_count
                 total_mappings += mapping_count
@@ -1874,7 +2146,9 @@ class StockPipelineV2:
             logger.info(
                 "[STOCK_V2_BACKFILL_DONE] "
                 f"processed={processed} stock_articles={self.stats['articles_stock_related']} "
+                f"indirect_articles={self.stats['articles_indirect_related']} "
                 f"events={total_events} signals={serve_stats['signals']} "
+                f"indirect_rows={total_indirect} promoted={total_indirect_promoted} "
                 f"opps={serve_stats['opportunities']} "
                 f"evidence={serve_stats.get('evidence', 0)} paths={serve_stats.get('paths', 0)}"
             )
@@ -1882,8 +2156,11 @@ class StockPipelineV2:
                 "run_id": run_id,
                 "processed_articles": processed,
                 "stock_articles": self.stats["articles_stock_related"],
+                "indirect_articles": self.stats["articles_indirect_related"],
                 "events_upserted": total_events,
                 "mappings_upserted": total_mappings,
+                "indirect_rows_written": total_indirect,
+                "indirect_promoted": total_indirect_promoted,
                 "signals_written": serve_stats["signals"],
                 "opportunities_written": serve_stats["opportunities"],
                 "evidence_rows_written": serve_stats.get("evidence", 0),
@@ -1904,6 +2181,7 @@ class StockPipelineV2:
                 metrics={
                     "processed_articles": self.stats["articles_seen"],
                     "stock_articles": self.stats["articles_stock_related"],
+                    "indirect_articles": self.stats["articles_indirect_related"],
                 },
                 notes=str(e),
             )

@@ -140,6 +140,53 @@ function formatSourceMixLine(sourceMix?: SourceMix | null): string {
   return `X占比 ${percent}%（${sourceMix.x_count}/${sourceMix.source_total}）${handles}`;
 }
 
+function sourceOriginMeta(origin?: OpportunityItem["source_origin"]): {
+  label: string;
+  className: string;
+} {
+  if (origin === "Indirect") {
+    return {
+      label: "间接关联晋升",
+      className: "text-amber-300 bg-amber-500/10 border-amber-300/30"
+    };
+  }
+  return {
+    label: "直接证据驱动",
+    className: "text-emerald-300 bg-emerald-500/10 border-emerald-300/30"
+  };
+}
+
+function indirectScopeLabel(scope: "index" | "sector" | "ticker"): string {
+  if (scope === "index") {
+    return "指数";
+  }
+  if (scope === "ticker") {
+    return "个股";
+  }
+  return "行业";
+}
+
+function indirectStatusMeta(
+  status: "pending" | "promoted" | "rejected"
+): { label: string; className: string } {
+  if (status === "promoted") {
+    return {
+      label: "已晋升",
+      className: "text-riskLow bg-emerald-500/10 border-emerald-300/30"
+    };
+  }
+  if (status === "rejected") {
+    return {
+      label: "已拒绝",
+      className: "text-textMuted bg-slate-500/10 border-slate-400/30"
+    };
+  }
+  return {
+    label: "观察中",
+    className: "text-riskMid bg-amber-500/10 border-amber-300/30"
+  };
+}
+
 function rankTicker(items: TickerSignalDigest[]): TickerSignalDigest[] {
   return [...items].sort((a, b) => {
     const riskDiff = levelWeight(b.risk_level) - levelWeight(a.risk_level);
@@ -320,6 +367,7 @@ function OpportunityCard({
   onOpenEvidence: (item: OpportunityItem) => void;
 }) {
   const sourceBadge = resolveSourceBadge(item.source_mix);
+  const originBadge = sourceOriginMeta(item.source_origin);
   const evidenceBadge = estimateEvidenceCompleteness(item);
   const transmissionBadge = estimateTransmissionStrength(item);
   const evidenceCount = (item.evidences || []).length || (item.evidence_ids || []).length;
@@ -392,6 +440,9 @@ function OpportunityCard({
       )}
 
       <div className="mt-3 text-xs text-textMuted">
+        <span className={`mr-2 inline-flex rounded-md border px-2 py-0.5 ${originBadge.className}`}>
+          {originBadge.label}
+        </span>
         <span className={`mr-2 inline-flex rounded-md border px-2 py-0.5 ${sourceBadge.className}`}>
           <LabelWithHint label={sourceBadge.label} hintKey="source_mix_badge" />
         </span>
@@ -757,6 +808,41 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
             <div className="mb-2 text-sm font-semibold">机会简报</div>
             <p className="text-sm leading-6 text-textMain">{data.marketSnapshot.daily_brief}</p>
           </article>
+
+          {data.indirectImpacts.length > 0 && (
+            <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
+              <div className="mb-2 text-sm font-semibold">关联影响（观察池）</div>
+              <div className="space-y-2">
+                {data.indirectImpacts.slice(0, 6).map((item) => {
+                  const statusMeta = indirectStatusMeta(item.promotion_status);
+                  return (
+                    <div key={item.id} className="rounded-lg border border-slate-700/80 bg-card/50 p-2.5">
+                      <div className="flex flex-wrap items-center gap-2 text-[11px]">
+                        <span className="rounded border border-slate-600/70 px-1.5 py-0.5 text-textMuted">
+                          {item.theme}
+                        </span>
+                        <span className="rounded border border-slate-600/70 px-1.5 py-0.5 text-textMuted">
+                          {indirectScopeLabel(item.impact_scope)}
+                        </span>
+                        <span className={`rounded border px-1.5 py-0.5 ${statusMeta.className}`}>
+                          {statusMeta.label}
+                        </span>
+                        <span className="text-textMuted">
+                          分数 {item.relevance_score.toFixed(1)} · 置信 {Math.round(item.confidence * 100)}%
+                        </span>
+                      </div>
+                      <p className="mt-1 text-sm text-textMain">{item.summary}</p>
+                      {item.candidate_tickers.length > 0 && (
+                        <p className="mt-1 text-xs text-textMuted">
+                          候选标的: {item.candidate_tickers.join(", ")}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </article>
+          )}
 
           {opportunities.length > 0 ? (
             <div className="grid gap-3 lg:grid-cols-2">

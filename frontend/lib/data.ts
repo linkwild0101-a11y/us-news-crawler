@@ -7,6 +7,7 @@ import {
   EvidenceItem,
   EntityRelationItem,
   HotCluster,
+  IndirectImpactItem,
   MarketRegime,
   MarketSnapshot,
   OpportunityItem,
@@ -120,6 +121,14 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
   flow: "资金流",
   sector: "行业",
   news: "新闻"
+};
+const INDIRECT_THEME_LABELS: Record<string, string> = {
+  macro: "宏观",
+  rate_fx: "利率/汇率",
+  policy: "政策",
+  geopolitics: "地缘",
+  commodity: "大宗商品",
+  supply_chain: "供应链"
 };
 
 function readV2Enabled(): boolean {
@@ -675,6 +684,11 @@ async function queryV2Opportunities(client: SupabaseClient): Promise<Opportunity
               .map((item: unknown) => Number(item || 0))
               .filter((item) => item > 0)
             : [],
+          source_event_ids: Array.isArray(row.source_event_ids)
+            ? row.source_event_ids
+              .map((item: unknown) => Number(item || 0))
+              .filter((item) => item > 0)
+            : [],
           source_cluster_ids: [],
           source_mix: toSourceMix(row.source_mix),
           evidence_ids: Array.isArray(row.evidence_ids)
@@ -757,6 +771,52 @@ async function queryV2Snapshot(client: SupabaseClient): Promise<V2SnapshotRow | 
   } catch (error) {
     console.warn("[FRONTEND_V2_SNAPSHOT_FALLBACK]", error);
     return null;
+  }
+}
+
+async function queryV2IndirectImpacts(client: SupabaseClient): Promise<IndirectImpactItem[]> {
+  try {
+    const { data, error } = await client
+      .from("stock_indirect_events_v2")
+      .select(
+        "id,theme,impact_scope,summary,candidate_tickers,relevance_score,"
+        + "confidence,promotion_status,as_of"
+      )
+      .eq("is_active", true)
+      .order("relevance_score", { ascending: false })
+      .order("as_of", { ascending: false })
+      .limit(16);
+
+    if (error) {
+      throw error;
+    }
+
+    const rows = (data || []) as unknown as Array<Record<string, unknown>>;
+    return rows.map((row) => {
+      const scopeText = String(row.impact_scope || "sector").toLowerCase();
+      const promotionText = String(row.promotion_status || "pending").toLowerCase();
+      return {
+        id: Number(row.id || 0),
+        theme: INDIRECT_THEME_LABELS[String(row.theme || "")] || String(row.theme || "其他"),
+        impact_scope: scopeText === "index" || scopeText === "ticker" ? scopeText : "sector",
+        summary: String(row.summary || ""),
+        candidate_tickers: Array.isArray(row.candidate_tickers)
+          ? row.candidate_tickers
+            .map((item) => String(item || "").toUpperCase())
+            .filter((item) => item.length > 0)
+            .slice(0, 4)
+          : [],
+        relevance_score: Math.max(0, Math.min(100, Number(row.relevance_score || 0))),
+        confidence: toScore(row.confidence),
+        promotion_status: promotionText === "promoted" || promotionText === "rejected"
+          ? promotionText
+          : "pending",
+        as_of: toIsoString(row.as_of)
+      };
+    });
+  } catch (error) {
+    console.warn("[FRONTEND_V2_INDIRECT_FALLBACK]", error);
+    return [];
   }
 }
 
@@ -885,6 +945,37 @@ function calculateTopRisk(signals: SentinelSignal[]): RiskLevel {
   return signals.reduce<RiskLevel>((maxLevel, signal) => {
     return LEVEL_ORDER[signal.alert_level] > LEVEL_ORDER[maxLevel] ? signal.alert_level : maxLevel;
   }, "L1");
+}
+
+async function queryV2IndirectEventIdSet(
+  client: SupabaseClient,
+  eventIds: number[]
+): Promise<Set<number>> {
+  if (eventIds.length === 0) {
+    return new Set();
+  }
+  try {
+    const { data, error } = await client
+      .from("stock_events_v2")
+      .select("id,source_type")
+      .in("id", eventIds)
+      .limit(2000);
+    if (error) {
+      throw error;
+    }
+    const indirectIds = new Set<number>();
+    for (const row of (data || []) as unknown as Array<Record<string, unknown>>) {
+      const sourceType = String(row.source_type || "").toLowerCase();
+      const eventId = Number(row.id || 0);
+      if (eventId > 0 && sourceType === "indirect_promoted") {
+        indirectIds.add(eventId);
+      }
+    }
+    return indirectIds;
+  } catch (error) {
+    console.warn("[FRONTEND_V2_EVENT_SOURCE_FALLBACK]", error);
+    return new Set();
+  }
 }
 
 async function queryOpportunities(
@@ -1505,11 +1596,12 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
   const transmissionEnabled = readTransmissionLayerFlag();
   const aiDebateEnabled = readAiDebateViewFlag();
 
-  const [sentinelSignals, rawOpportunities, marketRegime, v2Snapshot] = await Promise.all([
+  const [sentinelSignals, rawOpportunities, marketRegime, v2Snapshot, indirectImpacts] = await Promise.all([
     queryV2Signals(client),
     queryV2Opportunities(client),
     queryV2Regime(client),
-    queryV2Snapshot(client)
+    queryV2Snapshot(client),
+    queryV2IndirectImpacts(client)
   ]);
 
   if (!v2Snapshot && sentinelSignals.length === 0 && rawOpportunities.length === 0) {
@@ -1540,6 +1632,22 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
     });
   }
 
+  if (opportunities.length > 0) {
+    const sourceEventIds = Array.from(
+      new Set(
+        opportunities.flatMap((item) => item.source_event_ids || []).filter((item) => item > 0)
+      )
+    );
+    const indirectEventIds = await queryV2IndirectEventIdSet(client, sourceEventIds);
+    opportunities = opportunities.map((item) => {
+      const hasIndirect = (item.source_event_ids || []).some((eventId) => indirectEventIds.has(eventId));
+      return {
+        ...item,
+        source_origin: hasIndirect ? "Indirect" : "Direct"
+      };
+    });
+  }
+
   const tickerDigest = buildTickerDigestFromV2(sentinelSignals, opportunities);
   const xSourceRadar = buildXSourceRadar(sentinelSignals, opportunities);
   const focusTickers = new Set(opportunities.map((item) => item.ticker));
@@ -1566,13 +1674,15 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
   const topSignalTime = filteredSignals[0]?.created_at || "";
   const topClusterTime = hotClusters[0]?.created_at || "";
   const topRelationTime = relations[0]?.last_seen || "";
+  const topIndirectTime = indirectImpacts[0]?.as_of || "";
   const dataUpdatedAt = getLatestTimestamp([
     marketSnapshot.updated_at,
     v2Snapshot?.snapshot_time || "",
     topOpportunityTime,
     topSignalTime,
     topClusterTime,
-    topRelationTime
+    topRelationTime,
+    topIndirectTime
   ]);
   const sourceHealth = await querySourceHealth(client);
 
@@ -1584,6 +1694,7 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
     sentinelSignals: filteredSignals,
     tickerDigest,
     xSourceRadar,
+    indirectImpacts,
     hotClusters,
     relations,
     dataUpdatedAt
@@ -1643,6 +1754,7 @@ export async function getDashboardData(): Promise<DashboardData> {
       sentinelSignals: [],
       tickerDigest: fallbackTickerRows,
       xSourceRadar: [],
+      indirectImpacts: [],
       hotClusters: [],
       relations: [],
       dataUpdatedAt: now
@@ -1695,6 +1807,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     sentinelSignals: filteredSignals,
     tickerDigest,
     xSourceRadar,
+    indirectImpacts: [],
     hotClusters,
     relations,
     dataUpdatedAt

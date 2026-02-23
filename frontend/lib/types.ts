@@ -79,6 +79,8 @@ export interface OpportunityItem {
   factor_breakdown: Record<string, number>;
   source_signal_ids: number[];
   source_cluster_ids: number[];
+  source_event_ids?: number[];
+  source_origin?: "Direct" | "Indirect";
   source_mix?: SourceMix | null;
   evidence_ids?: number[];
   path_ids?: number[];
@@ -135,6 +137,18 @@ export interface XSourceRadarItem {
   latest_at: string;
 }
 
+export interface IndirectImpactItem {
+  id: number;
+  theme: string;
+  impact_scope: "index" | "sector" | "ticker";
+  summary: string;
+  candidate_tickers: string[];
+  relevance_score: number;
+  confidence: number;
+  promotion_status: "pending" | "promoted" | "rejected";
+  as_of: string;
+}
+
 export interface MarketRegime {
   regime_date: string;
   risk_state: string;
@@ -152,6 +166,7 @@ export interface DashboardData {
   sentinelSignals: SentinelSignal[];
   tickerDigest: TickerSignalDigest[];
   xSourceRadar: XSourceRadarItem[];
+  indirectImpacts: IndirectImpactItem[];
   hotClusters: HotCluster[];
   relations: EntityRelationItem[];
   dataUpdatedAt: string;
