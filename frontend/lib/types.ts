@@ -80,8 +80,51 @@ export interface OpportunityItem {
   source_signal_ids: number[];
   source_cluster_ids: number[];
   source_mix?: SourceMix | null;
+  evidence_ids?: number[];
+  path_ids?: number[];
+  uncertainty_flags?: string[];
+  counter_view?: string;
+  ai_debate_view?: AiDebateView | null;
+  evidences?: EvidenceItem[];
+  transmission_paths?: TransmissionPath[];
   expires_at: string;
   as_of: string;
+}
+
+export interface EvidenceItem {
+  id: number;
+  opportunity_id: number | null;
+  ticker: string;
+  source_type: string;
+  source_ref: string;
+  source_url: string;
+  source_name: string;
+  published_at: string;
+  quote_snippet: string;
+  numeric_facts: Array<Record<string, unknown>>;
+  confidence: number;
+  as_of: string;
+}
+
+export interface TransmissionPath {
+  id: number;
+  opportunity_id: number | null;
+  path_key: string;
+  ticker: string;
+  macro_factor: string;
+  industry: string;
+  direction: "LONG" | "SHORT" | "NEUTRAL";
+  strength: number;
+  reason: string;
+  evidence_ids: number[];
+  as_of: string;
+}
+
+export interface AiDebateView {
+  pro_case: string;
+  counter_case: string;
+  uncertainties: string[];
+  pre_trade_checks: string[];
 }
 
 export interface XSourceRadarItem {

@@ -38,11 +38,29 @@
 11. `ENABLE_STOCK_V3_VALIDATION=false`
    - 作用: 控制验证套件（幂等/压测/回放一致性）执行
    - 生效范围: 分析工作流与后端脚本进程环境
+12. `ENABLE_STOCK_EVIDENCE_LAYER=false`
+   - 作用: 控制证据抽取层（`stock_evidence_v2`）写入与读取
+   - 生效范围: 分析工作流与后端脚本进程环境
+13. `ENABLE_STOCK_TRANSMISSION_LAYER=false`
+   - 作用: 控制宏观传导链层（`stock_transmission_paths_v2`）写入与读取
+   - 生效范围: 分析工作流与后端脚本进程环境
+14. `ENABLE_STOCK_AI_DEBATE_VIEW=false`
+   - 作用: 控制 AI 正反观点/不确定性结构化输出
+   - 生效范围: 分析工作流与后端脚本进程环境
 
 ## 2. 前端 Flag（默认关闭）
 
 1. `NEXT_PUBLIC_DASHBOARD_V3_EXPLAIN=false`
    - 作用: 控制前端 V3 explain beta 展示
+   - 生效范围: 前端构建时注入（Cloudflare Pages）
+2. `NEXT_PUBLIC_ENABLE_STOCK_EVIDENCE_LAYER=false`
+   - 作用: 控制证据卡与证据优先 UI 区块展示
+   - 生效范围: 前端构建时注入（Cloudflare Pages）
+3. `NEXT_PUBLIC_ENABLE_STOCK_TRANSMISSION_LAYER=false`
+   - 作用: 控制宏观传导链卡片展示
+   - 生效范围: 前端构建时注入（Cloudflare Pages）
+4. `NEXT_PUBLIC_ENABLE_STOCK_AI_DEBATE_VIEW=false`
+   - 作用: 控制 AI 正反观点区块展示
    - 生效范围: 前端构建时注入（Cloudflare Pages）
 
 ## 3. 配置入口
@@ -60,9 +78,15 @@
      - `ENABLE_STOCK_V3_SCORECARD`
      - `ENABLE_STOCK_V3_SHADOW_REPORT`
      - `ENABLE_STOCK_V3_VALIDATION`
+     - `ENABLE_STOCK_EVIDENCE_LAYER`
+     - `ENABLE_STOCK_TRANSMISSION_LAYER`
+     - `ENABLE_STOCK_AI_DEBATE_VIEW`
 2. Cloudflare Pages（前端）
    - 通过项目环境变量注入：
      - `NEXT_PUBLIC_DASHBOARD_V3_EXPLAIN`
+     - `NEXT_PUBLIC_ENABLE_STOCK_EVIDENCE_LAYER`
+     - `NEXT_PUBLIC_ENABLE_STOCK_TRANSMISSION_LAYER`
+     - `NEXT_PUBLIC_ENABLE_STOCK_AI_DEBATE_VIEW`
 
 ## 4. 回滚策略
 
@@ -76,4 +100,6 @@
 - V2 pipeline 已接入 flag 读取（仅日志，不改变业务行为）
 - workflow 已注入后端 flags（默认 `false`，包含 eval/paper/challenger/drift/lifecycle/subscription）
 - workflow 已注入后端 flags（默认 `false`，包含 constraints/scorecard/shadow/validation）
+- workflow 已注入后端 flags（默认 `false`，包含 evidence/transmission/ai_debate）
 - 前端已新增 V3 explain flag 读取（默认 `false`）
+- 前端已新增 evidence/transmission/ai_debate flags 读取（默认 `false`）

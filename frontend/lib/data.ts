@@ -571,7 +571,8 @@ async function queryV2Opportunities(client: SupabaseClient): Promise<Opportunity
       .from("stock_opportunities_v2")
       .select(
         "id,ticker,side,horizon,opportunity_score,confidence,risk_level,why_now,invalid_if,"
-        + "catalysts,source_signal_ids,source_event_ids,source_mix,expires_at,as_of"
+        + "catalysts,source_signal_ids,source_event_ids,source_mix,evidence_ids,path_ids,"
+        + "uncertainty_flags,counter_view,expires_at,as_of"
       )
       .eq("is_active", true)
       .order("opportunity_score", { ascending: false })
@@ -610,6 +611,18 @@ async function queryV2Opportunities(client: SupabaseClient): Promise<Opportunity
             : [],
           source_cluster_ids: [],
           source_mix: toSourceMix(row.source_mix),
+          evidence_ids: Array.isArray(row.evidence_ids)
+            ? row.evidence_ids
+              .map((item: unknown) => Number(item || 0))
+              .filter((item) => item > 0)
+            : [],
+          path_ids: Array.isArray(row.path_ids)
+            ? row.path_ids
+              .map((item: unknown) => Number(item || 0))
+              .filter((item) => item > 0)
+            : [],
+          uncertainty_flags: toStringArray(row.uncertainty_flags),
+          counter_view: String(row.counter_view || "").trim(),
           expires_at: toIsoString(row.expires_at),
           as_of: toIsoString(row.as_of)
         };

@@ -10,3 +10,15 @@ function readBool(value: string | undefined, defaultValue = false): boolean {
 export function readDashboardV3ExplainFlag(): boolean {
   return readBool(process.env.NEXT_PUBLIC_DASHBOARD_V3_EXPLAIN, false);
 }
+
+export function readEvidenceLayerFlag(): boolean {
+  return readBool(process.env.NEXT_PUBLIC_ENABLE_STOCK_EVIDENCE_LAYER, false);
+}
+
+export function readTransmissionLayerFlag(): boolean {
+  return readBool(process.env.NEXT_PUBLIC_ENABLE_STOCK_TRANSMISSION_LAYER, false);
+}
+
+export function readAiDebateViewFlag(): boolean {
+  return readBool(process.env.NEXT_PUBLIC_ENABLE_STOCK_AI_DEBATE_VIEW, false);
+}

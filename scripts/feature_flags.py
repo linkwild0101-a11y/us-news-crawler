@@ -19,7 +19,7 @@ def read_bool_env(name: str, default: bool = False) -> bool:
 
 @dataclass(frozen=True)
 class FeatureFlags:
-    """Runtime feature flags for incremental V3 rollout."""
+    """Runtime feature flags for incremental stock pipeline rollout."""
 
     enable_stock_v3_run_log: bool = False
     enable_stock_v3_eval: bool = False
@@ -28,6 +28,9 @@ class FeatureFlags:
     enable_stock_v3_drift: bool = False
     enable_stock_v3_lifecycle: bool = False
     enable_stock_v3_subscription_alert: bool = False
+    enable_stock_evidence_layer: bool = False
+    enable_stock_transmission_layer: bool = False
+    enable_stock_ai_debate_view: bool = False
 
     @classmethod
     def from_env(cls) -> "FeatureFlags":
@@ -44,6 +47,18 @@ class FeatureFlags:
             enable_stock_v3_lifecycle=read_bool_env("ENABLE_STOCK_V3_LIFECYCLE", default=False),
             enable_stock_v3_subscription_alert=read_bool_env(
                 "ENABLE_STOCK_V3_SUBSCRIPTION_ALERT",
+                default=False,
+            ),
+            enable_stock_evidence_layer=read_bool_env(
+                "ENABLE_STOCK_EVIDENCE_LAYER",
+                default=False,
+            ),
+            enable_stock_transmission_layer=read_bool_env(
+                "ENABLE_STOCK_TRANSMISSION_LAYER",
+                default=False,
+            ),
+            enable_stock_ai_debate_view=read_bool_env(
+                "ENABLE_STOCK_AI_DEBATE_VIEW",
                 default=False,
             ),
         )

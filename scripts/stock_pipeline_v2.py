@@ -183,7 +183,10 @@ class StockPipelineV2:
             f"ENABLE_STOCK_V3_DRIFT={self.flags.enable_stock_v3_drift} "
             f"ENABLE_STOCK_V3_LIFECYCLE={self.flags.enable_stock_v3_lifecycle} "
             f"ENABLE_STOCK_V3_SUBSCRIPTION_ALERT="
-            f"{self.flags.enable_stock_v3_subscription_alert}"
+            f"{self.flags.enable_stock_v3_subscription_alert} "
+            f"ENABLE_STOCK_EVIDENCE_LAYER={self.flags.enable_stock_evidence_layer} "
+            f"ENABLE_STOCK_TRANSMISSION_LAYER={self.flags.enable_stock_transmission_layer} "
+            f"ENABLE_STOCK_AI_DEBATE_VIEW={self.flags.enable_stock_ai_debate_view}"
         )
 
     def _build_v3_params(self, params: Dict[str, Any]) -> Dict[str, Any]:
@@ -199,6 +202,9 @@ class StockPipelineV2:
         merged["flag_enable_stock_v3_subscription_alert"] = (
             self.flags.enable_stock_v3_subscription_alert
         )
+        merged["flag_enable_stock_evidence_layer"] = self.flags.enable_stock_evidence_layer
+        merged["flag_enable_stock_transmission_layer"] = self.flags.enable_stock_transmission_layer
+        merged["flag_enable_stock_ai_debate_view"] = self.flags.enable_stock_ai_debate_view
         return merged
 
     def _v3_log_run_start(

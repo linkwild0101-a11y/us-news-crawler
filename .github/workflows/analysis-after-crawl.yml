@@ -41,6 +41,9 @@ jobs:
       ENABLE_STOCK_V3_SHADOW_REPORT: ${{ vars.ENABLE_STOCK_V3_SHADOW_REPORT || 'false' }}
       ENABLE_STOCK_V3_VALIDATION: ${{ vars.ENABLE_STOCK_V3_VALIDATION || 'false' }}
       ENABLE_STOCK_X_SOURCE: ${{ vars.ENABLE_STOCK_X_SOURCE || 'true' }}
+      ENABLE_STOCK_EVIDENCE_LAYER: ${{ vars.ENABLE_STOCK_EVIDENCE_LAYER || 'false' }}
+      ENABLE_STOCK_TRANSMISSION_LAYER: ${{ vars.ENABLE_STOCK_TRANSMISSION_LAYER || 'false' }}
+      ENABLE_STOCK_AI_DEBATE_VIEW: ${{ vars.ENABLE_STOCK_AI_DEBATE_VIEW || 'false' }}
 
     steps:
       - uses: actions/checkout@v3
