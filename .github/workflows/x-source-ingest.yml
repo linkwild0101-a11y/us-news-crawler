@@ -89,3 +89,17 @@ jobs:
             --post-limit "${{ steps.run_params.outputs.post_limit }}" \
             --workers 6 \
             --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-xsource"
+
+      - name: Run stock x quality governor
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          PYTHONUNBUFFERED: '1'
+        run: |
+          python -u scripts/stock_x_quality_governor.py \
+            --lookback-days 7 \
+            --topn "${{ steps.run_params.outputs.topn }}" \
+            --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-xquality"

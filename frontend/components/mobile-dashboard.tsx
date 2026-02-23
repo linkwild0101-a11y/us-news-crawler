@@ -368,6 +368,7 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
   const topSignals = data.sentinelSignals.slice(0, 16);
   const topClusters = data.hotClusters.slice(0, 12);
   const topRelations = data.relations.slice(0, 10);
+  const xRadar = data.xSourceRadar.slice(0, 8);
 
   return (
     <div className="mx-auto min-h-screen max-w-6xl bg-bg px-4 pb-24 pt-4 text-textMain md:px-6 md:pb-10">
@@ -557,6 +558,27 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
                 </div>
               ))}
             </div>
+          </article>
+
+          <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
+            <h2 className="mb-3 text-sm font-semibold">X 信源雷达</h2>
+            {xRadar.length > 0 ? (
+              <div className="grid gap-3 sm:grid-cols-2">
+                {xRadar.map((item) => (
+                  <div key={item.handle} className="rounded-lg border border-slate-700/80 bg-card/40 p-3">
+                    <div className="mb-1 text-sm font-semibold">@{item.handle}</div>
+                    <div className="text-xs text-textMuted">
+                      提及 {item.mentions} · Mixed {item.mixed_count}
+                    </div>
+                    <div className="mt-1 text-xs text-textMuted">
+                      平均X占比 {Math.round(item.avg_x_ratio * 100)}% · {formatTime(item.latest_at)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-textMuted">暂无 X 信源贡献数据。</p>
+            )}
           </article>
         </section>
       )}

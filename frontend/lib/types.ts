@@ -84,6 +84,14 @@ export interface OpportunityItem {
   as_of: string;
 }
 
+export interface XSourceRadarItem {
+  handle: string;
+  mentions: number;
+  mixed_count: number;
+  avg_x_ratio: number;
+  latest_at: string;
+}
+
 export interface MarketRegime {
   regime_date: string;
   risk_state: string;
@@ -100,6 +108,7 @@ export interface DashboardData {
   dataQuality: DataQualitySnapshot;
   sentinelSignals: SentinelSignal[];
   tickerDigest: TickerSignalDigest[];
+  xSourceRadar: XSourceRadarItem[];
   hotClusters: HotCluster[];
   relations: EntityRelationItem[];
   dataUpdatedAt: string;

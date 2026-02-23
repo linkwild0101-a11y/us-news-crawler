@@ -308,6 +308,14 @@ class StockXSourceIngestor:
         return round(follower_score + keyword_score + category_bonus, 4)
 
     def _select_top_accounts(self, accounts: List[AccountSeed]) -> List[AccountSeed]:
+        quality_map = self._load_quality_scores()
+        if quality_map:
+            for item in accounts:
+                q_score = quality_map.get(item.handle)
+                if q_score is None:
+                    continue
+                item.score = round(item.score * 0.7 + q_score * 0.3, 4)
+
         by_category: Dict[str, List[AccountSeed]] = {}
         for item in accounts:
             by_category.setdefault(item.category_key, []).append(item)
@@ -348,6 +356,33 @@ class StockXSourceIngestor:
             f"topn={len(selected)} breakdown={json.dumps(category_breakdown, ensure_ascii=False)}"
         )
         return selected
+
+    def _load_quality_scores(self) -> Dict[str, float]:
+        """读取最近一次账号质量评分，用于 TopN 选择动态加权。"""
+        try:
+            rows = (
+                self.supabase.table("stock_x_account_score_daily")
+                .select("handle,quality_score,score_date")
+                .order("score_date", desc=True)
+                .limit(600)
+                .execute()
+                .data
+                or []
+            )
+        except Exception as e:
+            logger.warning(f"[STOCK_X_QUALITY_SCORE_FALLBACK] error={str(e)[:120]}")
+            return {}
+
+        score_map: Dict[str, float] = {}
+        for row in rows:
+            handle = str(row.get("handle") or "").strip()
+            if not handle or handle in score_map:
+                continue
+            quality_score = _safe_float(row.get("quality_score"), -1.0)
+            if quality_score < 0:
+                continue
+            score_map[handle] = _clamp(quality_score, 0.0, 100.0)
+        return score_map
 
     def _upsert_accounts(self, accounts: Sequence[AccountSeed]) -> Dict[str, int]:
         if not accounts:

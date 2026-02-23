@@ -697,6 +697,14 @@ class StockPipelineV2:
             other_count = max(0, sum(source_counts.values()) - x_count - article_count)
             source_total = max(1, x_count + article_count + other_count)
             x_ratio = round(x_count / source_total, 4)
+            event_diversity = min(1.0, len(counts) / 3.0)
+            count_density = min(1.0, event_count / 8.0)
+            mixed_flag = bool(x_count > 0 and article_count > 0)
+            resonance_score = _clamp(
+                (0.5 if mixed_flag else 0.0) + event_diversity * 0.25 + count_density * 0.25,
+                0.0,
+                1.0,
+            )
             top_x_handles = [name for name, _ in x_handles.most_common(3)]
             source_mix = {
                 "x_count": x_count,
@@ -704,7 +712,8 @@ class StockPipelineV2:
                 "other_count": other_count,
                 "source_total": source_total,
                 "x_ratio": x_ratio,
-                "mixed_sources": bool(x_count > 0 and article_count > 0),
+                "mixed_sources": mixed_flag,
+                "resonance_score": round(resonance_score, 4),
                 "top_x_handles": top_x_handles,
                 "latest_x_at": latest_x_at,
                 "latest_news_at": latest_news_at,
@@ -784,14 +793,74 @@ class StockPipelineV2:
             "is_active": True,
         }
 
+    def _load_x_quality_context(self) -> Dict[str, Any]:
+        """加载 X 源健康状态与账号质量评分。"""
+        context: Dict[str, Any] = {
+            "health_status": "healthy",
+            "freshness_sec": 0,
+            "avg_quality_score": 60.0,
+            "handle_scores": {},
+        }
+
+        try:
+            row = (
+                self.supabase.table("source_health_daily")
+                .select("status,freshness_sec,source_payload,as_of")
+                .eq("source_id", "x_grok_accounts")
+                .order("as_of", desc=True)
+                .limit(1)
+                .maybe_single()
+                .execute()
+                .data
+            )
+            if isinstance(row, dict):
+                context["health_status"] = str(row.get("status") or "healthy").strip().lower()
+                context["freshness_sec"] = max(0, int(_safe_float(row.get("freshness_sec"), 0.0)))
+        except Exception as e:
+            logger.warning(f"[V2_X_HEALTH_FALLBACK] error={str(e)[:120]}")
+
+        try:
+            score_rows = (
+                self.supabase.table("stock_x_account_score_daily")
+                .select("handle,quality_score,score_date")
+                .order("score_date", desc=True)
+                .limit(600)
+                .execute()
+                .data
+                or []
+            )
+            handle_scores: Dict[str, float] = {}
+            for row in score_rows:
+                handle = str(row.get("handle") or "").strip()
+                if not handle or handle in handle_scores:
+                    continue
+                handle_scores[handle] = _clamp(_safe_float(row.get("quality_score"), 60.0), 0.0, 100.0)
+            if handle_scores:
+                context["handle_scores"] = handle_scores
+                context["avg_quality_score"] = round(
+                    sum(handle_scores.values()) / max(1, len(handle_scores)),
+                    2,
+                )
+        except Exception as e:
+            logger.warning(f"[V2_X_SCORE_FALLBACK] error={str(e)[:120]}")
+
+        return context
+
     def _build_opportunities(
         self,
         signals: List[Dict[str, Any]],
         regime: Dict[str, Any],
         run_id: str,
         now: datetime,
+        x_context: Optional[Dict[str, Any]] = None,
     ) -> List[Dict[str, Any]]:
         regime_score = _safe_float(regime.get("regime_score"), 0.0)
+        x_ctx = x_context if isinstance(x_context, dict) else {}
+        x_health_status = str(x_ctx.get("health_status") or "healthy").strip().lower()
+        x_freshness_sec = max(0, int(_safe_float(x_ctx.get("freshness_sec"), 0.0)))
+        handle_scores = x_ctx.get("handle_scores")
+        x_handle_scores = handle_scores if isinstance(handle_scores, dict) else {}
+        x_avg_score = _clamp(_safe_float(x_ctx.get("avg_quality_score"), 60.0), 0.0, 100.0)
         rows: List[Dict[str, Any]] = []
         for signal in signals:
             side = str(signal.get("side") or "LONG")
@@ -804,18 +873,41 @@ class StockPipelineV2:
             x_count = max(0, int(_safe_float(source_mix.get("x_count"), 0.0)))
             source_total = max(1, int(_safe_float(source_mix.get("source_total"), 0.0)))
             mixed_sources = bool(source_mix.get("mixed_sources"))
+            resonance_score = _clamp(_safe_float(source_mix.get("resonance_score"), 0.0), 0.0, 1.0)
+            top_x_handles = source_mix.get("top_x_handles")
+            handles = top_x_handles if isinstance(top_x_handles, list) else []
+            quality_scores = [
+                _clamp(_safe_float(x_handle_scores.get(str(handle or "").strip()), x_avg_score), 0.0, 100.0)
+                for handle in handles
+                if str(handle or "").strip()
+            ]
+            x_quality = round(
+                (sum(quality_scores) / max(1, len(quality_scores)))
+                if quality_scores
+                else x_avg_score,
+                2,
+            )
             horizon = "A" if signal_score >= 65 else "B"
             source_boost = 0.0
             if x_count > 0:
                 source_boost += 1.2 + x_ratio * 1.8
             if mixed_sources:
                 source_boost += 1.5
+            source_boost += resonance_score * 1.6
+            if x_count > 0 and x_quality < 55:
+                source_boost -= 1.1
+            if x_health_status == "critical" or x_freshness_sec > 43200:
+                source_boost *= 0.2
+            elif x_health_status == "degraded" or x_freshness_sec > 21600:
+                source_boost *= 0.6
             opp_score = _clamp(
                 signal_score * 0.82 + (macro_boost + 1.0) * 9.0 + source_boost,
                 0.0,
                 100.0,
             )
             opp_conf = _clamp(confidence * 0.82 + 0.13, 0.4, 0.95)
+            if x_count > 0 and x_quality < 50 and x_ratio >= 0.6:
+                opp_conf = _clamp(opp_conf - 0.08, 0.35, 0.95)
             expiry = now + timedelta(hours=72 if horizon == "A" else 24 * 14)
 
             if side == "LONG":
@@ -826,7 +918,9 @@ class StockPipelineV2:
             if x_count > 0:
                 x_note = (
                     f" X贡献 {x_count}/{source_total}"
-                    f"（{int(round(x_ratio * 100))}%）。"
+                    f"（{int(round(x_ratio * 100))}%），"
+                    f"共振 {int(round(resonance_score * 100))}，"
+                    f"质量 {int(round(x_quality))}。"
                 )
 
             rows.append(
@@ -882,10 +976,15 @@ class StockPipelineV2:
         regime: Dict[str, Any],
         run_id: str,
         now: datetime,
+        x_context: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         risk_badge = "L1"
         if signals:
             risk_badge = max([str(item.get("level") or "L1") for item in signals])
+        x_ctx = x_context if isinstance(x_context, dict) else {}
+        x_health_status = str(x_ctx.get("health_status") or "healthy").strip().lower()
+        x_freshness_sec = max(0, int(_safe_float(x_ctx.get("freshness_sec"), 0.0)))
+        x_avg_quality = round(_clamp(_safe_float(x_ctx.get("avg_quality_score"), 60.0), 0.0, 100.0), 2)
         x_signal_count = 0
         x_mixed_count = 0
         x_event_total = 0
@@ -941,6 +1040,7 @@ class StockPipelineV2:
                 f"Stock V2 已生成 {len(opportunities)} 个机会、{len(signals)} 条信号，"
                 f"市场状态 {regime.get('risk_state', 'neutral')}。"
                 f" X相关信号 {x_signal_count} 条，平均占比 {int(round(x_ratio_avg * 100))}% 。"
+                f" X源健康 {x_health_status}，质量均值 {int(round(x_avg_quality))}。"
             ),
             "risk_badge": risk_badge,
             "data_health": {
@@ -952,6 +1052,9 @@ class StockPipelineV2:
                 "x_event_total": x_event_total,
                 "x_ratio_avg": x_ratio_avg,
                 "x_top_handles": x_top_handles,
+                "x_health_status": x_health_status,
+                "x_freshness_sec": x_freshness_sec,
+                "x_quality_avg": x_avg_quality,
                 "generated_at": now.isoformat(),
             },
             "as_of": now.isoformat(),
@@ -963,20 +1066,41 @@ class StockPipelineV2:
         """从事件层重建信号/机会/快照。"""
         now = _now_utc()
         regime = self._build_regime(run_id=run_id, now=now)
+        x_context = self._load_x_quality_context()
         self._replace_active("stock_market_regime_v2", [regime])
 
         bundle = self._load_event_bundle(lookback_hours=lookback_hours)
         signal_rows = self._build_signals(bundle, run_id=run_id, now=now)
         if not signal_rows:
             logger.warning("[V2_KEEP_OLD] 未生成新信号，本轮仅刷新市场状态和快照")
-            snapshot = self._build_snapshot([], [], regime, run_id=run_id, now=now)
+            snapshot = self._build_snapshot(
+                [],
+                [],
+                regime,
+                run_id=run_id,
+                now=now,
+                x_context=x_context,
+            )
             self._replace_active("stock_dashboard_snapshot_v2", [snapshot])
             return {"signals": 0, "opportunities": 0, "snapshot": 1}
 
         signal_count = self._replace_active("stock_signals_v2", signal_rows)
-        opp_rows = self._build_opportunities(signal_rows, regime, run_id=run_id, now=now)
+        opp_rows = self._build_opportunities(
+            signal_rows,
+            regime,
+            run_id=run_id,
+            now=now,
+            x_context=x_context,
+        )
         opp_count = self._replace_active("stock_opportunities_v2", opp_rows)
-        snapshot = self._build_snapshot(opp_rows, signal_rows, regime, run_id=run_id, now=now)
+        snapshot = self._build_snapshot(
+            opp_rows,
+            signal_rows,
+            regime,
+            run_id=run_id,
+            now=now,
+            x_context=x_context,
+        )
         snap_count = self._replace_active("stock_dashboard_snapshot_v2", [snapshot])
         return {"signals": signal_count, "opportunities": opp_count, "snapshot": snap_count}
 

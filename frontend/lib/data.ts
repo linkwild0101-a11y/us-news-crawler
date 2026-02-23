@@ -11,6 +11,7 @@ import {
   RiskLevel,
   SentinelSignal,
   SourceMix,
+  XSourceRadarItem,
   TickerSignalDigest
 } from "@/lib/types";
 
@@ -1067,6 +1068,59 @@ function buildTickerDigestFromV2(
   }));
 }
 
+function buildXSourceRadar(
+  signals: SentinelSignal[],
+  opportunities: OpportunityItem[]
+): XSourceRadarItem[] {
+  const bucket = new Map<string, { mentions: number; mixed: number; ratioSum: number; latestAt: string }>();
+  const merge = (sourceMix?: SourceMix | null, createdAt = "") => {
+    if (!sourceMix || sourceMix.x_count <= 0) {
+      return;
+    }
+    const ratio = Math.max(0, Math.min(1, sourceMix.x_ratio));
+    const handles = sourceMix.top_x_handles || [];
+    for (const handleRaw of handles) {
+      const handle = String(handleRaw || "").trim();
+      if (!handle) {
+        continue;
+      }
+      const prev = bucket.get(handle) || { mentions: 0, mixed: 0, ratioSum: 0, latestAt: createdAt };
+      prev.mentions += 1;
+      prev.ratioSum += ratio;
+      if (sourceMix.mixed_sources) {
+        prev.mixed += 1;
+      }
+      if (!prev.latestAt || createdAt > prev.latestAt) {
+        prev.latestAt = createdAt;
+      }
+      bucket.set(handle, prev);
+    }
+  };
+
+  for (const signal of signals) {
+    merge(signal.source_mix, signal.created_at);
+  }
+  for (const opp of opportunities) {
+    merge(opp.source_mix, opp.as_of);
+  }
+
+  return Array.from(bucket.entries())
+    .map(([handle, value]) => ({
+      handle,
+      mentions: value.mentions,
+      mixed_count: value.mixed,
+      avg_x_ratio: Number((value.ratioSum / Math.max(1, value.mentions)).toFixed(4)),
+      latest_at: value.latestAt || new Date().toISOString()
+    }))
+    .sort((a, b) => {
+      if (b.mentions !== a.mentions) {
+        return b.mentions - a.mentions;
+      }
+      return b.avg_x_ratio - a.avg_x_ratio;
+    })
+    .slice(0, 10);
+}
+
 async function queryV2HotClusters(client: SupabaseClient): Promise<HotCluster[]> {
   try {
     const { data, error } = await client
@@ -1259,6 +1313,7 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
   }
 
   const tickerDigest = buildTickerDigestFromV2(sentinelSignals, opportunities);
+  const xSourceRadar = buildXSourceRadar(sentinelSignals, opportunities);
   const focusTickers = new Set(opportunities.map((item) => item.ticker));
   const filteredSignals = focusTickers.size
     ? sentinelSignals.filter((item) => signalMentionsTicker(item, focusTickers))
@@ -1300,6 +1355,7 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
     dataQuality: buildDataQualitySnapshot(dataUpdatedAt, sourceHealth),
     sentinelSignals: filteredSignals,
     tickerDigest,
+    xSourceRadar,
     hotClusters,
     relations,
     dataUpdatedAt
@@ -1358,6 +1414,7 @@ export async function getDashboardData(): Promise<DashboardData> {
       dataQuality: buildDataQualitySnapshot(now, { healthy: 0, degraded: 0, critical: 0 }),
       sentinelSignals: [],
       tickerDigest: fallbackTickerRows,
+      xSourceRadar: [],
       hotClusters: [],
       relations: [],
       dataUpdatedAt: now
@@ -1400,6 +1457,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     topRelationTime
   ]);
   const sourceHealth = await querySourceHealth(client);
+  const xSourceRadar = buildXSourceRadar(filteredSignals, opportunities);
 
   return {
     opportunities,
@@ -1408,6 +1466,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     dataQuality: buildDataQualitySnapshot(dataUpdatedAt, sourceHealth),
     sentinelSignals: filteredSignals,
     tickerDigest,
+    xSourceRadar,
     hotClusters,
     relations,
     dataUpdatedAt
