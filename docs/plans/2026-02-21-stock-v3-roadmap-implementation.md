@@ -284,20 +284,20 @@
 
 ## 11. 近期执行清单（接下来 10 个工作日）
 
-1. [ ] 完成 Phase 0 全部事项
-2. [ ] 输出 3 份规格文档（provider、run contract、eval protocol）
-3. [ ] 完成 `research_runs` 与 `source_health_daily` migration 草案
-4. [ ] 在现有 workflow 增加 run summary 骨架（不改主逻辑）
-5. [ ] 产出第一版评分卡模板（CSV/Markdown）
-6. [ ] 约定模型晋级门槛并冻结
+1. [x] 完成 Phase 0 全部事项
+2. [x] 输出 3 份规格文档（provider、run contract、eval protocol）
+3. [x] 完成 `research_runs` 与 `source_health_daily` migration 草案
+4. [x] 在现有 workflow 增加 run summary 骨架（不改主逻辑）
+5. [x] 约定模型晋级门槛并冻结（v1 文档）
+6. [ ] 产出第一版评分卡模板（CSV/Markdown）
 
 ---
 
 ## 12. 交付物清单
 
-- [ ] `docs/plans/2026-02-21-stock-v3-roadmap-design.md`（已完成）
-- [ ] `docs/plans/2026-02-21-stock-v3-roadmap-implementation.md`（本文）
-- [ ] provider registry 规格文档
-- [ ] research run contract 规格文档
-- [ ] eval protocol 与 promotion gate 文档
+- [x] `docs/plans/2026-02-21-stock-v3-roadmap-design.md`（已完成）
+- [x] `docs/plans/2026-02-21-stock-v3-roadmap-implementation.md`（本文）
+- [x] provider registry 规格文档
+- [x] research run contract 规格文档
+- [x] eval protocol 与 promotion gate 文档
 - [ ] workflow shadow run 报告（7天）

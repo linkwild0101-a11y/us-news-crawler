@@ -106,6 +106,36 @@ jobs:
             --hours 168 \
             --limit 1200
 
+      - name: Run Stock V3 eval (optional)
+        if: ${{ env.ENABLE_STOCK_V3_EVAL == 'true' }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_eval_v3.py \
+            --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-eval" \
+            --window-hours 24 \
+            --max-age-days 14 \
+            --limit 2500
+
+      - name: Run Stock V3 paper trading (optional)
+        if: ${{ env.ENABLE_STOCK_V3_PAPER == 'true' }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_paper_trading_v3.py \
+            --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-paper" \
+            --topn 12
+
       - name: Collect source health snapshot (V3 optional)
         if: ${{ env.ENABLE_STOCK_V3_RUN_LOG == 'true' || env.ENABLE_STOCK_V3_EVAL == 'true' || env.ENABLE_STOCK_V3_PAPER == 'true' }}
         continue-on-error: true
@@ -132,6 +162,21 @@ jobs:
             --duration-sec "$duration" \
             --health-date "$(date -u +%F)" \
             --health-run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
+      - name: Notify Feishu (Stock V3)
+        if: ${{ always() }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_v3_notifier.py \
+            --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
+            --job-status "${{ job.status }}"
 
   legacy-fallback-analysis:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.legacy_fallback == true }}
