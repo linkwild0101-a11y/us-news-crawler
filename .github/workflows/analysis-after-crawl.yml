@@ -40,6 +40,7 @@ jobs:
       ENABLE_STOCK_V3_SCORECARD: ${{ vars.ENABLE_STOCK_V3_SCORECARD || 'false' }}
       ENABLE_STOCK_V3_SHADOW_REPORT: ${{ vars.ENABLE_STOCK_V3_SHADOW_REPORT || 'false' }}
       ENABLE_STOCK_V3_VALIDATION: ${{ vars.ENABLE_STOCK_V3_VALIDATION || 'false' }}
+      ENABLE_STOCK_X_SOURCE: ${{ vars.ENABLE_STOCK_X_SOURCE || 'true' }}
 
     steps:
       - uses: actions/checkout@v3
@@ -71,6 +72,27 @@ jobs:
             llm_flag="--enable-llm --llm-event-cap 80 --llm-workers 10"
           fi
           printf "llm_flag=%s\n" "$llm_flag" >> "$GITHUB_OUTPUT"
+
+      - name: Run Stock X supplement ingest (optional)
+        if: ${{ env.ENABLE_STOCK_X_SOURCE == 'true' }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          GROK_API_BASE_URL: ${{ secrets.GROK_API_BASE_URL }}
+          GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+          GROK_MODEL: ${{ secrets.GROK_MODEL }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_x_source_ingest.py \
+            --mode ingest \
+            --accounts-file config/us_stock_x_accounts.tsv \
+            --topn 30 \
+            --post-limit 20 \
+            --workers 6 \
+            --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-x-supp"
 
       - name: Run Stock V2 incremental pipeline
         env:

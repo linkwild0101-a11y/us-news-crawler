@@ -1,0 +1,85 @@
+name: Stock X Source Ingest
+
+on:
+  schedule:
+    - cron: '15 */2 * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Run mode: full/import/ingest'
+        required: false
+        default: ingest
+        type: choice
+        options:
+          - ingest
+          - full
+          - import
+      topn:
+        description: 'Active account count'
+        required: false
+        default: '30'
+        type: string
+      post_limit:
+        description: 'Posts per account'
+        required: false
+        default: '20'
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    if: ${{ github.event_name == 'workflow_dispatch' || vars.ENABLE_STOCK_X_SOURCE == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      ENABLE_STOCK_X_SOURCE: ${{ vars.ENABLE_STOCK_X_SOURCE || 'true' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Resolve run params
+        id: run_params
+        run: |
+          mode="ingest"
+          topn="30"
+          post_limit="20"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            mode="${{ inputs.mode }}"
+            topn="${{ inputs.topn }}"
+            post_limit="${{ inputs.post_limit }}"
+          fi
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+          echo "topn=$topn" >> "$GITHUB_OUTPUT"
+          echo "post_limit=$post_limit" >> "$GITHUB_OUTPUT"
+
+      - name: Run stock x source ingest
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          GROK_API_BASE_URL: ${{ secrets.GROK_API_BASE_URL }}
+          GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+          GROK_MODEL: ${{ secrets.GROK_MODEL }}
+          PYTHONUNBUFFERED: '1'
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          python -u scripts/stock_x_source_ingest.py \
+            --mode "${{ steps.run_params.outputs.mode }}" \
+            --accounts-file config/us_stock_x_accounts.tsv \
+            --topn "${{ steps.run_params.outputs.topn }}" \
+            --post-limit "${{ steps.run_params.outputs.post_limit }}" \
+            --workers 6 \
+            --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-xsource"
