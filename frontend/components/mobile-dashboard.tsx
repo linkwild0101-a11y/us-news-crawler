@@ -436,8 +436,14 @@ function EvidenceDrawer({
   const pathRows = (enableTransmissionLayer ? item.transmission_paths : []) || [];
   const originalLinks = collectOriginalLinks(item);
   return (
-    <div className="fixed inset-0 z-40 bg-black/70 px-3 py-4 backdrop-blur-sm md:px-6 md:py-8">
-      <div className="mx-auto max-h-full max-w-xl overflow-y-auto rounded-2xl border border-slate-700 bg-panel p-4">
+    <div
+      className="fixed inset-0 z-40 bg-black/70 px-3 py-4 backdrop-blur-sm md:px-6 md:py-8"
+      onClick={onClose}
+    >
+      <div
+        className="mx-auto max-h-full max-w-xl overflow-y-auto rounded-2xl border border-slate-700 bg-panel p-4"
+        onClick={(event) => event.stopPropagation()}
+      >
         <div className="mb-3 flex items-start justify-between gap-3">
           <div>
             <h3 className="text-base font-semibold">
