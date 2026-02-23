@@ -311,8 +311,43 @@ def _upsert_run_metrics(supabase, run_id: str, metrics: Dict[str, float]) -> int
         ).execute()
         return len(rows)
     except Exception as e:
-        logger.warning(f"[CONSTRAINT_V3_METRICS_UPSERT_FAILED] error={str(e)[:120]}")
+        error_text = str(e)
+        if "research_run_metrics_run_id_fkey" in error_text:
+            _ensure_run_row(
+                supabase=supabase,
+                run_id=run_id,
+                pipeline_name="stock_v3_portfolio_constraints",
+            )
+            try:
+                supabase.table("research_run_metrics").upsert(
+                    rows,
+                    on_conflict="run_id,metric_name",
+                ).execute()
+                return len(rows)
+            except Exception as inner:
+                logger.warning(f"[CONSTRAINT_V3_METRICS_RETRY_FAILED] error={str(inner)[:120]}")
+                return 0
+        logger.warning(f"[CONSTRAINT_V3_METRICS_UPSERT_FAILED] error={error_text[:120]}")
         return 0
+
+
+def _ensure_run_row(supabase, run_id: str, pipeline_name: str) -> None:
+    payload = {
+        "run_id": run_id,
+        "pipeline_name": pipeline_name,
+        "pipeline_version": os.getenv("GITHUB_SHA", "")[:12] or "local",
+        "trigger_type": os.getenv("GITHUB_EVENT_NAME", "manual"),
+        "status": "running",
+        "started_at": _now_utc().isoformat(),
+        "input_window": {},
+        "params_json": {},
+        "commit_sha": os.getenv("GITHUB_SHA", "")[:40],
+        "as_of": _now_utc().isoformat(),
+    }
+    try:
+        supabase.table("research_runs").upsert(payload, on_conflict="run_id").execute()
+    except Exception as e:
+        logger.warning(f"[CONSTRAINT_V3_ENSURE_RUN_FAILED] error={str(e)[:120]}")
 
 
 def _log_run_start(supabase, run_id: str, limit: int, config: ConstraintConfig) -> None:
@@ -345,6 +380,7 @@ def _log_run_start(supabase, run_id: str, limit: int, config: ConstraintConfig) 
 
 
 def _log_run_finish(supabase, run_id: str, status: str, notes: str) -> None:
+    _ensure_run_row(supabase=supabase, run_id=run_id, pipeline_name="stock_v3_portfolio_constraints")
     try:
         (
             supabase.table("research_runs")
