@@ -173,26 +173,27 @@ class StockXSourceIngestor:
         return create_client(url, key)
 
     def _resolve_grok_config(self) -> Tuple[str, str, str]:
-        model = str(os.getenv("GROK_MODEL") or "").strip()
-        base_url = str(os.getenv("GROK_API_BASE_URL") or "").strip()
-        api_key = str(os.getenv("GROK_API_KEY") or "").strip()
+        config_path = Path("grok_apikey.txt")
+        if not config_path.exists():
+            raise ValueError("缺少 grok_apikey.txt，必须使用该文件提供 Grok 配置")
 
-        if model and base_url and api_key:
-            return model, base_url, api_key
+        parsed = self._parse_grok_file(config_path)
+        model = str(parsed.get("model") or "").strip()
+        base_url = str(parsed.get("base_url") or "").strip()
+        api_key = str(parsed.get("api_key") or "").strip()
 
-        fallback_path = Path("grok_apikey.txt")
-        if fallback_path.exists():
-            parsed = self._parse_grok_file(fallback_path)
-            model = model or parsed.get("model", "")
-            base_url = base_url or parsed.get("base_url", "")
-            api_key = api_key or parsed.get("api_key", "")
-
+        missing: List[str] = []
         if not model:
-            model = "grok-4-fast-reasoning"
+            missing.append("model")
         if not base_url:
-            base_url = "https://api.x.ai/v1"
+            missing.append("base_url")
         if not api_key:
-            raise ValueError("缺少 GROK_API_KEY（环境变量或 grok_apikey.txt）")
+            missing.append("api_key")
+
+        if missing:
+            raise ValueError(
+                "grok_apikey.txt 缺少必要字段: " + ",".join(missing)
+            )
 
         return model, base_url, api_key
 

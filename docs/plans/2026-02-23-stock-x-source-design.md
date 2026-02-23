@@ -52,7 +52,13 @@ GitHub Variables：
 
 - `ENABLE_STOCK_X_SOURCE=true`
 
-本地调试可回退读取：`grok_apikey.txt`（不入库，不提交）
+Grok 配置统一通过 `grok_apikey.txt` 读取（必需），文件需包含：
+
+- `模型名字: ...`
+- `api地址: ...`
+- `apikey: ...`
+
+CI 中通过 Secrets 动态生成该文件，不提交到仓库。
 
 ## 6. 运行命令
 

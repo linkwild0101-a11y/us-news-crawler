@@ -86,6 +86,12 @@ jobs:
           GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
           PYTHONUNBUFFERED: "1"
         run: |
+          cat > grok_apikey.txt <<EOF
+          模型名字: ${GROK_MODEL}
+          api地址: ${GROK_API_BASE_URL}
+          apikey: ${GROK_API_KEY}
+          EOF
+
           python -u scripts/stock_x_source_ingest.py \
             --mode ingest \
             --accounts-file config/us_stock_x_accounts.tsv \
