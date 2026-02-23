@@ -129,9 +129,9 @@ jobs:
         run: |
           python -u scripts/stock_pipeline_v2.py \
             --mode incremental \
-            --hours 168 \
-            --article-limit 3000 \
-            --lookback-hours 336 \
+            --hours 72 \
+            --article-limit 2000 \
+            --lookback-hours 240 \
             ${{ steps.stock_v2_flags.outputs.llm_flag }}
 
       - name: Backfill Chinese evidence texts (Stock V2)
@@ -146,10 +146,10 @@ jobs:
         run: |
           python -u scripts/stock_translate_backfill_v2.py \
             --active-only \
-            --limit 500 \
-            --scan-limit 30000 \
-            --batch-size 400 \
-            --workers 10
+            --limit 250 \
+            --scan-limit 8000 \
+            --batch-size 250 \
+            --workers 8
 
       - name: Refresh market digest prices
         env:
