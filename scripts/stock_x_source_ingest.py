@@ -386,10 +386,18 @@ class StockXSourceIngestor:
             )
             return id_map
 
-        self.supabase.table("stock_x_accounts").upsert(
-            payload_rows,
-            on_conflict="handle",
-        ).execute()
+        try:
+            self.supabase.table("stock_x_accounts").upsert(
+                payload_rows,
+                on_conflict="handle",
+            ).execute()
+        except Exception as e:
+            msg = str(e)
+            if "stock_x_accounts" in msg or "schema cache" in msg:
+                raise ValueError(
+                    "缺少 stock_x_* 表，请先执行 sql/2026-02-23_stock_x_source_tables.sql"
+                ) from e
+            raise
 
         if self.deactivate_others:
             existing_rows = (
@@ -414,29 +422,45 @@ class StockXSourceIngestor:
                     .execute()
                 )
 
-        rows = (
-            self.supabase.table("stock_x_accounts")
-            .select("id,handle")
-            .in_("handle", selected_handles)
-            .execute()
-            .data
-            or []
-        )
+        try:
+            rows = (
+                self.supabase.table("stock_x_accounts")
+                .select("id,handle")
+                .in_("handle", selected_handles)
+                .execute()
+                .data
+                or []
+            )
+        except Exception as e:
+            msg = str(e)
+            if "stock_x_accounts" in msg or "schema cache" in msg:
+                raise ValueError(
+                    "缺少 stock_x_* 表，请先执行 sql/2026-02-23_stock_x_source_tables.sql"
+                ) from e
+            raise
         id_map = {str(row.get("handle") or ""): int(row.get("id") or 0) for row in rows}
         logger.info(f"[STOCK_X_ACCOUNTS_UPSERT] total={len(payload_rows)}")
         return id_map
 
     def _load_active_accounts(self, limit: int) -> List[Dict[str, Any]]:
-        rows = (
-            self.supabase.table("stock_x_accounts")
-            .select("id,handle,category,signal_type,value_note,priority_rank")
-            .eq("is_active", True)
-            .order("priority_rank", desc=False)
-            .limit(max(1, limit))
-            .execute()
-            .data
-            or []
-        )
+        try:
+            rows = (
+                self.supabase.table("stock_x_accounts")
+                .select("id,handle,category,signal_type,value_note,priority_rank")
+                .eq("is_active", True)
+                .order("priority_rank", desc=False)
+                .limit(max(1, limit))
+                .execute()
+                .data
+                or []
+            )
+        except Exception as e:
+            msg = str(e)
+            if "stock_x_accounts" in msg or "schema cache" in msg:
+                raise ValueError(
+                    "缺少 stock_x_* 表，请先执行 sql/2026-02-23_stock_x_source_tables.sql"
+                ) from e
+            raise
         return rows
 
     def _grok_fetch_account(self, account: Dict[str, Any]) -> AccountResult:
@@ -644,17 +668,20 @@ class StockXSourceIngestor:
     def _create_run_record(self, params_json: Dict[str, Any]) -> None:
         if self.dry_run:
             return
-        self.supabase.table("stock_x_ingest_runs").upsert(
-            {
-                "run_id": self.run_id,
-                "mode": self.mode,
-                "status": "running",
-                "params_json": params_json,
-                "started_at": _now_utc().isoformat(),
-                "as_of": _now_utc().isoformat(),
-            },
-            on_conflict="run_id",
-        ).execute()
+        try:
+            self.supabase.table("stock_x_ingest_runs").upsert(
+                {
+                    "run_id": self.run_id,
+                    "mode": self.mode,
+                    "status": "running",
+                    "params_json": params_json,
+                    "started_at": _now_utc().isoformat(),
+                    "as_of": _now_utc().isoformat(),
+                },
+                on_conflict="run_id",
+            ).execute()
+        except Exception as e:
+            logger.warning(f"[STOCK_X_RUN_RECORD_START_FAILED] error={str(e)[:160]}")
 
     def _finish_run_record(
         self,
@@ -667,21 +694,24 @@ class StockXSourceIngestor:
             return
         ended_at = _now_utc()
         duration_sec = max(0, int((ended_at - started_at).total_seconds()))
-        self.supabase.table("stock_x_ingest_runs").update(
-            {
-                "status": status,
-                "accounts_total": stats.accounts_total,
-                "accounts_success": stats.accounts_success,
-                "accounts_failed": stats.accounts_failed,
-                "posts_written": stats.posts_written,
-                "signals_written": stats.signals_written,
-                "events_written": stats.events_written,
-                "duration_sec": duration_sec,
-                "error_summary": error_summary[:5000],
-                "ended_at": ended_at.isoformat(),
-                "as_of": ended_at.isoformat(),
-            }
-        ).eq("run_id", self.run_id).execute()
+        try:
+            self.supabase.table("stock_x_ingest_runs").update(
+                {
+                    "status": status,
+                    "accounts_total": stats.accounts_total,
+                    "accounts_success": stats.accounts_success,
+                    "accounts_failed": stats.accounts_failed,
+                    "posts_written": stats.posts_written,
+                    "signals_written": stats.signals_written,
+                    "events_written": stats.events_written,
+                    "duration_sec": duration_sec,
+                    "error_summary": error_summary[:5000],
+                    "ended_at": ended_at.isoformat(),
+                    "as_of": ended_at.isoformat(),
+                }
+            ).eq("run_id", self.run_id).execute()
+        except Exception as e:
+            logger.warning(f"[STOCK_X_RUN_RECORD_FINISH_FAILED] error={str(e)[:160]}")
 
     def _persist_account_results(
         self,
