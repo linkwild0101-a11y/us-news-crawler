@@ -79,6 +79,23 @@ jobs:
             --lookback-hours 336 \
             ${{ steps.stock_v2_flags.outputs.llm_flag }}
 
+      - name: Backfill Chinese evidence texts (Stock V2)
+        if: ${{ steps.stock_v2_flags.outputs.llm_flag != '' }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
+          ALIBABA_API_KEY: ${{ secrets.ALIBABA_API_KEY }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_translate_backfill_v2.py \
+            --active-only \
+            --limit 500 \
+            --scan-limit 30000 \
+            --batch-size 400 \
+            --workers 10
+
       - name: Refresh market digest prices
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

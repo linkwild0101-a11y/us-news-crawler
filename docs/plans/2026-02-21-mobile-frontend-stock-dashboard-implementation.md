@@ -16,6 +16,7 @@
 - [x] 新增 `market_snapshot_daily` / `ticker_signal_digest` 迁移脚本
 - [x] 新增 `scripts/refresh_market_digest.py` 聚合刷新脚本
 - [x] 接入 `analysis-after-crawl.yml` 自动刷新
+- [x] 接入 `stock_translate_backfill_v2.py` 自动中文证据回填
 - [ ] 接入真实市场行情源（SPY/QQQ/VIX/10Y/DXY）
 
 ## Phase 3（待开始）

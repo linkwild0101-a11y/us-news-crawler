@@ -102,6 +102,14 @@ const STOCK_CLUSTER_HINTS = [
 ];
 const TICKER_PATTERN = /\b[A-Z]{2,5}\b/g;
 const TRUE_VALUES = new Set(["1", "true", "yes", "on"]);
+const EVENT_TYPE_LABELS: Record<string, string> = {
+  earnings: "财报",
+  macro: "宏观",
+  policy: "政策",
+  flow: "资金流",
+  sector: "行业",
+  news: "新闻"
+};
 
 function readV2Enabled(): boolean {
   const raw = String(
@@ -117,6 +125,15 @@ function toIsoString(value: unknown): string {
     return value;
   }
   return new Date().toISOString();
+}
+
+function hasChinese(text: string): boolean {
+  return /[\u4e00-\u9fff]/.test(text);
+}
+
+function toZhClusterCategory(eventType: string): string {
+  const key = String(eventType || "news").toLowerCase();
+  return EVENT_TYPE_LABELS[key] || "新闻";
 }
 
 function toNumber(value: unknown): number | null {
@@ -935,12 +952,17 @@ async function queryV2HotClusters(client: SupabaseClient): Promise<HotCluster[]>
 
     const clusters: HotCluster[] = Array.from(grouped.entries()).map(([eventType, items]) => {
       const latest = items[0] || {};
-      const details = (latest.details && typeof latest.details === "object" && !Array.isArray(latest.details))
+      const details = (
+        latest.details
+        && typeof latest.details === "object"
+        && !Array.isArray(latest.details)
+      )
         ? latest.details as Record<string, unknown>
         : {};
-      const title = String(
-        details.title_zh || details.title || details.summary_zh || latest.summary || `${eventType} 事件簇`
-      ).trim();
+      const titleZh = String(details.title_zh || details.summary_zh || "").trim();
+      const summaryLatest = String(latest.summary || "").trim();
+      const title = titleZh
+        || (hasChinese(summaryLatest) ? summaryLatest : `${toZhClusterCategory(eventType)}事件簇`);
       const summary = items
         .slice(0, 3)
         .map((item) => {
@@ -949,15 +971,23 @@ async function queryV2HotClusters(client: SupabaseClient): Promise<HotCluster[]>
             && typeof item.details === "object"
             && !Array.isArray(item.details)
           ) ? item.details as Record<string, unknown> : {};
-          return String(itemDetails.summary_zh || item.summary || "").trim();
+          const summaryZh = String(itemDetails.summary_zh || "").trim();
+          if (summaryZh) {
+            return summaryZh;
+          }
+          const summaryRaw = String(item.summary || "").trim();
+          if (hasChinese(summaryRaw)) {
+            return summaryRaw;
+          }
+          return "翻译处理中";
         })
         .filter((item) => item.length > 0)
         .join("；");
 
       return {
         id: Number(latest.id || 0),
-        category: eventType,
-        primary_title: title || `${eventType} 事件簇`,
+        category: toZhClusterCategory(eventType),
+        primary_title: title || `${toZhClusterCategory(eventType)}事件簇`,
         summary: summary || "暂无摘要",
         article_count: items.length,
         created_at: toIsoString(latest.as_of)

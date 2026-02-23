@@ -152,6 +152,14 @@ class StockV2TranslationBackfill:
             return title_src[:180], summary_src[:220]
 
         client = self._get_llm_client()
+        try:
+            title_fast = _normalize_text(client.translate_text(title_src, use_cache=True), 180)
+            summary_fast = _normalize_text(client.translate_text(summary_src, use_cache=True), 220)
+            if _contains_chinese(title_fast) and _contains_chinese(summary_fast):
+                return title_fast, summary_fast
+        except Exception as e:
+            logger.warning(f"[STOCK_V2_TRANSLATE_FAST_FALLBACK] error={str(e)[:120]}")
+
         prompt = (
             "你是财经新闻翻译助手。请把下面英文内容翻译成自然流畅的中文，"
             "只输出 JSON：{\"title_zh\":\"<=40字\",\"summary_zh\":\"<=80字\"}。\n"
