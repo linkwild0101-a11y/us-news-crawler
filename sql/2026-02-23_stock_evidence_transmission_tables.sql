@@ -2,12 +2,12 @@
 -- 日期: 2026-02-23
 
 CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS 66113
+RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = NOW();
     RETURN NEW;
 END;
-66113 language 'plpgsql';
+$$ language 'plpgsql';
 
 CREATE TABLE IF NOT EXISTS stock_evidence_v2 (
     id BIGSERIAL PRIMARY KEY,
