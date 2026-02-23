@@ -1,0 +1,65 @@
+{
+  "factors": [
+    {
+      "factor": "rates",
+      "label": "利率",
+      "keywords": [
+        "yield",
+        "10y",
+        "rates",
+        "fed",
+        "fomc",
+        "加息",
+        "降息",
+        "利率"
+      ]
+    },
+    {
+      "factor": "inflation",
+      "label": "通胀",
+      "keywords": [
+        "cpi",
+        "pce",
+        "inflation",
+        "通胀",
+        "物价"
+      ]
+    },
+    {
+      "factor": "oil",
+      "label": "油价",
+      "keywords": [
+        "oil",
+        "crude",
+        "wti",
+        "brent",
+        "原油",
+        "油价"
+      ]
+    },
+    {
+      "factor": "fx",
+      "label": "美元汇率",
+      "keywords": [
+        "dxy",
+        "usd",
+        "dollar",
+        "汇率",
+        "美元"
+      ]
+    },
+    {
+      "factor": "policy",
+      "label": "政策监管",
+      "keywords": [
+        "policy",
+        "regulation",
+        "antitrust",
+        "tariff",
+        "监管",
+        "制裁",
+        "关税"
+      ]
+    }
+  ]
+}

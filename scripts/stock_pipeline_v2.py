@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import logging
 import os
 import re
@@ -13,6 +14,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
+from urllib.parse import urlparse
 
 from supabase import Client, create_client
 
@@ -126,6 +128,62 @@ EVENT_RULES: Sequence[Tuple[str, Sequence[str], int]] = (
     ("sector", ("半导体", "semiconductor", "ai", "cloud"), 96),
 )
 
+TICKER_TO_INDUSTRY: Dict[str, str] = {
+    "SPY": "Index",
+    "QQQ": "Index",
+    "DIA": "Index",
+    "IWM": "Index",
+    "VTI": "Index",
+    "VOO": "Index",
+    "XLF": "Financials",
+    "XLK": "Technology",
+    "XLE": "Energy",
+    "XLV": "Healthcare",
+    "XLI": "Industrials",
+    "XLP": "Consumer Staples",
+    "XLY": "Consumer Discretionary",
+    "XLU": "Utilities",
+    "XLRE": "Real Estate",
+    "SMH": "Semiconductors",
+    "SOXX": "Semiconductors",
+    "TLT": "Rates",
+    "AAPL": "Technology",
+    "MSFT": "Technology",
+    "NVDA": "Semiconductors",
+    "AMZN": "Consumer Discretionary",
+    "GOOGL": "Technology",
+    "META": "Technology",
+    "TSLA": "Automotive",
+}
+
+DEFAULT_MACRO_FACTORS: List[Dict[str, Any]] = [
+    {
+        "factor": "rates",
+        "label": "利率",
+        "keywords": ["yield", "10y", "rates", "加息", "降息", "fomc", "fed"],
+    },
+    {
+        "factor": "inflation",
+        "label": "通胀",
+        "keywords": ["cpi", "pce", "inflation", "通胀", "物价"],
+    },
+    {
+        "factor": "oil",
+        "label": "油价",
+        "keywords": ["oil", "crude", "wti", "brent", "原油", "油价"],
+    },
+    {
+        "factor": "fx",
+        "label": "美元汇率",
+        "keywords": ["dxy", "dollar", "usd", "汇率", "美元"],
+    },
+    {
+        "factor": "policy",
+        "label": "政策监管",
+        "keywords": ["policy", "regulation", "监管", "制裁", "antitrust", "tariff", "关税"],
+    },
+]
+
 
 def _now_utc() -> datetime:
     return datetime.now(timezone.utc)
@@ -172,6 +230,7 @@ class StockPipelineV2:
         self.enable_llm = enable_llm
         self.llm_client = self._init_llm_client(enable_llm)
         self.llm_workers = max(1, llm_workers)
+        self.macro_factors = self._load_macro_factor_config()
         self.flags = FeatureFlags.from_env()
         self.stats: Dict[str, int] = defaultdict(int)
         logger.info(
@@ -312,6 +371,47 @@ class StockPipelineV2:
         except Exception as e:
             logger.warning(f"[V2_LLM_DISABLED] LLM 初始化失败: {str(e)[:160]}")
             return None
+
+    def _load_macro_factor_config(self) -> List[Dict[str, Any]]:
+        """加载宏观因子词典配置，缺失时回退默认值。"""
+        config_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "config",
+            "macro_factor_dictionary.json",
+        )
+        try:
+            if os.path.exists(config_path):
+                with open(config_path, "r", encoding="utf-8") as fp:
+                    payload = json.load(fp)
+                rows = payload.get("factors") if isinstance(payload, dict) else payload
+                if isinstance(rows, list) and rows:
+                    normalized: List[Dict[str, Any]] = []
+                    for row in rows:
+                        if not isinstance(row, dict):
+                            continue
+                        factor = str(row.get("factor") or "").strip().lower()
+                        label = str(row.get("label") or factor).strip()
+                        keywords = [
+                            str(item or "").strip().lower()
+                            for item in (row.get("keywords") or [])
+                            if str(item or "").strip()
+                        ]
+                        if factor and keywords:
+                            normalized.append(
+                                {
+                                    "factor": factor,
+                                    "label": label,
+                                    "keywords": keywords,
+                                }
+                            )
+                    if normalized:
+                        logger.info(
+                            f"[V2_MACRO_DICT_LOADED] path={config_path} factors={len(normalized)}"
+                        )
+                        return normalized
+        except Exception as e:
+            logger.warning(f"[V2_MACRO_DICT_FALLBACK] error={str(e)[:120]}")
+        return [dict(item) for item in DEFAULT_MACRO_FACTORS]
 
     def _extract_tickers(self, text: str) -> Set[str]:
         found: Set[str] = set()
@@ -639,6 +739,257 @@ class StockPipelineV2:
             )
         return bundle
 
+    def _to_int_list(self, value: Any, limit: int = 20) -> List[int]:
+        """将任意数组值转换为 int 列表。"""
+        if not isinstance(value, list):
+            return []
+        nums: List[int] = []
+        for item in value:
+            try:
+                number = int(item)
+            except Exception:
+                continue
+            if number > 0:
+                nums.append(number)
+            if len(nums) >= limit:
+                break
+        return nums
+
+    def _extract_numeric_facts(self, text: str) -> List[Dict[str, Any]]:
+        """从证据句段抽取数字事实，便于前端快速复核。"""
+        if not text:
+            return []
+
+        facts: List[Dict[str, Any]] = []
+        patterns = [
+            ("percent", re.compile(r"(-?\d+(?:\.\d+)?)\s*%")),
+            ("bps", re.compile(r"(-?\d+(?:\.\d+)?)\s*bps", re.IGNORECASE)),
+            (
+                "usd",
+                re.compile(
+                    r"(\$\s*\d+(?:\.\d+)?(?:\s*(?:bn|billion|m|million|trillion|t))?)",
+                    re.IGNORECASE,
+                ),
+            ),
+            ("number", re.compile(r"\b(-?\d+(?:\.\d+)?)\b")),
+        ]
+        for fact_type, pattern in patterns:
+            for match in pattern.finditer(text):
+                raw = match.group(0).strip()
+                if not raw:
+                    continue
+                value = _safe_float(match.group(1), 0.0)
+                facts.append(
+                    {
+                        "type": fact_type,
+                        "raw": raw[:32],
+                        "value": round(value, 4),
+                    }
+                )
+                if len(facts) >= 5:
+                    return facts
+        return facts
+
+    def _source_name_from_ref(self, source_ref: str, source_type: str) -> str:
+        """将 source_ref 归一化为可读来源名。"""
+        text = str(source_ref or "").strip()
+        if text.startswith("http://") or text.startswith("https://"):
+            host = (urlparse(text).hostname or "").strip().lower()
+            if host.startswith("www."):
+                host = host[4:]
+            return host or "news"
+        source_type_norm = str(source_type or "").strip().lower()
+        if source_type_norm == "x_grok":
+            return "x.com"
+        return source_type_norm or "news"
+
+    def _build_ai_debate_view(
+        self,
+        opportunity: Dict[str, Any],
+        regime: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """构建机会的正反观点与不确定性摘要。"""
+        side = str(opportunity.get("side") or "LONG").upper()
+        ticker = str(opportunity.get("ticker") or "")
+        source_mix = opportunity.get("source_mix")
+        mix = source_mix if isinstance(source_mix, dict) else {}
+        x_ratio = _clamp(_safe_float(mix.get("x_ratio"), 0.0), 0.0, 1.0)
+        source_total = max(0, int(_safe_float(mix.get("source_total"), 0.0)))
+        confidence = _clamp(_safe_float(opportunity.get("confidence"), 0.0), 0.0, 1.0)
+        regime_state = str(regime.get("risk_state") or "neutral")
+
+        pro_case = (
+            f"{ticker} 当前方向为 {side}，主信号分与催化共振支持该判断。"
+            f" 市场状态为 {regime_state}。"
+        )
+        if side == "LONG":
+            counter_case = "若利率与美元同步走强，成长估值可能承压，机会兑现难度上升。"
+        else:
+            counter_case = "若流动性边际转松且风险偏好回升，空头逻辑可能快速失效。"
+
+        uncertainties: List[str] = []
+        if source_total <= 1:
+            uncertainties.append("单源证据占比高，需补充交叉来源确认。")
+        if x_ratio >= 0.7:
+            uncertainties.append("X 信源占比偏高，短期情绪噪声可能放大波动。")
+        if confidence < 0.55:
+            uncertainties.append("模型置信度偏低，建议降低仓位并等待新增证据。")
+        if regime_state == "neutral":
+            uncertainties.append("宏观状态中性，方向延续性不确定。")
+        if not uncertainties:
+            uncertainties.append("需持续跟踪财报、政策与流动性变化。")
+
+        pre_trade_checks = [
+            "核对原文关键数字是否与二次传播一致。",
+            "确认近24小时是否出现反向催化新闻。",
+            "检查同板块 ETF 与龙头个股是否共振。",
+        ]
+        return {
+            "pro_case": pro_case[:220],
+            "counter_case": counter_case[:220],
+            "uncertainties": uncertainties[:4],
+            "pre_trade_checks": pre_trade_checks[:3],
+        }
+
+    def _build_evidence_rows(
+        self,
+        opportunities: List[Dict[str, Any]],
+        events_by_ticker: Dict[str, List[Dict[str, Any]]],
+        run_id: str,
+        now: datetime,
+    ) -> List[Dict[str, Any]]:
+        """根据机会关联事件生成关键证据段落。"""
+        rows: List[Dict[str, Any]] = []
+        now_iso = now.isoformat()
+        for opp in opportunities:
+            opp_id = int(opp.get("id") or 0)
+            if opp_id <= 0:
+                continue
+            ticker = str(opp.get("ticker") or "").upper()
+            event_rows = events_by_ticker.get(ticker) or []
+            if not event_rows:
+                continue
+
+            event_ids = set(self._to_int_list(opp.get("source_event_ids"), limit=12))
+            selected = [
+                row for row in event_rows
+                if int(row.get("event_id") or 0) in event_ids
+            ][:8]
+            if not selected:
+                selected = event_rows[:5]
+
+            for row in selected:
+                summary = str(row.get("summary") or "").strip()
+                if not summary:
+                    continue
+                event_id = int(row.get("event_id") or 0)
+                source_ref = str(row.get("source_ref") or "").strip()
+                source_type = str(row.get("source_type") or "article").strip().lower()
+                source_url = source_ref if source_ref.startswith("http") else ""
+                snippet_hash = _hash_text(f"{opp_id}:{event_id}:{summary}")
+                rows.append(
+                    {
+                        "opportunity_id": opp_id,
+                        "ticker": ticker,
+                        "source_type": source_type or "article",
+                        "source_ref": source_ref[:128],
+                        "source_url": source_url[:512],
+                        "source_name": self._source_name_from_ref(source_ref, source_type)[:128],
+                        "published_at": _to_iso(row.get("published_at"), fallback=now_iso),
+                        "quote_snippet": summary[:560],
+                        "numeric_facts": self._extract_numeric_facts(summary),
+                        "entity_tags": [ticker],
+                        "confidence": round(
+                            _clamp(
+                                _safe_float(row.get("map_confidence"), 0.5) * 0.55
+                                + _safe_float(row.get("strength"), 0.45) * 0.45,
+                                0.35,
+                                0.95,
+                            ),
+                            4,
+                        ),
+                        "snippet_hash": snippet_hash,
+                        "as_of": now_iso,
+                        "run_id": run_id,
+                        "is_active": True,
+                    }
+                )
+        return rows
+
+    def _build_transmission_rows(
+        self,
+        opportunities: List[Dict[str, Any]],
+        events_by_ticker: Dict[str, List[Dict[str, Any]]],
+        evidence_ids_by_opp: Dict[int, List[int]],
+        run_id: str,
+        now: datetime,
+    ) -> List[Dict[str, Any]]:
+        """基于宏观词典构建宏观→行业→个股传导链。"""
+        rows: List[Dict[str, Any]] = []
+        now_iso = now.isoformat()
+        for opp in opportunities:
+            opp_id = int(opp.get("id") or 0)
+            if opp_id <= 0:
+                continue
+            ticker = str(opp.get("ticker") or "").upper()
+            if not ticker:
+                continue
+            side = str(opp.get("side") or "LONG").upper()
+            industry = TICKER_TO_INDUSTRY.get(ticker, "Unknown")
+            summaries = [
+                str(row.get("summary") or "").strip()
+                for row in (events_by_ticker.get(ticker) or [])[:16]
+                if str(row.get("summary") or "").strip()
+            ]
+            merged_text = " ".join(summaries).lower()
+            if not merged_text:
+                continue
+
+            factor_hits: List[Tuple[float, Dict[str, Any]]] = []
+            for factor in self.macro_factors:
+                keywords = factor.get("keywords") or []
+                hit_count = 0
+                for word in keywords:
+                    token = str(word or "").strip().lower()
+                    if token and token in merged_text:
+                        hit_count += 1
+                if hit_count <= 0:
+                    continue
+                factor_hits.append((float(hit_count), factor))
+
+            if not factor_hits:
+                continue
+            factor_hits.sort(key=lambda item: item[0], reverse=True)
+            opp_evidence_ids = evidence_ids_by_opp.get(opp_id) or []
+            for weight, factor in factor_hits[:3]:
+                factor_label = str(factor.get("label") or factor.get("factor") or "").strip()
+                factor_key = str(factor.get("factor") or factor_label).strip().lower() or "macro"
+                strength = _clamp(
+                    0.4 + min(4.0, weight) * 0.12 + _safe_float(opp.get("confidence"), 0.5) * 0.1,
+                    0.35,
+                    0.95,
+                )
+                rows.append(
+                    {
+                        "opportunity_id": opp_id,
+                        "path_key": f"{run_id}:{opp_id}:{factor_key}",
+                        "ticker": ticker,
+                        "macro_factor": factor_label[:64] or factor_key[:64],
+                        "industry": industry[:64],
+                        "direction": side if side in ("LONG", "SHORT") else "NEUTRAL",
+                        "strength": round(strength, 4),
+                        "reason": (
+                            f"{factor_label} 相关事件触发 {industry} 板块传导，"
+                            f"{ticker} 在当前窗口呈现 {side} 倾向。"
+                        )[:260],
+                        "evidence_ids": opp_evidence_ids[:8],
+                        "as_of": now_iso,
+                        "run_id": run_id,
+                        "is_active": True,
+                    }
+                )
+        return rows
+
     def _build_signals(
         self,
         event_bundle: List[Dict[str, Any]],
@@ -928,6 +1279,21 @@ class StockPipelineV2:
                     f"共振 {int(round(resonance_score * 100))}，"
                     f"质量 {int(round(x_quality))}。"
                 )
+            debate_view = self._build_ai_debate_view(
+                opportunity={
+                    "ticker": signal.get("ticker"),
+                    "side": side,
+                    "confidence": opp_conf,
+                    "source_mix": source_mix,
+                },
+                regime=regime,
+            )
+            counter_view = str(debate_view.get("counter_case") or "")
+            uncertainty_flags = [
+                str(item or "").strip()
+                for item in (debate_view.get("uncertainties") or [])
+                if str(item or "").strip()
+            ]
 
             rows.append(
                 {
@@ -948,6 +1314,8 @@ class StockPipelineV2:
                     "source_signal_ids": [],
                     "source_event_ids": signal.get("source_event_ids") or [],
                     "source_mix": source_mix,
+                    "counter_view": counter_view[:260],
+                    "uncertainty_flags": uncertainty_flags[:4],
                     "expires_at": expiry.isoformat(),
                     "as_of": now.isoformat(),
                     "run_id": run_id,
@@ -957,23 +1325,136 @@ class StockPipelineV2:
         rows.sort(key=lambda row: float(row.get("opportunity_score", 0.0)), reverse=True)
         return rows[:80]
 
-    def _replace_active(self, table_name: str, rows: List[Dict[str, Any]]) -> int:
+    def _replace_active(
+        self,
+        table_name: str,
+        rows: List[Dict[str, Any]],
+        clear_when_empty: bool = False,
+    ) -> int:
         if not rows:
+            if clear_when_empty:
+                self.supabase.table(table_name).update({"is_active": False}).eq("is_active", True).execute()
             return 0
         self.supabase.table(table_name).update({"is_active": False}).eq("is_active", True).execute()
         try:
             self.supabase.table(table_name).insert(rows).execute()
         except Exception as e:
-            if "source_mix" in str(e):
-                fallback_rows = [
-                    {key: value for key, value in row.items() if key != "source_mix"}
-                    for row in rows
-                ]
-                self.supabase.table(table_name).insert(fallback_rows).execute()
-                logger.warning(f"[V2_SOURCE_MIX_COLUMN_MISSING] table={table_name}")
-            else:
+            error_text = str(e).lower()
+            optional_columns = [
+                "source_mix",
+                "counter_view",
+                "uncertainty_flags",
+                "evidence_ids",
+                "path_ids",
+            ]
+            drop_cols = [col for col in optional_columns if col in error_text]
+            if not drop_cols:
                 raise
+            fallback_rows = [
+                {key: value for key, value in row.items() if key not in drop_cols}
+                for row in rows
+            ]
+            self.supabase.table(table_name).insert(fallback_rows).execute()
+            logger.warning(
+                f"[V2_OPTIONAL_COLUMN_MISSING] table={table_name} dropped={','.join(drop_cols)}"
+            )
         return len(rows)
+
+    def _safe_replace_optional_table(
+        self,
+        table_name: str,
+        rows: List[Dict[str, Any]],
+    ) -> int:
+        """写入可选表，若表未创建则告警降级。"""
+        try:
+            return self._replace_active(table_name, rows, clear_when_empty=True)
+        except Exception as e:
+            logger.warning(f"[V2_OPTIONAL_TABLE_FALLBACK] table={table_name} error={str(e)[:160]}")
+            return 0
+
+    def _load_active_opportunities_by_run(self, run_id: str) -> List[Dict[str, Any]]:
+        """加载本轮机会行，用于证据/链路二次写入。"""
+        try:
+            rows = (
+                self.supabase.table("stock_opportunities_v2")
+                .select(
+                    "id,opportunity_key,ticker,side,confidence,source_event_ids,source_mix,as_of"
+                )
+                .eq("run_id", run_id)
+                .eq("is_active", True)
+                .order("opportunity_score", desc=True)
+                .limit(300)
+                .execute()
+                .data
+                or []
+            )
+            return rows
+        except Exception as e:
+            logger.warning(f"[V2_OPP_LOAD_FALLBACK] run_id={run_id} error={str(e)[:160]}")
+            return []
+
+    def _load_active_id_map(self, table_name: str, run_id: str) -> Dict[int, List[int]]:
+        """读取 run 内表数据并按 opportunity_id 聚合 ID。"""
+        try:
+            rows = (
+                self.supabase.table(table_name)
+                .select("id,opportunity_id")
+                .eq("run_id", run_id)
+                .eq("is_active", True)
+                .execute()
+                .data
+                or []
+            )
+        except Exception as e:
+            logger.warning(f"[V2_ID_MAP_FALLBACK] table={table_name} error={str(e)[:140]}")
+            return {}
+
+        grouped: Dict[int, List[int]] = defaultdict(list)
+        for row in rows:
+            opp_id = int(row.get("opportunity_id") or 0)
+            item_id = int(row.get("id") or 0)
+            if opp_id > 0 and item_id > 0:
+                grouped[opp_id].append(item_id)
+        return dict(grouped)
+
+    def _patch_opportunity_enrichment(
+        self,
+        opportunities: List[Dict[str, Any]],
+        evidence_ids_by_opp: Dict[int, List[int]],
+        path_ids_by_opp: Dict[int, List[int]],
+        regime: Dict[str, Any],
+    ) -> int:
+        """回写机会证据与反方观点字段。"""
+        updated = 0
+        for opp in opportunities:
+            opp_id = int(opp.get("id") or 0)
+            if opp_id <= 0:
+                continue
+            debate_view = self._build_ai_debate_view(opp, regime)
+            payload: Dict[str, Any] = {
+                "counter_view": str(debate_view.get("counter_case") or "")[:260],
+                "uncertainty_flags": [
+                    str(item or "").strip()
+                    for item in (debate_view.get("uncertainties") or [])
+                    if str(item or "").strip()
+                ][:4],
+                "evidence_ids": (evidence_ids_by_opp.get(opp_id) or [])[:24],
+                "path_ids": (path_ids_by_opp.get(opp_id) or [])[:12],
+            }
+            try:
+                (
+                    self.supabase.table("stock_opportunities_v2")
+                    .update(payload)
+                    .eq("id", opp_id)
+                    .execute()
+                )
+                updated += 1
+            except Exception as e:
+                logger.warning(
+                    f"[V2_OPP_ENRICH_FALLBACK] opp_id={opp_id} error={str(e)[:160]}"
+                )
+                break
+        return updated
 
     def _build_snapshot(
         self,
@@ -1088,7 +1569,7 @@ class StockPipelineV2:
                 x_context=x_context,
             )
             self._replace_active("stock_dashboard_snapshot_v2", [snapshot])
-            return {"signals": 0, "opportunities": 0, "snapshot": 1}
+            return {"signals": 0, "opportunities": 0, "snapshot": 1, "evidence": 0, "paths": 0}
 
         signal_count = self._replace_active("stock_signals_v2", signal_rows)
         opp_rows = self._build_opportunities(
@@ -1099,6 +1580,64 @@ class StockPipelineV2:
             x_context=x_context,
         )
         opp_count = self._replace_active("stock_opportunities_v2", opp_rows)
+
+        evidence_count = 0
+        path_count = 0
+        enriched_opp_count = 0
+        if self.flags.enable_stock_evidence_layer or self.flags.enable_stock_transmission_layer:
+            active_opps = self._load_active_opportunities_by_run(run_id=run_id)
+            events_by_ticker: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+            for row in bundle:
+                ticker = str(row.get("ticker") or "").upper()
+                if ticker:
+                    events_by_ticker[ticker].append(row)
+
+            evidence_ids_by_opp: Dict[int, List[int]] = {}
+            if self.flags.enable_stock_evidence_layer:
+                evidence_rows = self._build_evidence_rows(
+                    opportunities=active_opps,
+                    events_by_ticker=events_by_ticker,
+                    run_id=run_id,
+                    now=now,
+                )
+                evidence_count = self._safe_replace_optional_table("stock_evidence_v2", evidence_rows)
+                evidence_ids_by_opp = self._load_active_id_map("stock_evidence_v2", run_id=run_id)
+
+            path_ids_by_opp: Dict[int, List[int]] = {}
+            if self.flags.enable_stock_transmission_layer:
+                path_rows = self._build_transmission_rows(
+                    opportunities=active_opps,
+                    events_by_ticker=events_by_ticker,
+                    evidence_ids_by_opp=evidence_ids_by_opp,
+                    run_id=run_id,
+                    now=now,
+                )
+                path_count = self._safe_replace_optional_table(
+                    "stock_transmission_paths_v2",
+                    path_rows,
+                )
+                path_ids_by_opp = self._load_active_id_map(
+                    "stock_transmission_paths_v2",
+                    run_id=run_id,
+                )
+
+            if (
+                self.flags.enable_stock_ai_debate_view
+                or self.flags.enable_stock_evidence_layer
+                or self.flags.enable_stock_transmission_layer
+            ):
+                enriched_opp_count = self._patch_opportunity_enrichment(
+                    opportunities=active_opps,
+                    evidence_ids_by_opp=evidence_ids_by_opp,
+                    path_ids_by_opp=path_ids_by_opp,
+                    regime=regime,
+                )
+                if enriched_opp_count > 0:
+                    logger.info(
+                        f"[V2_OPP_ENRICHED] count={enriched_opp_count} "
+                        f"evidence_rows={evidence_count} path_rows={path_count}"
+                    )
+
         snapshot = self._build_snapshot(
             opp_rows,
             signal_rows,
@@ -1108,7 +1647,13 @@ class StockPipelineV2:
             x_context=x_context,
         )
         snap_count = self._replace_active("stock_dashboard_snapshot_v2", [snapshot])
-        return {"signals": signal_count, "opportunities": opp_count, "snapshot": snap_count}
+        return {
+            "signals": signal_count,
+            "opportunities": opp_count,
+            "snapshot": snap_count,
+            "evidence": evidence_count,
+            "paths": path_count,
+        }
 
     def run_incremental(
         self,
@@ -1187,7 +1732,8 @@ class StockPipelineV2:
                 f"articles_seen={self.stats['articles_seen']} "
                 f"stock_articles={self.stats['articles_stock_related']} "
                 f"events={event_count} mappings={mapping_count} "
-                f"signals={serve_stats['signals']} opps={serve_stats['opportunities']}"
+                f"signals={serve_stats['signals']} opps={serve_stats['opportunities']} "
+                f"evidence={serve_stats.get('evidence', 0)} paths={serve_stats.get('paths', 0)}"
             )
             metrics = {
                 "run_id": run_id,
@@ -1197,6 +1743,8 @@ class StockPipelineV2:
                 "mappings_upserted": mapping_count,
                 "signals_written": serve_stats["signals"],
                 "opportunities_written": serve_stats["opportunities"],
+                "evidence_rows_written": serve_stats.get("evidence", 0),
+                "transmission_paths_written": serve_stats.get("paths", 0),
             }
             self._v3_log_run_finish(
                 run_id=run_id,
@@ -1294,7 +1842,8 @@ class StockPipelineV2:
                 "[STOCK_V2_BACKFILL_DONE] "
                 f"processed={processed} stock_articles={self.stats['articles_stock_related']} "
                 f"events={total_events} signals={serve_stats['signals']} "
-                f"opps={serve_stats['opportunities']}"
+                f"opps={serve_stats['opportunities']} "
+                f"evidence={serve_stats.get('evidence', 0)} paths={serve_stats.get('paths', 0)}"
             )
             metrics = {
                 "run_id": run_id,
@@ -1304,6 +1853,8 @@ class StockPipelineV2:
                 "mappings_upserted": total_mappings,
                 "signals_written": serve_stats["signals"],
                 "opportunities_written": serve_stats["opportunities"],
+                "evidence_rows_written": serve_stats.get("evidence", 0),
+                "transmission_paths_written": serve_stats.get("paths", 0),
             }
             self._v3_log_run_finish(
                 run_id=run_id,
