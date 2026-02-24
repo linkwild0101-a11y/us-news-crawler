@@ -1,0 +1,228 @@
+{
+  "moved": [
+    {
+      "from": "web",
+      "to": "archive/legacy_intel/web"
+    },
+    {
+      "from": "scripts/.DS_Store",
+      "to": "archive/legacy_intel/scripts/.DS_Store"
+    },
+    {
+      "from": "scripts/analyzer.py",
+      "to": "archive/legacy_intel/scripts/analyzer.py"
+    },
+    {
+      "from": "scripts/cleaner.py",
+      "to": "archive/legacy_intel/scripts/cleaner.py"
+    },
+    {
+      "from": "scripts/clustering.py",
+      "to": "archive/legacy_intel/scripts/clustering.py"
+    },
+    {
+      "from": "scripts/compare_reports.py",
+      "to": "archive/legacy_intel/scripts/compare_reports.py"
+    },
+    {
+      "from": "scripts/create_tables.py",
+      "to": "archive/legacy_intel/scripts/create_tables.py"
+    },
+    {
+      "from": "scripts/datasources",
+      "to": "archive/legacy_intel/scripts/datasources"
+    },
+    {
+      "from": "scripts/dedup.py",
+      "to": "archive/legacy_intel/scripts/dedup.py"
+    },
+    {
+      "from": "scripts/enhanced_analyzer.py",
+      "to": "archive/legacy_intel/scripts/enhanced_analyzer.py"
+    },
+    {
+      "from": "scripts/entity_classification.py",
+      "to": "archive/legacy_intel/scripts/entity_classification.py"
+    },
+    {
+      "from": "scripts/entity_relation_worker.py",
+      "to": "archive/legacy_intel/scripts/entity_relation_worker.py"
+    },
+    {
+      "from": "scripts/export_independent_signal_sources.py",
+      "to": "archive/legacy_intel/scripts/export_independent_signal_sources.py"
+    },
+    {
+      "from": "scripts/extract_sources.py",
+      "to": "archive/legacy_intel/scripts/extract_sources.py"
+    },
+    {
+      "from": "scripts/extract_worldmonitor_sources.py",
+      "to": "archive/legacy_intel/scripts/extract_worldmonitor_sources.py"
+    },
+    {
+      "from": "scripts/full_pipeline_test.py",
+      "to": "archive/legacy_intel/scripts/full_pipeline_test.py"
+    },
+    {
+      "from": "scripts/import_sources.py",
+      "to": "archive/legacy_intel/scripts/import_sources.py"
+    },
+    {
+      "from": "scripts/import_worldmonitor_recommended.py",
+      "to": "archive/legacy_intel/scripts/import_worldmonitor_recommended.py"
+    },
+    {
+      "from": "scripts/merge_worldmonitor_sources.py",
+      "to": "archive/legacy_intel/scripts/merge_worldmonitor_sources.py"
+    },
+    {
+      "from": "scripts/notifier.py",
+      "to": "archive/legacy_intel/scripts/notifier.py"
+    },
+    {
+      "from": "scripts/refresh_opportunities.py",
+      "to": "archive/legacy_intel/scripts/refresh_opportunities.py"
+    },
+    {
+      "from": "scripts/reset_analysis.py",
+      "to": "archive/legacy_intel/scripts/reset_analysis.py"
+    },
+    {
+      "from": "scripts/signal_detector.py",
+      "to": "archive/legacy_intel/scripts/signal_detector.py"
+    },
+    {
+      "from": "scripts/signal_explainer.py",
+      "to": "archive/legacy_intel/scripts/signal_explainer.py"
+    },
+    {
+      "from": "scripts/test_crawler.py",
+      "to": "archive/legacy_intel/scripts/test_crawler.py"
+    },
+    {
+      "from": "scripts/test_system.py",
+      "to": "archive/legacy_intel/scripts/test_system.py"
+    },
+    {
+      "from": "scripts/text_normalizer.py",
+      "to": "archive/legacy_intel/scripts/text_normalizer.py"
+    },
+    {
+      "from": "scripts/validate_rss.py",
+      "to": "archive/legacy_intel/scripts/validate_rss.py"
+    },
+    {
+      "from": ".github/workflows/deploy-worker.yml",
+      "to": "archive/legacy_intel/workflows/deploy-worker.yml"
+    },
+    {
+      "from": ".github/workflows/test.yml",
+      "to": "archive/legacy_intel/workflows/test.yml"
+    },
+    {
+      "from": ".github/workflows/validate.yml",
+      "to": "archive/legacy_intel/workflows/validate.yml"
+    },
+    {
+      "from": "actions_rss_validation",
+      "to": "archive/legacy_intel/root/actions_rss_validation"
+    },
+    {
+      "from": "railway-rss-proxy",
+      "to": "archive/legacy_intel/root/railway-rss-proxy"
+    },
+    {
+      "from": "railway-rss-proxy.zip",
+      "to": "archive/legacy_intel/root/railway-rss-proxy.zip"
+    },
+    {
+      "from": "worldmonitor",
+      "to": "archive/legacy_intel/root/worldmonitor"
+    },
+    {
+      "from": "workers",
+      "to": "archive/legacy_intel/root/workers"
+    },
+    {
+      "from": "military_news_validation_report.md",
+      "to": "archive/legacy_intel/root/military_news_validation_report.md"
+    },
+    {
+      "from": "military_subreddits_100plus.md",
+      "to": "archive/legacy_intel/root/military_subreddits_100plus.md"
+    },
+    {
+      "from": "rss_rediscovery_updates_search.csv",
+      "to": "archive/legacy_intel/root/rss_rediscovery_updates_search.csv"
+    },
+    {
+      "from": "rss_validation_report_20260216_172354.json",
+      "to": "archive/legacy_intel/root/rss_validation_report_20260216_172354.json"
+    },
+    {
+      "from": "rss_validation_report_20260216_172355.csv",
+      "to": "archive/legacy_intel/root/rss_validation_report_20260216_172355.csv"
+    },
+    {
+      "from": "url_validation_report.md",
+      "to": "archive/legacy_intel/root/url_validation_report.md"
+    },
+    {
+      "from": "us_economy_finance_sources_151.md",
+      "to": "archive/legacy_intel/root/us_economy_finance_sources_151.md"
+    },
+    {
+      "from": "us_economy_finance_subreddits.md",
+      "to": "archive/legacy_intel/root/us_economy_finance_subreddits.md"
+    },
+    {
+      "from": "us_economy_finance_twitter_accounts.md",
+      "to": "archive/legacy_intel/root/us_economy_finance_twitter_accounts.md"
+    },
+    {
+      "from": "us_finance_facebook_pages_groups.md",
+      "to": "archive/legacy_intel/root/us_finance_facebook_pages_groups.md"
+    },
+    {
+      "from": "us_military_facebook_pages_100plus.md",
+      "to": "archive/legacy_intel/root/us_military_facebook_pages_100plus.md"
+    },
+    {
+      "from": "us_military_news_sources_214.csv",
+      "to": "archive/legacy_intel/root/us_military_news_sources_214.csv"
+    },
+    {
+      "from": "us_military_news_sources_214.md",
+      "to": "archive/legacy_intel/root/us_military_news_sources_214.md"
+    },
+    {
+      "from": "us_military_twitter_accounts.md",
+      "to": "archive/legacy_intel/root/us_military_twitter_accounts.md"
+    },
+    {
+      "from": "us_politics_facebook_pages.md",
+      "to": "archive/legacy_intel/root/us_politics_facebook_pages.md"
+    },
+    {
+      "from": "us_politics_news_sources_100plus.txt",
+      "to": "archive/legacy_intel/root/us_politics_news_sources_100plus.txt"
+    },
+    {
+      "from": "us_politics_news_sources_validation_report.txt",
+      "to": "archive/legacy_intel/root/us_politics_news_sources_validation_report.txt"
+    },
+    {
+      "from": "us_politics_subreddits.md",
+      "to": "archive/legacy_intel/root/us_politics_subreddits.md"
+    },
+    {
+      "from": "us_politics_twitter_accounts.md",
+      "to": "archive/legacy_intel/root/us_politics_twitter_accounts.md"
+    },
+    {
+      "from": "完整社交媒体与新闻源收集报告.md",
+      "to": "archive/legacy_intel/root/完整社交媒体与新闻源收集报告.md"
+    }
+  ]
+}

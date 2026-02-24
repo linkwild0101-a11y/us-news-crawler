@@ -8,11 +8,6 @@ on:
       - completed
   workflow_dispatch:
     inputs:
-      legacy_fallback:
-        description: "Run legacy enhanced analyzer pipeline"
-        required: false
-        default: false
-        type: boolean
       enable_llm:
         description: "Enable LLM correction in Stock V2 pipeline"
         required: false
@@ -25,7 +20,7 @@ concurrency:
 
 jobs:
   stock-v2-analysis:
-    if: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || (github.event_name == 'workflow_dispatch' && inputs.legacy_fallback != true) }}
+    if: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 360
     env:
@@ -362,71 +357,3 @@ jobs:
           python -u scripts/stock_v3_notifier.py \
             --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
             --job-status "${{ job.status }}"
-
-  legacy-fallback-analysis:
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.legacy_fallback == true }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 360
-    env:
-      LLM_VERBOSE_LOGS: ${{ vars.LLM_VERBOSE_LOGS || 'false' }}
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-          cache: "pip"
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Validate LLM secrets
-        env:
-          DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
-          ALIBABA_API_KEY: ${{ secrets.ALIBABA_API_KEY }}
-        run: |
-          if [ -z "$DASHSCOPE_API_KEY" ] && [ -z "$ALIBABA_API_KEY" ]; then
-            echo "::error::Missing DASHSCOPE_API_KEY / ALIBABA_API_KEY. Legacy analyzer cannot run."
-            exit 1
-          fi
-
-      - name: Run legacy enhanced analyzer (manual fallback)
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          WORKER_URL: ${{ secrets.WORKER_URL }}
-          RAILWAY_URL: ${{ secrets.RAILWAY_URL }}
-          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
-          DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
-          ALIBABA_API_KEY: ${{ secrets.ALIBABA_API_KEY }}
-          PYTHONUNBUFFERED: "1"
-        run: |
-          python -u scripts/enhanced_analyzer.py \
-            --enrich-signals-after-run \
-            --enrich-hours 24 \
-            --enrich-limit 30 \
-            --enrich-workers 5
-
-      - name: Refresh legacy market digest
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          PYTHONUNBUFFERED: "1"
-        run: |
-          python -u scripts/refresh_market_digest.py \
-            --hours 24 \
-            --limit 500
-
-      - name: Refresh legacy opportunity engine
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          PYTHONUNBUFFERED: "1"
-        run: |
-          python -u scripts/refresh_opportunities.py \
-            --hours 48 \
-            --limit 800 \
-            --topn 40
