@@ -94,7 +94,7 @@ jobs:
           python -u scripts/stock_x_source_ingest.py \
             --mode ingest \
             --accounts-file config/us_stock_x_accounts.tsv \
-            --topn 30 \
+            --topn 44 \
             --post-limit 20 \
             --workers 6 \
             --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-x-supp"
@@ -111,7 +111,7 @@ jobs:
         run: |
           python -u scripts/stock_x_quality_governor.py \
             --lookback-days 7 \
-            --topn 30 \
+            --topn 44 \
             --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-x-quality"
 
       - name: Run Stock V2 incremental pipeline

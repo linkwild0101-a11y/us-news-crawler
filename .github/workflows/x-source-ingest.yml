@@ -17,7 +17,7 @@ on:
       topn:
         description: 'Active account count'
         required: false
-        default: '30'
+        default: '44'
         type: string
       post_limit:
         description: 'Posts per account'
@@ -54,7 +54,7 @@ jobs:
         id: run_params
         run: |
           mode="ingest"
-          topn="30"
+          topn="44"
           post_limit="20"
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             mode="${{ inputs.mode }}"
