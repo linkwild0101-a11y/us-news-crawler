@@ -23,14 +23,15 @@ import {
   TickerSignalDigest
 } from "@/lib/types";
 
-type DashboardTab = "opportunities" | "alerts" | "market" | "signals" | "evidence";
+type DashboardTab = "opportunities" | "alerts" | "market" | "signals" | "evidence" | "settings";
 
 const TABS: { id: DashboardTab; label: string; icon: string }[] = [
   { id: "opportunities", label: "机会", icon: "🎯" },
   { id: "alerts", label: "提醒", icon: "🔔" },
   { id: "market", label: "市场", icon: "📈" },
   { id: "signals", label: "信号", icon: "🚨" },
-  { id: "evidence", label: "证据", icon: "🧩" }
+  { id: "evidence", label: "证据", icon: "🧩" },
+  { id: "settings", label: "设置", icon: "⚙️" }
 ];
 
 function levelClass(level: RiskLevel): string {
@@ -808,6 +809,10 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
   const [feedbackStateMap, setFeedbackStateMap] = useState<
     Record<number, { label: "useful" | "noise" | null; submitting: boolean; error: string }>
   >({});
+  const [alertPrefs, setAlertPrefs] = useState(data.alertPrefs);
+  const [dailyCapInput, setDailyCapInput] = useState(String(data.alertPrefs.daily_alert_cap || 20));
+  const [prefsSaving, setPrefsSaving] = useState(false);
+  const [prefsMessage, setPrefsMessage] = useState("");
   const showV3ExplainBadge = readDashboardV3ExplainFlag();
   const enableEvidenceLayer = readEvidenceLayerFlag();
   const enableTransmissionLayer = readTransmissionLayerFlag();
@@ -907,6 +912,43 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
     }
   }
 
+  async function saveAlertPrefs(patch: {
+    enable_premarket?: boolean;
+    enable_postmarket?: boolean;
+    daily_alert_cap?: number;
+  }): Promise<void> {
+    const nextPrefs = {
+      ...alertPrefs,
+      ...patch
+    };
+
+    setPrefsSaving(true);
+    setPrefsMessage("");
+    try {
+      const response = await fetch("/api/alerts/prefs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: nextPrefs.user_id || "system",
+          enablePremarket: Boolean(nextPrefs.enable_premarket),
+          enablePostmarket: Boolean(nextPrefs.enable_postmarket),
+          dailyAlertCap: Math.max(1, Math.min(200, Number(nextPrefs.daily_alert_cap || 20)))
+        })
+      });
+      if (!response.ok) {
+        throw new Error("save_prefs_failed");
+      }
+      setAlertPrefs(nextPrefs);
+      setDailyCapInput(String(nextPrefs.daily_alert_cap));
+      setPrefsMessage("设置已保存");
+    } catch (error) {
+      console.warn("[FRONTEND_ALERT_PREFS_SAVE_FALLBACK]", error);
+      setPrefsMessage("保存失败，请稍后重试");
+    } finally {
+      setPrefsSaving(false);
+    }
+  }
+
   return (
     <div className="mx-auto min-h-screen max-w-6xl bg-bg px-4 pb-24 pt-4 text-textMain md:px-6 md:pb-10">
       <header className="mb-4 rounded-2xl border border-slate-700/80 bg-panel p-4">
@@ -964,7 +1006,7 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
         </div>
       </header>
 
-      <nav className="mb-4 hidden grid-cols-5 gap-2 md:grid">
+      <nav className="mb-4 hidden grid-cols-6 gap-2 md:grid">
         {TABS.map((tab) => (
           <button
             key={tab.id}
@@ -1308,7 +1350,87 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
         </section>
       )}
 
-      <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-5 gap-1 border-t border-slate-700/80 bg-panel/95 px-2 py-2 backdrop-blur md:hidden">
+      {activeTab === "settings" && (
+        <section className="space-y-4">
+          <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
+            <h2 className="mb-3 text-sm font-semibold">提醒时段开关</h2>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between rounded-lg border border-slate-700/80 bg-card/40 p-3">
+                <div>
+                  <p className="text-sm text-textMain">盘前提醒（04:00-09:30 ET）</p>
+                  <p className="text-xs text-textMuted">关闭后盘前不产生新的提醒</p>
+                </div>
+                <button
+                  type="button"
+                  disabled={prefsSaving}
+                  onClick={() => saveAlertPrefs({ enable_premarket: !alertPrefs.enable_premarket })}
+                  className={`rounded-md border px-2 py-1 text-xs ${
+                    alertPrefs.enable_premarket
+                      ? "border-emerald-300/60 bg-emerald-500/20 text-riskLow"
+                      : "border-slate-600 text-textMuted"
+                  }`}
+                >
+                  {alertPrefs.enable_premarket ? "已开启" : "已关闭"}
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between rounded-lg border border-slate-700/80 bg-card/40 p-3">
+                <div>
+                  <p className="text-sm text-textMain">盘后提醒（16:00-20:00 ET）</p>
+                  <p className="text-xs text-textMuted">关闭后盘后不产生新的提醒</p>
+                </div>
+                <button
+                  type="button"
+                  disabled={prefsSaving}
+                  onClick={() => saveAlertPrefs({ enable_postmarket: !alertPrefs.enable_postmarket })}
+                  className={`rounded-md border px-2 py-1 text-xs ${
+                    alertPrefs.enable_postmarket
+                      ? "border-emerald-300/60 bg-emerald-500/20 text-riskLow"
+                      : "border-slate-600 text-textMuted"
+                  }`}
+                >
+                  {alertPrefs.enable_postmarket ? "已开启" : "已关闭"}
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
+            <h2 className="mb-3 text-sm font-semibold">每日提醒上限</h2>
+            <div className="flex items-end gap-2">
+              <label className="flex-1">
+                <span className="mb-1 block text-xs text-textMuted">daily_alert_cap（1-200）</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={200}
+                  value={dailyCapInput}
+                  onChange={(event) => setDailyCapInput(event.target.value)}
+                  className="w-full rounded-md border border-slate-600 bg-card/60 px-3 py-2 text-sm text-textMain outline-none"
+                />
+              </label>
+              <button
+                type="button"
+                disabled={prefsSaving}
+                onClick={() => {
+                  const parsed = Number(dailyCapInput || 20);
+                  const nextCap = Math.max(1, Math.min(200, Number.isFinite(parsed) ? parsed : 20));
+                  void saveAlertPrefs({ daily_alert_cap: nextCap });
+                }}
+                className="rounded-md border border-cyan-400/40 bg-cyan-500/10 px-3 py-2 text-xs text-accent disabled:opacity-60"
+              >
+                保存
+              </button>
+            </div>
+            <p className="mt-2 text-xs text-textMuted">
+              当前值：{alertPrefs.daily_alert_cap}（超过上限后当日不再生成新提醒）
+            </p>
+            {prefsMessage && <p className="mt-2 text-xs text-textMuted">{prefsMessage}</p>}
+          </article>
+        </section>
+      )}
+
+      <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-6 gap-1 border-t border-slate-700/80 bg-panel/95 px-2 py-2 backdrop-blur md:hidden">
         {TABS.map((tab) => (
           <button
             key={tab.id}

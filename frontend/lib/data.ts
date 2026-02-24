@@ -4,6 +4,7 @@ import {
   AiDebateView,
   AlertCenterItem,
   AlertFeedbackLabel,
+  AlertUserPrefs,
   AlertStatus,
   AlertSide,
   DashboardData,
@@ -524,6 +525,56 @@ async function queryAlertCenter(client: SupabaseClient): Promise<AlertCenterItem
   } catch (error) {
     console.warn("[FRONTEND_ALERT_CENTER_FALLBACK]", error);
     return [];
+  }
+}
+
+async function queryAlertPrefs(client: SupabaseClient): Promise<AlertUserPrefs> {
+  const fallback: AlertUserPrefs = {
+    user_id: "system",
+    enable_premarket: false,
+    enable_postmarket: true,
+    daily_alert_cap: 20,
+    watch_tickers: [],
+    muted_signal_types: []
+  };
+
+  try {
+    const { data, error } = await client
+      .from("stock_alert_user_prefs_v1")
+      .select(
+        "user_id,enable_premarket,enable_postmarket,daily_alert_cap,watch_tickers,muted_signal_types"
+      )
+      .eq("is_active", true)
+      .eq("user_id", "system")
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error || !data) {
+      if (error) {
+        throw error;
+      }
+      return fallback;
+    }
+
+    return {
+      user_id: String(data.user_id || "system"),
+      enable_premarket: Boolean(data.enable_premarket),
+      enable_postmarket: Boolean(data.enable_postmarket),
+      daily_alert_cap: Math.max(1, Math.min(200, Number(data.daily_alert_cap || 20))),
+      watch_tickers: Array.isArray(data.watch_tickers)
+        ? data.watch_tickers
+          .map((item: unknown) => String(item || "").toUpperCase().trim())
+          .filter((item: string) => item.length > 0)
+        : [],
+      muted_signal_types: Array.isArray(data.muted_signal_types)
+        ? data.muted_signal_types
+          .map((item: unknown) => String(item || "").toLowerCase().trim())
+          .filter((item: string) => item.length > 0)
+        : []
+    };
+  } catch (error) {
+    console.warn("[FRONTEND_ALERT_PREFS_FALLBACK]", error);
+    return fallback;
   }
 }
 
@@ -1721,13 +1772,14 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
   const transmissionEnabled = readTransmissionLayerFlag();
   const aiDebateEnabled = readAiDebateViewFlag();
 
-  const [sentinelSignals, rawOpportunities, marketRegime, v2Snapshot, indirectImpacts, alerts] = await Promise.all([
+  const [sentinelSignals, rawOpportunities, marketRegime, v2Snapshot, indirectImpacts, alerts, alertPrefs] = await Promise.all([
     queryV2Signals(client),
     queryV2Opportunities(client),
     queryV2Regime(client),
     queryV2Snapshot(client),
     queryV2IndirectImpacts(client),
-    queryAlertCenter(client)
+    queryAlertCenter(client),
+    queryAlertPrefs(client)
   ]);
 
   if (!v2Snapshot && sentinelSignals.length === 0 && rawOpportunities.length === 0) {
@@ -1815,6 +1867,7 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
   return {
     opportunities,
     alerts,
+    alertPrefs,
     marketRegime,
     marketSnapshot,
     dataQuality: buildDataQualitySnapshot(dataUpdatedAt, sourceHealth),
@@ -1876,6 +1929,14 @@ export async function getDashboardData(): Promise<DashboardData> {
         as_of: now
       })),
       alerts: [],
+      alertPrefs: {
+        user_id: "system",
+        enable_premarket: false,
+        enable_postmarket: true,
+        daily_alert_cap: 20,
+        watch_tickers: [],
+        muted_signal_types: []
+      },
       marketRegime: null,
       marketSnapshot: baseSnapshot(),
       dataQuality: buildDataQualitySnapshot(now, { healthy: 0, degraded: 0, critical: 0 }),
@@ -1902,6 +1963,7 @@ export async function getDashboardData(): Promise<DashboardData> {
   const opportunities = await queryOpportunities(client, tickerDigest, sentinelSignals);
   const marketRegime = await queryMarketRegime(client);
   const alerts = await queryAlertCenter(client);
+  const alertPrefs = await queryAlertPrefs(client);
 
   const focusTickers = new Set(opportunities.map((item) => item.ticker));
   const filteredSignals = focusTickers.size
@@ -1931,6 +1993,7 @@ export async function getDashboardData(): Promise<DashboardData> {
   return {
     opportunities,
     alerts,
+    alertPrefs,
     marketRegime,
     marketSnapshot,
     dataQuality: buildDataQualitySnapshot(dataUpdatedAt, sourceHealth),

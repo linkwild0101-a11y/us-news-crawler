@@ -161,6 +161,7 @@ export interface MarketRegime {
 export interface DashboardData {
   opportunities: OpportunityItem[];
   alerts: AlertCenterItem[];
+  alertPrefs: AlertUserPrefs;
   marketRegime: MarketRegime | null;
   marketSnapshot: MarketSnapshot;
   dataQuality: DataQualitySnapshot;
@@ -203,4 +204,13 @@ export interface AlertCenterItem {
   feedback_useful_count: number;
   feedback_noise_count: number;
   latest_feedback_label: AlertFeedbackLabel | null;
+}
+
+export interface AlertUserPrefs {
+  user_id: string;
+  enable_premarket: boolean;
+  enable_postmarket: boolean;
+  daily_alert_cap: number;
+  watch_tickers: string[];
+  muted_signal_types: string[];
 }
