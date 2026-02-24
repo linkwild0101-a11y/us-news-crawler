@@ -13,6 +13,8 @@ interface HoldingPayload {
   notes: string;
 }
 
+const MAX_BATCH_ITEMS = 200;
+
 function readSupabaseConfig(): { url: string; key: string } | null {
   const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "";
   const key = process.env.SUPABASE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
@@ -22,20 +24,20 @@ function readSupabaseConfig(): { url: string; key: string } | null {
   return { url, key };
 }
 
-function parseHoldingPayload(body: unknown): HoldingPayload | null {
-  if (!body || typeof body !== "object" || Array.isArray(body)) {
+function parseHoldingRow(row: unknown): HoldingPayload | null {
+  if (!row || typeof row !== "object" || Array.isArray(row)) {
     return null;
   }
-  const row = body as Record<string, unknown>;
-  const ticker = String(row.ticker || "").toUpperCase().trim();
-  const sideText = String(row.side || "LONG").toUpperCase().trim();
+  const payload = row as Record<string, unknown>;
+  const ticker = String(payload.ticker || "").toUpperCase().trim();
+  const sideText = String(payload.side || "LONG").toUpperCase().trim();
   const side: "LONG" | "SHORT" = sideText === "SHORT" ? "SHORT" : "LONG";
 
-  const quantity = Number(row.quantity || 0);
-  const avgCost = Number(row.avgCost || 0);
-  const marketValue = Number(row.marketValue || 0);
-  const weight = Number(row.weight || 0);
-  const notes = String(row.notes || "").trim().slice(0, 240);
+  const quantity = Number(payload.quantity || 0);
+  const avgCost = Number(payload.avgCost || 0);
+  const marketValue = Number(payload.marketValue || 0);
+  const weight = Number(payload.weight || 0);
+  const notes = String(payload.notes || "").trim().slice(0, 240);
 
   if (!ticker || ticker.length > 16) {
     return null;
@@ -62,6 +64,36 @@ function parseHoldingPayload(body: unknown): HoldingPayload | null {
     weight,
     notes
   };
+}
+
+function parseHoldingPayloads(body: unknown): HoldingPayload[] | null {
+  if (!body) {
+    return null;
+  }
+
+  let rows: unknown[] = [];
+  if (Array.isArray(body)) {
+    rows = body;
+  } else if (typeof body === "object") {
+    const item = body as Record<string, unknown>;
+    if (Array.isArray(item.items)) {
+      rows = item.items;
+    } else {
+      rows = [item];
+    }
+  } else {
+    return null;
+  }
+
+  if (rows.length === 0 || rows.length > MAX_BATCH_ITEMS) {
+    return null;
+  }
+
+  const parsed = rows.map((row) => parseHoldingRow(row));
+  if (parsed.some((row) => row === null)) {
+    return null;
+  }
+  return parsed.filter((row): row is HoldingPayload => row !== null);
 }
 
 function parseDeletePayload(body: unknown): { id: number } | null {
@@ -183,8 +215,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "supabase_config_missing" }, { status: 503 });
   }
 
-  const payload = parseHoldingPayload(await request.json().catch(() => null));
-  if (!payload) {
+  const payloads = parseHoldingPayloads(await request.json().catch(() => null));
+  if (!payloads) {
     return NextResponse.json({ error: "bad_request" }, { status: 400 });
   }
 
@@ -195,7 +227,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const portfolioId = await ensureDefaultPortfolio(client);
     const nowIso = new Date().toISOString();
-    const upsertRow = {
+    const runId = `frontend-holdings-${Date.now()}`;
+    const upsertRows = payloads.map((payload) => ({
       portfolio_id: portfolioId,
       user_id: "system",
       ticker: payload.ticker,
@@ -206,14 +239,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       weight: payload.weight,
       notes: payload.notes,
       tags: [],
-      run_id: `frontend-holdings-${Date.now()}`,
+      run_id: runId,
       as_of: nowIso,
       is_active: true
-    };
+    }));
 
     const { error: writeError } = await client
       .from("stock_portfolio_holdings_v1")
-      .upsert(upsertRow, { onConflict: "portfolio_id,ticker,side" });
+      .upsert(upsertRows, { onConflict: "portfolio_id,ticker,side" });
 
     if (writeError) {
       throw writeError;

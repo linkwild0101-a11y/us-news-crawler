@@ -16,6 +16,7 @@ import {
   AlertCenterItem,
   DashboardData,
   OpportunityItem,
+  PortfolioAdviceItem,
   PortfolioHoldingItem,
   RiskLevel,
   SentinelSignal,
@@ -233,6 +234,45 @@ function alertSessionLabel(sessionTag: string): string {
   return "闭市";
 }
 
+function portfolioAdviceTypeMeta(
+  adviceType: PortfolioAdviceItem["advice_type"]
+): { label: string; className: string } {
+  if (adviceType === "add") {
+    return {
+      label: "加仓",
+      className: "text-riskLow bg-emerald-500/10 border-emerald-300/30"
+    };
+  }
+  if (adviceType === "reduce") {
+    return {
+      label: "减仓",
+      className: "text-riskHigh bg-red-500/10 border-red-400/30"
+    };
+  }
+  if (adviceType === "hold") {
+    return {
+      label: "持有",
+      className: "text-accent bg-cyan-500/10 border-cyan-300/30"
+    };
+  }
+  if (adviceType === "hedge") {
+    return {
+      label: "对冲",
+      className: "text-violet-300 bg-violet-500/10 border-violet-300/30"
+    };
+  }
+  if (adviceType === "watch") {
+    return {
+      label: "观察",
+      className: "text-riskMid bg-amber-500/10 border-amber-300/30"
+    };
+  }
+  return {
+    label: "复核",
+    className: "text-textMuted bg-slate-500/10 border-slate-400/30"
+  };
+}
+
 function rankTicker(items: TickerSignalDigest[]): TickerSignalDigest[] {
   return [...items].sort((a, b) => {
     const riskDiff = levelWeight(b.risk_level) - levelWeight(a.risk_level);
@@ -448,6 +488,77 @@ function toHoldingItems(rows: unknown): PortfolioHoldingItem[] {
       };
     })
     .filter((item): item is PortfolioHoldingItem => item !== null && item.id > 0);
+}
+
+interface HoldingWritePayload {
+  ticker: string;
+  side: "LONG" | "SHORT";
+  quantity: number;
+  avgCost: number;
+  marketValue: number;
+  weight: number;
+  notes: string;
+}
+
+function parseBulkHoldingText(text: string): {
+  items: HoldingWritePayload[];
+  errors: string[];
+} {
+  const rows = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0 && !line.startsWith("#"));
+  const items: HoldingWritePayload[] = [];
+  const errors: string[] = [];
+
+  rows.forEach((line, index) => {
+    const parts = line.split(",").map((item) => item.trim());
+    if (parts.length < 6) {
+      errors.push(`第 ${index + 1} 行格式错误（至少6列）`);
+      return;
+    }
+    const [tickerRaw, sideRaw, qtyRaw, avgCostRaw, marketValueRaw, weightRaw, ...noteParts] = parts;
+    const ticker = tickerRaw.toUpperCase();
+    const side = sideRaw.toUpperCase() === "SHORT" ? "SHORT" : "LONG";
+    const quantity = Number(qtyRaw || 0);
+    const avgCost = Number(avgCostRaw || 0);
+    const marketValue = Number(marketValueRaw || 0);
+    const weight = Number(weightRaw || 0);
+    const notes = noteParts.join(",").trim();
+
+    if (!ticker || ticker.length > 16) {
+      errors.push(`第 ${index + 1} 行 ticker 无效`);
+      return;
+    }
+    if (!Number.isFinite(quantity) || quantity < 0) {
+      errors.push(`第 ${index + 1} 行 quantity 无效`);
+      return;
+    }
+    if (!Number.isFinite(avgCost) || avgCost < 0) {
+      errors.push(`第 ${index + 1} 行 avgCost 无效`);
+      return;
+    }
+    if (!Number.isFinite(marketValue) || marketValue < 0) {
+      errors.push(`第 ${index + 1} 行 marketValue 无效`);
+      return;
+    }
+    if (!Number.isFinite(weight) || weight < -1 || weight > 1) {
+      errors.push(`第 ${index + 1} 行 weight 需在 -1~1`);
+      return;
+    }
+
+    items.push({
+      ticker,
+      side,
+      quantity,
+      avgCost,
+      marketValue,
+      weight,
+      notes
+    });
+  });
+
+  return { items, errors };
 }
 
 function SignalCard({ signal }: { signal: SentinelSignal }) {
@@ -911,6 +1022,7 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
   const [holdingMarketValueInput, setHoldingMarketValueInput] = useState("0");
   const [holdingWeightInput, setHoldingWeightInput] = useState("0");
   const [holdingNotesInput, setHoldingNotesInput] = useState("");
+  const [holdingBulkInput, setHoldingBulkInput] = useState("");
   const [holdingSaving, setHoldingSaving] = useState(false);
   const [holdingMessage, setHoldingMessage] = useState("");
   const [prefsSaving, setPrefsSaving] = useState(false);
@@ -929,6 +1041,16 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
   const topClusters = data.hotClusters.slice(0, 12);
   const topRelations = data.relations.slice(0, 10);
   const xRadar = data.xSourceRadar.slice(0, 8);
+  const portfolioAdvice = useMemo(() => {
+    return [...data.portfolioAdvice]
+      .sort((a, b) => {
+        if (b.priority_score !== a.priority_score) {
+          return b.priority_score - a.priority_score;
+        }
+        return b.updated_at.localeCompare(a.updated_at);
+      })
+      .slice(0, 24);
+  }, [data.portfolioAdvice]);
   const alerts = useMemo(() => {
     const filtered = data.alerts.filter((item) => {
       if (alertStatusFilter === "all") {
@@ -1104,18 +1226,19 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
     setHoldingSaving(true);
     setHoldingMessage("");
     try {
+      const item: HoldingWritePayload = {
+        ticker,
+        side: holdingSideInput,
+        quantity,
+        avgCost,
+        marketValue,
+        weight,
+        notes: holdingNotesInput.trim()
+      };
       const response = await fetch("/api/portfolio/holdings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ticker,
-          side: holdingSideInput,
-          quantity,
-          avgCost,
-          marketValue,
-          weight,
-          notes: holdingNotesInput.trim()
-        })
+        body: JSON.stringify(item)
       });
       if (!response.ok) {
         throw new Error("save_holding_failed");
@@ -1133,6 +1256,41 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
     } catch (error) {
       console.warn("[FRONTEND_HOLDING_SAVE_FALLBACK]", error);
       setHoldingMessage("持仓保存失败，请稍后重试。");
+    } finally {
+      setHoldingSaving(false);
+    }
+  }
+
+  async function handleSaveBulkHoldings(): Promise<void> {
+    const parsed = parseBulkHoldingText(holdingBulkInput);
+    if (parsed.items.length === 0) {
+      setHoldingMessage(parsed.errors[0] || "请输入批量持仓内容。");
+      return;
+    }
+    if (parsed.errors.length > 0) {
+      setHoldingMessage(`批量录入有错误：${parsed.errors[0]}`);
+      return;
+    }
+
+    setHoldingSaving(true);
+    setHoldingMessage("");
+    try {
+      const response = await fetch("/api/portfolio/holdings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: parsed.items })
+      });
+      if (!response.ok) {
+        throw new Error("save_holding_bulk_failed");
+      }
+      const payload = await response.json();
+      const nextHoldings = toHoldingItems(payload.items);
+      setPortfolioHoldings(nextHoldings);
+      setHoldingBulkInput("");
+      setHoldingMessage(`已保存 ${parsed.items.length} 条持仓。`);
+    } catch (error) {
+      console.warn("[FRONTEND_HOLDING_BULK_SAVE_FALLBACK]", error);
+      setHoldingMessage("批量持仓保存失败，请稍后重试。");
     } finally {
       setHoldingSaving(false);
     }
@@ -1668,6 +1826,32 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
               </button>
               <span className="text-xs text-textMuted">当前持仓数：{portfolioHoldings.length}</span>
             </div>
+
+            <div className="mt-3 rounded-lg border border-slate-700/80 bg-card/40 p-3">
+              <p className="text-xs font-medium text-textMain">批量录入（每行一条）</p>
+              <p className="mt-1 text-[11px] text-textMuted">
+                格式：ticker,side,quantity,avgCost,marketValue,weight,notes
+              </p>
+              <textarea
+                value={holdingBulkInput}
+                onChange={(event) => setHoldingBulkInput(event.target.value)}
+                placeholder={"AAPL,LONG,10,180,1800,0.12,核心仓位\nTSLA,SHORT,5,200,1000,0.08,对冲"}
+                className="mt-2 min-h-[88px] w-full rounded-md border border-slate-600 bg-card/60 px-3 py-2 text-xs text-textMain outline-none"
+              />
+              <div className="mt-2">
+                <button
+                  type="button"
+                  disabled={holdingSaving}
+                  onClick={() => {
+                    void handleSaveBulkHoldings();
+                  }}
+                  className="rounded-md border border-cyan-400/40 bg-cyan-500/10 px-3 py-2 text-xs text-accent disabled:opacity-60"
+                >
+                  批量保存
+                </button>
+              </div>
+            </div>
+
             {holdingMessage && <p className="mt-2 text-xs text-textMuted">{holdingMessage}</p>}
 
             <div className="mt-3 space-y-2">
@@ -1711,6 +1895,75 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
                 ))
               ) : (
                 <p className="text-xs text-textMuted">暂无持仓，录入后会参与 P1 建议生成。</p>
+              )}
+            </div>
+          </article>
+
+          <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
+            <h2 className="mb-3 text-sm font-semibold">P1 持仓建议卡片</h2>
+            <div className="space-y-2">
+              {portfolioAdvice.length > 0 ? (
+                portfolioAdvice.map((item) => {
+                  const adviceMeta = portfolioAdviceTypeMeta(item.advice_type);
+                  return (
+                    <div
+                      key={item.advice_key || `${item.id}`}
+                      className="rounded-lg border border-slate-700/80 bg-card/50 p-3"
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div>
+                          <p className="text-sm font-semibold">
+                            {item.ticker} · {item.holding_side}
+                          </p>
+                          <TickerProfileLine
+                            ticker={item.ticker}
+                            profile={tickerProfiles[item.ticker] || null}
+                            compact
+                          />
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span
+                            className={`rounded-md border px-2 py-0.5 text-xs font-semibold ${adviceMeta.className}`}
+                          >
+                            {adviceMeta.label}
+                          </span>
+                          <span
+                            className={`rounded-md border px-2 py-0.5 text-xs font-semibold ${levelClass(item.risk_level)}`}
+                          >
+                            {item.risk_level}
+                          </span>
+                        </div>
+                      </div>
+
+                      <p className="mt-2 text-xs text-textMuted">
+                        优先级 {item.priority_score.toFixed(1)} · 置信度 {(item.confidence * 100).toFixed(0)}%
+                        {" · "}
+                        建议方向 {item.action_side}
+                      </p>
+
+                      {item.trigger_points.length > 0 && (
+                        <div className="mt-2 space-y-1">
+                          {item.trigger_points.map((point, index) => (
+                            <p key={`${item.advice_key}-point-${index}`} className="text-xs text-textMain">
+                              {index + 1}. {point}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+
+                      {item.invalid_if && (
+                        <p className="mt-2 text-xs text-textMuted">失效条件：{item.invalid_if}</p>
+                      )}
+                      <p className="mt-1 text-[11px] text-textMuted">
+                        状态 {item.status} · 更新时间 {formatTime(item.updated_at)}
+                      </p>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="text-xs text-textMuted">
+                  暂无持仓建议。录入持仓后等待下一次分析任务（P1 Portfolio Advice）生成。
+                </p>
               )}
             </div>
           </article>

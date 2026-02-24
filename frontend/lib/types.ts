@@ -163,6 +163,7 @@ export interface DashboardData {
   alerts: AlertCenterItem[];
   alertPrefs: AlertUserPrefs;
   portfolioHoldings: PortfolioHoldingItem[];
+  portfolioAdvice: PortfolioAdviceItem[];
   tickerProfiles: Record<string, TickerProfileItem>;
   marketRegime: MarketRegime | null;
   marketSnapshot: MarketSnapshot;
@@ -230,6 +231,29 @@ export interface PortfolioHoldingItem {
   market_value: number;
   weight: number;
   notes: string;
+  updated_at: string;
+}
+
+export type PortfolioAdviceType = "add" | "reduce" | "hold" | "hedge" | "watch" | "review";
+export type PortfolioAdviceStatus = "pending" | "accepted" | "dismissed" | "expired";
+
+export interface PortfolioAdviceItem {
+  id: number;
+  advice_key: string;
+  user_id: string;
+  portfolio_id: number;
+  ticker: string;
+  holding_side: "LONG" | "SHORT";
+  advice_type: PortfolioAdviceType;
+  action_side: "LONG" | "SHORT" | "NEUTRAL";
+  priority_score: number;
+  confidence: number;
+  risk_level: RiskLevel;
+  trigger_points: string[];
+  invalid_if: string;
+  status: PortfolioAdviceStatus;
+  valid_until: string;
+  as_of: string;
   updated_at: string;
 }
 

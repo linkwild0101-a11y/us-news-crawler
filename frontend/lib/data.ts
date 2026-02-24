@@ -16,6 +16,9 @@ import {
   MarketRegime,
   MarketSnapshot,
   OpportunityItem,
+  PortfolioAdviceItem,
+  PortfolioAdviceStatus,
+  PortfolioAdviceType,
   PortfolioHoldingItem,
   RiskLevel,
   SentinelSignal,
@@ -400,6 +403,33 @@ function toAlertFeedbackLabel(value: unknown): AlertFeedbackLabel | null {
   return null;
 }
 
+function toPortfolioAdviceType(value: unknown): PortfolioAdviceType {
+  const text = String(value || "review").toLowerCase();
+  if (
+    text === "add"
+    || text === "reduce"
+    || text === "hold"
+    || text === "hedge"
+    || text === "watch"
+    || text === "review"
+  ) {
+    return text;
+  }
+  return "review";
+}
+
+function toPortfolioAdviceStatus(value: unknown): PortfolioAdviceStatus {
+  const text = String(value || "pending").toLowerCase();
+  if (text === "pending" || text === "accepted" || text === "dismissed" || text === "expired") {
+    return text;
+  }
+  return "pending";
+}
+
+function toHoldingSide(value: unknown): "LONG" | "SHORT" {
+  return String(value || "LONG").toUpperCase() === "SHORT" ? "SHORT" : "LONG";
+}
+
 function toStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) {
     return [];
@@ -781,13 +811,12 @@ async function queryPortfolioHoldings(client: SupabaseClient): Promise<Portfolio
 
     const rows = (data || []) as unknown as Array<Record<string, unknown>>;
     return rows.map((row) => {
-      const side = String(row.side || "LONG").toUpperCase() === "SHORT" ? "SHORT" : "LONG";
       return {
         id: Number(row.id || 0),
         portfolio_id: Number(row.portfolio_id || portfolioId),
         user_id: String(row.user_id || "system"),
         ticker: String(row.ticker || "").toUpperCase(),
-        side,
+        side: toHoldingSide(row.side),
         quantity: Number(row.quantity || 0),
         avg_cost: Number(row.avg_cost || 0),
         market_value: Number(row.market_value || 0),
@@ -798,6 +827,66 @@ async function queryPortfolioHoldings(client: SupabaseClient): Promise<Portfolio
     });
   } catch (error) {
     console.warn("[FRONTEND_PORTFOLIO_HOLDINGS_FALLBACK]", error);
+    return [];
+  }
+}
+
+async function queryPortfolioAdvice(client: SupabaseClient): Promise<PortfolioAdviceItem[]> {
+  try {
+    const { data: portfolioRows, error: portfolioError } = await client
+      .from("stock_portfolios_v1")
+      .select("id")
+      .eq("is_active", true)
+      .eq("user_id", "system")
+      .eq("portfolio_key", "default")
+      .limit(1);
+    if (portfolioError) {
+      throw portfolioError;
+    }
+
+    const portfolioId = Number(portfolioRows?.[0]?.id || 0);
+    if (portfolioId <= 0) {
+      return [];
+    }
+
+    const { data, error } = await client
+      .from("stock_portfolio_advice_v1")
+      .select(
+        "id,advice_key,user_id,portfolio_id,ticker,holding_side,advice_type,action_side,"
+        + "priority_score,confidence,risk_level,trigger_points,invalid_if,status,valid_until,as_of,updated_at"
+      )
+      .eq("is_active", true)
+      .eq("portfolio_id", portfolioId)
+      .in("status", ["pending", "accepted"])
+      .order("priority_score", { ascending: false })
+      .order("updated_at", { ascending: false })
+      .limit(80);
+    if (error) {
+      throw error;
+    }
+
+    const rows = (data || []) as unknown as Array<Record<string, unknown>>;
+    return rows.map((row) => ({
+      id: Number(row.id || 0),
+      advice_key: String(row.advice_key || ""),
+      user_id: String(row.user_id || "system"),
+      portfolio_id: Number(row.portfolio_id || portfolioId),
+      ticker: String(row.ticker || "").toUpperCase(),
+      holding_side: toHoldingSide(row.holding_side),
+      advice_type: toPortfolioAdviceType(row.advice_type),
+      action_side: toAlertSide(row.action_side),
+      priority_score: Math.max(0, Math.min(100, Number(row.priority_score || 0))),
+      confidence: Math.max(0, Math.min(1, Number(row.confidence || 0))),
+      risk_level: toLevel(row.risk_level),
+      trigger_points: toStringArray(row.trigger_points),
+      invalid_if: String(row.invalid_if || ""),
+      status: toPortfolioAdviceStatus(row.status),
+      valid_until: toIsoString(row.valid_until),
+      as_of: toIsoString(row.as_of),
+      updated_at: toIsoString(row.updated_at)
+    }));
+  } catch (error) {
+    console.warn("[FRONTEND_PORTFOLIO_ADVICE_FALLBACK]", error);
     return [];
   }
 }
@@ -2057,7 +2146,8 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
     indirectImpacts,
     alerts,
     alertPrefs,
-    portfolioHoldings
+    portfolioHoldings,
+    portfolioAdvice
   ] = await Promise.all([
     queryV2Signals(client),
     queryV2Opportunities(client),
@@ -2066,7 +2156,8 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
     queryV2IndirectImpacts(client),
     queryAlertCenter(client),
     queryAlertPrefs(client),
-    queryPortfolioHoldings(client)
+    queryPortfolioHoldings(client),
+    queryPortfolioAdvice(client)
   ]);
 
   if (!v2Snapshot && sentinelSignals.length === 0 && rawOpportunities.length === 0) {
@@ -2178,6 +2269,7 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
     alerts,
     alertPrefs,
     portfolioHoldings,
+    portfolioAdvice,
     tickerProfiles,
     marketRegime,
     marketSnapshot,
@@ -2251,6 +2343,7 @@ export async function getDashboardData(): Promise<DashboardData> {
         muted_signal_types: []
       },
       portfolioHoldings: [],
+      portfolioAdvice: [],
       tickerProfiles: Object.fromEntries(
         fallbackTickerRows.map((row) => [row.ticker, fallbackTickerProfile(row.ticker)])
       ),
@@ -2282,6 +2375,7 @@ export async function getDashboardData(): Promise<DashboardData> {
   const alerts = await queryAlertCenter(client);
   const alertPrefs = await queryAlertPrefs(client);
   const portfolioHoldings = await queryPortfolioHoldings(client);
+  const portfolioAdvice = await queryPortfolioAdvice(client);
 
   const focusTickers = new Set(opportunities.map((item) => item.ticker));
   const filteredSignals = focusTickers.size
@@ -2335,6 +2429,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     alerts,
     alertPrefs,
     portfolioHoldings,
+    portfolioAdvice,
     tickerProfiles,
     marketRegime,
     marketSnapshot,
