@@ -91,6 +91,45 @@ def _load_active_opportunities(supabase, limit: int) -> List[Dict[str, Any]]:
     return rows
 
 
+def _load_opportunity_evidence_map(
+    supabase,
+    opportunity_ids: List[int],
+) -> Dict[int, List[Dict[str, str]]]:
+    if not opportunity_ids:
+        return {}
+    rows = (
+        supabase.table("stock_evidence_v2")
+        .select("opportunity_id,source_name,source_url,published_at")
+        .eq("is_active", True)
+        .in_("opportunity_id", opportunity_ids[:500])
+        .order("published_at", desc=True)
+        .limit(2000)
+        .execute()
+        .data
+        or []
+    )
+    result: Dict[int, List[Dict[str, str]]] = {}
+    for row in rows:
+        opportunity_id = int(row.get("opportunity_id") or 0)
+        if opportunity_id <= 0:
+            continue
+        source_url = str(row.get("source_url") or "").strip()
+        if not source_url:
+            continue
+        bucket = result.get(opportunity_id) or []
+        if any(item.get("source_url") == source_url for item in bucket):
+            continue
+        bucket.append(
+            {
+                "source_name": str(row.get("source_name") or "source").strip() or "source",
+                "source_url": source_url,
+                "published_at": str(row.get("published_at") or "").strip(),
+            }
+        )
+        result[opportunity_id] = bucket[:3]
+    return result
+
+
 def _in_quiet_hours(now: datetime, start_hour: int, end_hour: int) -> bool:
     start = int(start_hour)
     end = int(end_hour)
@@ -159,14 +198,29 @@ def _was_recently_sent(supabase, subscription_id: int, opportunity_id: int, cool
     return bool(rows)
 
 
-def _build_text_payload(subscriber: str, row: Dict[str, Any]) -> Dict[str, Any]:
+def _build_text_payload(
+    subscriber: str,
+    row: Dict[str, Any],
+    evidences: Optional[List[Dict[str, str]]] = None,
+) -> Dict[str, Any]:
+    source_lines: List[str] = []
+    for item in (evidences or [])[:2]:
+        source_name = str(item.get("source_name") or "source")[:40]
+        source_url = str(item.get("source_url") or "").strip()
+        if not source_url:
+            continue
+        source_lines.append(f"- {source_name}: {source_url}")
+
+    source_block = "\n".join(source_lines) if source_lines else "- 暂无原文链接"
     lines = [
         f"【Stock V3订阅告警】{subscriber}",
         f"{row.get('ticker')} {row.get('side')} {row.get('risk_level')}"
         f" · score={round(_safe_float(row.get('opportunity_score'), 0.0), 1)}"
         f" · conf={round(_safe_float(row.get('confidence'), 0.0) * 100)}%",
-        f"why_now: {str(row.get('why_now') or '')[:120]}",
-        f"invalid_if: {str(row.get('invalid_if') or '')[:120]}",
+        f"why_now: {str(row.get('why_now') or '')[:180]}",
+        f"风险失效条件: {str(row.get('invalid_if') or '')[:160]}",
+        "原文入口:",
+        source_block,
         f"as_of: {row.get('as_of')}",
     ]
     return {
@@ -205,6 +259,7 @@ def _dispatch_subscription(
     run_id: str,
     sub: Dict[str, Any],
     opportunities: List[Dict[str, Any]],
+    evidence_map: Dict[int, List[Dict[str, str]]],
     default_webhook: str,
     dry_run: bool,
 ) -> Dict[str, int]:
@@ -260,7 +315,11 @@ def _dispatch_subscription(
             continue
 
         delivery_key = f"{sub_id}:{opportunity_id}:{_now_utc().strftime('%Y%m%d%H%M')}"
-        payload = _build_text_payload(subscriber=subscriber, row=row)
+        payload = _build_text_payload(
+            subscriber=subscriber,
+            row=row,
+            evidences=evidence_map.get(opportunity_id) or [],
+        )
         if dry_run:
             ok = True
             response_text = "dry_run"
@@ -409,6 +468,14 @@ def run_subscription_alerts(
     try:
         subscriptions = _load_active_subscriptions(supabase=supabase, limit=sub_limit)
         opportunities = _load_active_opportunities(supabase=supabase, limit=opp_limit)
+        evidence_map = _load_opportunity_evidence_map(
+            supabase=supabase,
+            opportunity_ids=[
+                int(item.get("id") or 0)
+                for item in opportunities
+                if int(item.get("id") or 0) > 0
+            ],
+        )
         aggregate = {
             "run_id": final_run_id,
             "subscriptions": len(subscriptions),
@@ -425,6 +492,7 @@ def run_subscription_alerts(
                 run_id=final_run_id,
                 sub=sub,
                 opportunities=opportunities,
+                evidence_map=evidence_map,
                 default_webhook=default_webhook,
                 dry_run=dry_run,
             )

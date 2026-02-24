@@ -39,6 +39,7 @@ jobs:
       ENABLE_STOCK_X_SOURCE: ${{ vars.ENABLE_STOCK_X_SOURCE || 'true' }}
       ENABLE_STOCK_ALERT_V1: ${{ vars.ENABLE_STOCK_ALERT_V1 || 'false' }}
       ENABLE_STOCK_ALERT_FEEDBACK_AGG: ${{ vars.ENABLE_STOCK_ALERT_FEEDBACK_AGG || 'true' }}
+      ENABLE_STOCK_ALERT_NOISE_WEEKLY: ${{ vars.ENABLE_STOCK_ALERT_NOISE_WEEKLY || 'true' }}
       ENABLE_STOCK_EVIDENCE_LAYER: ${{ vars.ENABLE_STOCK_EVIDENCE_LAYER || 'false' }}
       ENABLE_STOCK_TRANSMISSION_LAYER: ${{ vars.ENABLE_STOCK_TRANSMISSION_LAYER || 'false' }}
       ENABLE_STOCK_AI_DEBATE_VIEW: ${{ vars.ENABLE_STOCK_AI_DEBATE_VIEW || 'false' }}
@@ -200,6 +201,20 @@ jobs:
           python -u scripts/stock_alert_feedback_agg_v1.py \
             --days 7 \
             --limit 5000 \
+            --md-dir docs/reports \
+            --csv-dir data/reports
+
+      - name: Build StockOps alert noise weekly report (optional)
+        if: ${{ env.ENABLE_STOCK_ALERT_V1 == 'true' && env.ENABLE_STOCK_ALERT_NOISE_WEEKLY == 'true' }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_alert_noise_weekly_report_v1.py \
+            --days 7 \
+            --limit 8000 \
             --md-dir docs/reports \
             --csv-dir data/reports
 
