@@ -38,6 +38,7 @@ jobs:
       ENABLE_STOCK_V3_VALIDATION: ${{ vars.ENABLE_STOCK_V3_VALIDATION || 'false' }}
       ENABLE_STOCK_X_SOURCE: ${{ vars.ENABLE_STOCK_X_SOURCE || 'true' }}
       ENABLE_STOCK_ALERT_V1: ${{ vars.ENABLE_STOCK_ALERT_V1 || 'false' }}
+      ENABLE_STOCK_ALERT_FEEDBACK_AGG: ${{ vars.ENABLE_STOCK_ALERT_FEEDBACK_AGG || 'true' }}
       ENABLE_STOCK_EVIDENCE_LAYER: ${{ vars.ENABLE_STOCK_EVIDENCE_LAYER || 'false' }}
       ENABLE_STOCK_TRANSMISSION_LAYER: ${{ vars.ENABLE_STOCK_TRANSMISSION_LAYER || 'false' }}
       ENABLE_STOCK_AI_DEBATE_VIEW: ${{ vars.ENABLE_STOCK_AI_DEBATE_VIEW || 'false' }}
@@ -187,6 +188,20 @@ jobs:
             --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-alert-dispatch" \
             --channel inbox \
             --limit 260
+
+      - name: Build StockOps alert feedback report (optional)
+        if: ${{ env.ENABLE_STOCK_ALERT_V1 == 'true' && env.ENABLE_STOCK_ALERT_FEEDBACK_AGG == 'true' }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_alert_feedback_agg_v1.py \
+            --days 7 \
+            --limit 5000 \
+            --md-dir docs/reports \
+            --csv-dir data/reports
 
       - name: Run Stock V3 eval (optional)
         if: ${{ env.ENABLE_STOCK_V3_EVAL == 'true' }}

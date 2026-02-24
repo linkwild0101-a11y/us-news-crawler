@@ -23,7 +23,7 @@
 - [x] 提醒卡“有用/噪音”反馈按钮
 - [x] 反馈 API：`frontend/app/api/alerts/feedback/route.ts`
 - [x] 执行 SQL：`sql/2026-02-24_stock_alert_feedback_insert_policy.sql`
-- [ ] 新增 `scripts/stock_alert_feedback_agg_v1.py`
+- [x] 新增 `scripts/stock_alert_feedback_agg_v1.py`
 - [ ] 每日报告：`docs/reports/stock-alert-feedback-daily-*.md`
 
 ## C. 时段治理与通知质量（待执行）
