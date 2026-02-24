@@ -98,4 +98,10 @@
 - [x] 产出首份反馈调优日报
 - [x] 完成盘前/盘后 + 上限治理 SQL 与脚本
 - [x] 将 Alert CTR/Noise Ratio 接入周报
-- [ ] 启动 P1 数据模型设计稿（portfolio + screener）
+- [x] 启动 P1 数据模型设计稿（portfolio + screener）
+
+## P1 启动补充（2026-02-24）
+
+- [x] 新增 SQL：`sql/2026-02-24_stock_p1_portfolio_screener_schema.sql`
+- [x] 新增脚本：`scripts/stock_portfolio_advice_v1.py`
+- [x] workflow 接入可选步骤：`ENABLE_STOCK_P1_PORTFOLIO_ADVICE`

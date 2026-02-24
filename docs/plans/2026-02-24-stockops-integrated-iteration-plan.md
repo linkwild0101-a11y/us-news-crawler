@@ -39,6 +39,12 @@
 - 缺 P1 的持仓建议、策略筛选器、宏观影响层与实验框架
 - 缺 P2 自动化执行与风控闸门主链路
 
+### 2.3 最新进展（2026-02-24）
+
+- P0 反馈日报/周报已落地并接入 workflow 可选步骤。
+- P1 数据层已启动：新增 `portfolio + screener + macro map` SQL 草案。
+- P1 建议引擎 MVP 已落地：`scripts/stock_portfolio_advice_v1.py`。
+
 ---
 
 ## 3. PRD 到迭代方案映射（总览）
@@ -199,5 +205,5 @@
 
 1. 完成 Sprint B 收尾：反馈聚合脚本 + 报告产出。
 2. 完成 Sprint C：时段开关、频控、飞书模板升级。
-3. 建立 P1 技术预研分支：Portfolio schema + Screener 模板定义。
+3. 建立 P1 技术预研分支：Portfolio schema + Screener 模板定义。（已启动）
 4. 补齐埋点事件与 KPI 看板，形成每周例行复盘模板。

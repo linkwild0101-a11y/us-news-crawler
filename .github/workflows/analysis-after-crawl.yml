@@ -40,6 +40,7 @@ jobs:
       ENABLE_STOCK_ALERT_V1: ${{ vars.ENABLE_STOCK_ALERT_V1 || 'false' }}
       ENABLE_STOCK_ALERT_FEEDBACK_AGG: ${{ vars.ENABLE_STOCK_ALERT_FEEDBACK_AGG || 'true' }}
       ENABLE_STOCK_ALERT_NOISE_WEEKLY: ${{ vars.ENABLE_STOCK_ALERT_NOISE_WEEKLY || 'true' }}
+      ENABLE_STOCK_P1_PORTFOLIO_ADVICE: ${{ vars.ENABLE_STOCK_P1_PORTFOLIO_ADVICE || 'false' }}
       ENABLE_STOCK_EVIDENCE_LAYER: ${{ vars.ENABLE_STOCK_EVIDENCE_LAYER || 'false' }}
       ENABLE_STOCK_TRANSMISSION_LAYER: ${{ vars.ENABLE_STOCK_TRANSMISSION_LAYER || 'false' }}
       ENABLE_STOCK_AI_DEBATE_VIEW: ${{ vars.ENABLE_STOCK_AI_DEBATE_VIEW || 'false' }}
@@ -217,6 +218,24 @@ jobs:
             --limit 8000 \
             --md-dir docs/reports \
             --csv-dir data/reports
+
+      - name: Build Stock P1 portfolio advice (optional)
+        if: ${{ env.ENABLE_STOCK_P1_PORTFOLIO_ADVICE == 'true' }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_portfolio_advice_v1.py \
+            --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-p1-advice" \
+            --lookback-hours 72 \
+            --portfolio-limit 400 \
+            --holding-limit 2000 \
+            --opportunity-limit 4000 \
+            --min-score 68
 
       - name: Run Stock V3 eval (optional)
         if: ${{ env.ENABLE_STOCK_V3_EVAL == 'true' }}
