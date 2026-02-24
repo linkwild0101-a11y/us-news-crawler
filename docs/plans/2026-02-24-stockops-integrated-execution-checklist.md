@@ -115,3 +115,5 @@
 - [x] 新增脚本：`scripts/stock_screener_run_v1.py`
 - [x] FastAPI 旁路：`apps/stockops_api/main.py`
 - [x] workflow 接入可选步骤：`ENABLE_STOCK_P1_SCREENER`
+- [x] 前端持仓录入：`frontend/app/api/portfolio/holdings/route.ts` + Settings 持仓表单
+- [x] 股票代码基础说明：`stock_ticker_profiles_v1` + `scripts/stock_ticker_profile_sync_v1.py`

@@ -16,9 +16,11 @@ import {
   AlertCenterItem,
   DashboardData,
   OpportunityItem,
+  PortfolioHoldingItem,
   RiskLevel,
   SentinelSignal,
   SourceMix,
+  TickerProfileItem,
   TransmissionPath,
   TickerSignalDigest
 } from "@/lib/types";
@@ -374,6 +376,80 @@ function LabelWithHint({ label, hintKey }: { label: string; hintKey: MetricKey }
   );
 }
 
+function tickerAssetLabel(assetType: TickerProfileItem["asset_type"]): string {
+  if (assetType === "etf") {
+    return "ETF";
+  }
+  if (assetType === "equity") {
+    return "个股";
+  }
+  if (assetType === "index") {
+    return "指数";
+  }
+  if (assetType === "macro") {
+    return "宏观";
+  }
+  return "标的";
+}
+
+function TickerProfileLine({
+  ticker,
+  profile,
+  compact = false
+}: {
+  ticker: string;
+  profile?: TickerProfileItem | null;
+  compact?: boolean;
+}) {
+  if (!profile) {
+    return (
+      <p className={`text-xs text-textMuted ${compact ? "" : "mt-1"}`}>
+        {ticker} · 美股观察标的
+      </p>
+    );
+  }
+  const prefix = profile.display_name && profile.display_name !== ticker
+    ? `${profile.display_name} · `
+    : "";
+  const meta = `${tickerAssetLabel(profile.asset_type)} · ${profile.sector}`;
+  const summary = profile.summary_cn.trim();
+  const suffix = !compact && summary ? ` · ${summary}` : "";
+  return (
+    <p className={`text-xs text-textMuted ${compact ? "" : "mt-1"}`} title={profile.summary_cn}>
+      {prefix}
+      {meta}
+      {suffix}
+    </p>
+  );
+}
+
+function toHoldingItems(rows: unknown): PortfolioHoldingItem[] {
+  if (!Array.isArray(rows)) {
+    return [];
+  }
+  return rows
+    .map((item) => {
+      if (!item || typeof item !== "object" || Array.isArray(item)) {
+        return null;
+      }
+      const row = item as Record<string, unknown>;
+      return {
+        id: Number(row.id || 0),
+        portfolio_id: Number(row.portfolio_id || 0),
+        user_id: String(row.user_id || "system"),
+        ticker: String(row.ticker || "").toUpperCase(),
+        side: String(row.side || "LONG").toUpperCase() === "SHORT" ? "SHORT" : "LONG",
+        quantity: Number(row.quantity || 0),
+        avg_cost: Number(row.avg_cost || 0),
+        market_value: Number(row.market_value || 0),
+        weight: Number(row.weight || 0),
+        notes: String(row.notes || ""),
+        updated_at: String(row.updated_at || new Date().toISOString())
+      };
+    })
+    .filter((item): item is PortfolioHoldingItem => item !== null && item.id > 0);
+}
+
 function SignalCard({ signal }: { signal: SentinelSignal }) {
   const sourceBadge = resolveSourceBadge(signal.source_mix);
   return (
@@ -405,10 +481,12 @@ function SignalCard({ signal }: { signal: SentinelSignal }) {
 
 function OpportunityCard({
   item,
-  onOpenEvidence
+  onOpenEvidence,
+  tickerProfile
 }: {
   item: OpportunityItem;
   onOpenEvidence: (item: OpportunityItem) => void;
+  tickerProfile?: TickerProfileItem | null;
 }) {
   const sourceBadge = resolveSourceBadge(item.source_mix);
   const originBadge = sourceOriginMeta(item.source_origin);
@@ -421,6 +499,7 @@ function OpportunityCard({
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">{item.ticker}</h3>
+          <TickerProfileLine ticker={item.ticker} profile={tickerProfile} />
           <p className="mt-1 text-xs text-textMuted">更新 {formatTime(item.as_of)}</p>
         </div>
         <div className="flex flex-wrap items-center justify-end gap-2">
@@ -510,6 +589,7 @@ function OpportunityCard({
 
 function AlertCard({
   item,
+  tickerProfile,
   selectedLabel,
   submitting,
   errorText,
@@ -518,6 +598,7 @@ function AlertCard({
   onMarkRead
 }: {
   item: AlertCenterItem;
+  tickerProfile?: TickerProfileItem | null;
   selectedLabel: "useful" | "noise" | null;
   submitting: boolean;
   errorText: string;
@@ -532,6 +613,7 @@ function AlertCard({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h3 className="text-base font-semibold">{item.title || `${item.ticker} 提醒`}</h3>
+          <TickerProfileLine ticker={item.ticker} profile={tickerProfile} />
           <p className="mt-1 text-xs text-textMuted">
             {item.ticker} · {sideText} · {alertSessionLabel(item.session_tag)} · {formatTime(item.created_at)}
           </p>
@@ -819,12 +901,25 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
   const [quietHoursEndInput, setQuietHoursEndInput] = useState(
     String(data.alertPrefs.quiet_hours_end || 0)
   );
+  const [portfolioHoldings, setPortfolioHoldings] = useState<PortfolioHoldingItem[]>(
+    data.portfolioHoldings
+  );
+  const [holdingTickerInput, setHoldingTickerInput] = useState("");
+  const [holdingSideInput, setHoldingSideInput] = useState<"LONG" | "SHORT">("LONG");
+  const [holdingQtyInput, setHoldingQtyInput] = useState("0");
+  const [holdingAvgCostInput, setHoldingAvgCostInput] = useState("0");
+  const [holdingMarketValueInput, setHoldingMarketValueInput] = useState("0");
+  const [holdingWeightInput, setHoldingWeightInput] = useState("0");
+  const [holdingNotesInput, setHoldingNotesInput] = useState("");
+  const [holdingSaving, setHoldingSaving] = useState(false);
+  const [holdingMessage, setHoldingMessage] = useState("");
   const [prefsSaving, setPrefsSaving] = useState(false);
   const [prefsMessage, setPrefsMessage] = useState("");
   const showV3ExplainBadge = readDashboardV3ExplainFlag();
   const enableEvidenceLayer = readEvidenceLayerFlag();
   const enableTransmissionLayer = readTransmissionLayerFlag();
   const enableAiDebateView = readAiDebateViewFlag();
+  const tickerProfiles = data.tickerProfiles;
 
   const rankedTicker = useMemo(() => rankTicker(data.tickerDigest), [data.tickerDigest]);
   const opportunities = useMemo(() => rankOpportunities(data.opportunities), [data.opportunities]);
@@ -975,6 +1070,98 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
       setPrefsMessage("保存失败，请稍后重试");
     } finally {
       setPrefsSaving(false);
+    }
+  }
+
+  async function handleSaveHolding(): Promise<void> {
+    const ticker = holdingTickerInput.trim().toUpperCase();
+    if (!ticker || ticker.length > 16) {
+      setHoldingMessage("请输入有效股票代码（1-16位）。");
+      return;
+    }
+
+    const quantity = Number(holdingQtyInput || 0);
+    const avgCost = Number(holdingAvgCostInput || 0);
+    const marketValue = Number(holdingMarketValueInput || 0);
+    const weight = Number(holdingWeightInput || 0);
+    if (!Number.isFinite(quantity) || quantity < 0) {
+      setHoldingMessage("数量必须是非负数字。");
+      return;
+    }
+    if (!Number.isFinite(avgCost) || avgCost < 0) {
+      setHoldingMessage("成本价必须是非负数字。");
+      return;
+    }
+    if (!Number.isFinite(marketValue) || marketValue < 0) {
+      setHoldingMessage("市值必须是非负数字。");
+      return;
+    }
+    if (!Number.isFinite(weight) || weight < -1 || weight > 1) {
+      setHoldingMessage("权重请输入 -1 到 1（例如 0.12 = 12%）。");
+      return;
+    }
+
+    setHoldingSaving(true);
+    setHoldingMessage("");
+    try {
+      const response = await fetch("/api/portfolio/holdings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ticker,
+          side: holdingSideInput,
+          quantity,
+          avgCost,
+          marketValue,
+          weight,
+          notes: holdingNotesInput.trim()
+        })
+      });
+      if (!response.ok) {
+        throw new Error("save_holding_failed");
+      }
+      const payload = await response.json();
+      const nextHoldings = toHoldingItems(payload.items);
+      setPortfolioHoldings(nextHoldings);
+      setHoldingTickerInput("");
+      setHoldingQtyInput("0");
+      setHoldingAvgCostInput("0");
+      setHoldingMarketValueInput("0");
+      setHoldingWeightInput("0");
+      setHoldingNotesInput("");
+      setHoldingMessage("持仓已保存。");
+    } catch (error) {
+      console.warn("[FRONTEND_HOLDING_SAVE_FALLBACK]", error);
+      setHoldingMessage("持仓保存失败，请稍后重试。");
+    } finally {
+      setHoldingSaving(false);
+    }
+  }
+
+  async function handleDeleteHolding(id: number): Promise<void> {
+    if (id <= 0) {
+      return;
+    }
+    setHoldingSaving(true);
+    setHoldingMessage("");
+    try {
+      const response = await fetch("/api/portfolio/holdings", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
+      });
+      if (!response.ok) {
+        throw new Error("delete_holding_failed");
+      }
+      const payload = await response.json();
+      const nextHoldings = toHoldingItems(payload.items);
+      setPortfolioHoldings(nextHoldings);
+      setHoldingMessage("持仓已删除。");
+    } catch (error) {
+      console.warn("[FRONTEND_HOLDING_DELETE_FALLBACK]", error);
+      setHoldingMessage("删除失败，请稍后重试。");
+    } finally {
+      setHoldingSaving(false);
     }
   }
 
@@ -1129,6 +1316,7 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
                 <OpportunityCard
                   key={item.id}
                   item={item}
+                  tickerProfile={tickerProfiles[item.ticker] || null}
                   onOpenEvidence={(selected) => setSelectedOpportunity(selected)}
                 />
               ))}
@@ -1206,6 +1394,7 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
                   <AlertCard
                     key={item.id}
                     item={item}
+                    tickerProfile={tickerProfiles[item.ticker] || null}
                     selectedLabel={selectedLabel}
                     submitting={Boolean(localFeedback?.submitting)}
                     errorText={localFeedback?.error || ""}
@@ -1276,6 +1465,11 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
                       {row.risk_level}
                     </span>
                   </div>
+                  <TickerProfileLine
+                    ticker={row.ticker}
+                    profile={tickerProfiles[row.ticker] || null}
+                    compact
+                  />
                   <div className="text-xs text-textMuted">
                     <LabelWithHint label="24h 信号" hintKey="signal_count_24h" /> {row.signal_count_24h}
                     {" · "}
@@ -1381,6 +1575,146 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
 
       {activeTab === "settings" && (
         <section className="space-y-4">
+          <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
+            <h2 className="mb-3 text-sm font-semibold">P1 持仓录入（Portfolio Intelligence）</h2>
+            <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+              <label>
+                <span className="mb-1 block text-xs text-textMuted">股票代码</span>
+                <input
+                  type="text"
+                  value={holdingTickerInput}
+                  onChange={(event) => setHoldingTickerInput(event.target.value.toUpperCase())}
+                  placeholder="AAPL"
+                  className="w-full rounded-md border border-slate-600 bg-card/60 px-3 py-2 text-sm text-textMain outline-none"
+                />
+              </label>
+              <label>
+                <span className="mb-1 block text-xs text-textMuted">方向</span>
+                <select
+                  value={holdingSideInput}
+                  onChange={(event) => setHoldingSideInput(event.target.value === "SHORT" ? "SHORT" : "LONG")}
+                  className="w-full rounded-md border border-slate-600 bg-card/60 px-3 py-2 text-sm text-textMain outline-none"
+                >
+                  <option value="LONG">LONG</option>
+                  <option value="SHORT">SHORT</option>
+                </select>
+              </label>
+              <label>
+                <span className="mb-1 block text-xs text-textMuted">数量</span>
+                <input
+                  type="number"
+                  min={0}
+                  step="0.0001"
+                  value={holdingQtyInput}
+                  onChange={(event) => setHoldingQtyInput(event.target.value)}
+                  className="w-full rounded-md border border-slate-600 bg-card/60 px-3 py-2 text-sm text-textMain outline-none"
+                />
+              </label>
+              <label>
+                <span className="mb-1 block text-xs text-textMuted">成本价</span>
+                <input
+                  type="number"
+                  min={0}
+                  step="0.0001"
+                  value={holdingAvgCostInput}
+                  onChange={(event) => setHoldingAvgCostInput(event.target.value)}
+                  className="w-full rounded-md border border-slate-600 bg-card/60 px-3 py-2 text-sm text-textMain outline-none"
+                />
+              </label>
+              <label>
+                <span className="mb-1 block text-xs text-textMuted">市值</span>
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={holdingMarketValueInput}
+                  onChange={(event) => setHoldingMarketValueInput(event.target.value)}
+                  className="w-full rounded-md border border-slate-600 bg-card/60 px-3 py-2 text-sm text-textMain outline-none"
+                />
+              </label>
+              <label>
+                <span className="mb-1 block text-xs text-textMuted">权重（-1~1）</span>
+                <input
+                  type="number"
+                  min={-1}
+                  max={1}
+                  step="0.0001"
+                  value={holdingWeightInput}
+                  onChange={(event) => setHoldingWeightInput(event.target.value)}
+                  className="w-full rounded-md border border-slate-600 bg-card/60 px-3 py-2 text-sm text-textMain outline-none"
+                />
+              </label>
+              <label className="col-span-2 md:col-span-2">
+                <span className="mb-1 block text-xs text-textMuted">备注（可选）</span>
+                <input
+                  type="text"
+                  value={holdingNotesInput}
+                  onChange={(event) => setHoldingNotesInput(event.target.value)}
+                  placeholder="例如：核心仓位"
+                  className="w-full rounded-md border border-slate-600 bg-card/60 px-3 py-2 text-sm text-textMain outline-none"
+                />
+              </label>
+            </div>
+            <div className="mt-3 flex items-center gap-2">
+              <button
+                type="button"
+                disabled={holdingSaving}
+                onClick={() => {
+                  void handleSaveHolding();
+                }}
+                className="rounded-md border border-cyan-400/40 bg-cyan-500/10 px-3 py-2 text-xs text-accent disabled:opacity-60"
+              >
+                保存持仓
+              </button>
+              <span className="text-xs text-textMuted">当前持仓数：{portfolioHoldings.length}</span>
+            </div>
+            {holdingMessage && <p className="mt-2 text-xs text-textMuted">{holdingMessage}</p>}
+
+            <div className="mt-3 space-y-2">
+              {portfolioHoldings.length > 0 ? (
+                portfolioHoldings.map((holding) => (
+                  <div
+                    key={holding.id}
+                    className="rounded-lg border border-slate-700/80 bg-card/50 p-2.5"
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-semibold">
+                          {holding.ticker} · {holding.side}
+                        </p>
+                        <TickerProfileLine
+                          ticker={holding.ticker}
+                          profile={tickerProfiles[holding.ticker] || null}
+                          compact
+                        />
+                        <p className="mt-1 text-xs text-textMuted">
+                          数量 {holding.quantity} · 成本 {holding.avg_cost.toFixed(2)} · 市值
+                          {" "}
+                          {holding.market_value.toFixed(2)} · 权重 {(holding.weight * 100).toFixed(2)}%
+                        </p>
+                        {holding.notes && (
+                          <p className="mt-1 text-xs text-textMuted">备注：{holding.notes}</p>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        disabled={holdingSaving}
+                        onClick={() => {
+                          void handleDeleteHolding(holding.id);
+                        }}
+                        className="rounded-md border border-slate-600 px-2 py-1 text-xs text-textMuted hover:text-textMain disabled:opacity-60"
+                      >
+                        删除
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-textMuted">暂无持仓，录入后会参与 P1 建议生成。</p>
+              )}
+            </div>
+          </article>
+
           <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
             <h2 className="mb-3 text-sm font-semibold">提醒时段开关</h2>
             <div className="space-y-3">

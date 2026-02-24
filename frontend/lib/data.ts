@@ -16,9 +16,11 @@ import {
   MarketRegime,
   MarketSnapshot,
   OpportunityItem,
+  PortfolioHoldingItem,
   RiskLevel,
   SentinelSignal,
   SourceMix,
+  TickerProfileItem,
   TransmissionPath,
   XSourceRadarItem,
   TickerSignalDigest
@@ -135,6 +137,168 @@ const INDIRECT_THEME_LABELS: Record<string, string> = {
   commodity: "大宗商品",
   supply_chain: "供应链"
 };
+const TICKER_PROFILE_SEED: Record<string, TickerProfileItem> = {
+  SPY: {
+    ticker: "SPY",
+    display_name: "SPDR S&P 500 ETF",
+    asset_type: "etf",
+    sector: "Index",
+    industry: "US Large Cap",
+    summary_cn: "跟踪标普500，适合观察美股整体风险偏好与市场趋势。"
+  },
+  QQQ: {
+    ticker: "QQQ",
+    display_name: "Invesco QQQ Trust",
+    asset_type: "etf",
+    sector: "Index",
+    industry: "Nasdaq 100",
+    summary_cn: "跟踪纳指100，科技权重高，对成长风格与利率更敏感。"
+  },
+  DIA: {
+    ticker: "DIA",
+    display_name: "SPDR Dow Jones Industrial Average ETF",
+    asset_type: "etf",
+    sector: "Index",
+    industry: "Dow 30",
+    summary_cn: "跟踪道琼斯工业指数，偏大盘蓝筹，防御属性相对更强。"
+  },
+  IWM: {
+    ticker: "IWM",
+    display_name: "iShares Russell 2000 ETF",
+    asset_type: "etf",
+    sector: "Index",
+    industry: "Small Cap",
+    summary_cn: "跟踪罗素2000小盘股，常用于衡量风险偏好与内需弹性。"
+  },
+  XLF: {
+    ticker: "XLF",
+    display_name: "Financial Select Sector SPDR",
+    asset_type: "etf",
+    sector: "Financials",
+    industry: "Sector ETF",
+    summary_cn: "金融板块ETF，对利率曲线、信用环境与监管变化敏感。"
+  },
+  XLK: {
+    ticker: "XLK",
+    display_name: "Technology Select Sector SPDR",
+    asset_type: "etf",
+    sector: "Technology",
+    industry: "Sector ETF",
+    summary_cn: "科技板块ETF，受AI资本开支、业绩预期和估值影响较大。"
+  },
+  XLE: {
+    ticker: "XLE",
+    display_name: "Energy Select Sector SPDR",
+    asset_type: "etf",
+    sector: "Energy",
+    industry: "Sector ETF",
+    summary_cn: "能源板块ETF，与油价、地缘风险和供需周期关系紧密。"
+  },
+  XLV: {
+    ticker: "XLV",
+    display_name: "Health Care Select Sector SPDR",
+    asset_type: "etf",
+    sector: "Healthcare",
+    industry: "Sector ETF",
+    summary_cn: "医疗板块ETF，兼具防御属性与政策监管敏感性。"
+  },
+  SMH: {
+    ticker: "SMH",
+    display_name: "VanEck Semiconductor ETF",
+    asset_type: "etf",
+    sector: "Technology",
+    industry: "Semiconductors",
+    summary_cn: "半导体ETF，受AI算力周期、库存与资本开支影响显著。"
+  },
+  TLT: {
+    ticker: "TLT",
+    display_name: "iShares 20+ Year Treasury Bond ETF",
+    asset_type: "etf",
+    sector: "Rates",
+    industry: "US Treasury",
+    summary_cn: "美债长久期ETF，反映利率预期与避险情绪变化。"
+  },
+  AAPL: {
+    ticker: "AAPL",
+    display_name: "Apple Inc.",
+    asset_type: "equity",
+    sector: "Technology",
+    industry: "Consumer Electronics",
+    summary_cn: "消费电子龙头，关注新品周期、服务收入与全球需求变化。"
+  },
+  MSFT: {
+    ticker: "MSFT",
+    display_name: "Microsoft Corporation",
+    asset_type: "equity",
+    sector: "Technology",
+    industry: "Software",
+    summary_cn: "软件与云计算龙头，关键变量是云增速、AI商业化与利润率。"
+  },
+  NVDA: {
+    ticker: "NVDA",
+    display_name: "NVIDIA Corporation",
+    asset_type: "equity",
+    sector: "Technology",
+    industry: "Semiconductors",
+    summary_cn: "AI芯片核心公司，关注数据中心需求、供给节奏与估值波动。"
+  },
+  AMZN: {
+    ticker: "AMZN",
+    display_name: "Amazon.com, Inc.",
+    asset_type: "equity",
+    sector: "Consumer Discretionary",
+    industry: "E-commerce & Cloud",
+    summary_cn: "电商与云双引擎公司，重点看AWS增速、消费强度与利润改善。"
+  },
+  GOOGL: {
+    ticker: "GOOGL",
+    display_name: "Alphabet Inc.",
+    asset_type: "equity",
+    sector: "Technology",
+    industry: "Internet Services",
+    summary_cn: "搜索与广告平台龙头，关注广告景气、云业务与AI竞争格局。"
+  },
+  META: {
+    ticker: "META",
+    display_name: "Meta Platforms, Inc.",
+    asset_type: "equity",
+    sector: "Technology",
+    industry: "Social Media",
+    summary_cn: "社交广告平台公司，核心变量为广告效率、用户增长和AI投入。"
+  },
+  TSLA: {
+    ticker: "TSLA",
+    display_name: "Tesla, Inc.",
+    asset_type: "equity",
+    sector: "Consumer Discretionary",
+    industry: "EV & Energy Storage",
+    summary_cn: "新能源车龙头，关注交付增速、价格策略与自动驾驶进展。"
+  }
+};
+
+function normalizeAssetType(value: unknown): TickerProfileItem["asset_type"] {
+  const text = String(value || "unknown").toLowerCase().trim();
+  if (text === "equity" || text === "etf" || text === "index" || text === "macro") {
+    return text;
+  }
+  return "unknown";
+}
+
+function fallbackTickerProfile(ticker: string): TickerProfileItem {
+  const upper = ticker.toUpperCase().trim();
+  const seeded = TICKER_PROFILE_SEED[upper];
+  if (seeded) {
+    return seeded;
+  }
+  return {
+    ticker: upper,
+    display_name: upper,
+    asset_type: "unknown",
+    sector: "Unknown",
+    industry: "Unknown",
+    summary_cn: "美股观察标的，建议结合原文证据与行业背景做二次判断。"
+  };
+}
 
 function readV2Enabled(): boolean {
   const raw = String(
@@ -581,6 +745,113 @@ async function queryAlertPrefs(client: SupabaseClient): Promise<AlertUserPrefs> 
   } catch (error) {
     console.warn("[FRONTEND_ALERT_PREFS_FALLBACK]", error);
     return fallback;
+  }
+}
+
+async function queryPortfolioHoldings(client: SupabaseClient): Promise<PortfolioHoldingItem[]> {
+  try {
+    const { data: portfolioRows, error: portfolioError } = await client
+      .from("stock_portfolios_v1")
+      .select("id")
+      .eq("is_active", true)
+      .eq("user_id", "system")
+      .eq("portfolio_key", "default")
+      .limit(1);
+    if (portfolioError) {
+      throw portfolioError;
+    }
+    const portfolioId = Number(portfolioRows?.[0]?.id || 0);
+    if (portfolioId <= 0) {
+      return [];
+    }
+
+    const { data, error } = await client
+      .from("stock_portfolio_holdings_v1")
+      .select(
+        "id,portfolio_id,user_id,ticker,side,quantity,avg_cost,market_value,"
+        + "weight,notes,updated_at"
+      )
+      .eq("is_active", true)
+      .eq("portfolio_id", portfolioId)
+      .order("updated_at", { ascending: false })
+      .limit(300);
+    if (error) {
+      throw error;
+    }
+
+    const rows = (data || []) as unknown as Array<Record<string, unknown>>;
+    return rows.map((row) => {
+      const side = String(row.side || "LONG").toUpperCase() === "SHORT" ? "SHORT" : "LONG";
+      return {
+        id: Number(row.id || 0),
+        portfolio_id: Number(row.portfolio_id || portfolioId),
+        user_id: String(row.user_id || "system"),
+        ticker: String(row.ticker || "").toUpperCase(),
+        side,
+        quantity: Number(row.quantity || 0),
+        avg_cost: Number(row.avg_cost || 0),
+        market_value: Number(row.market_value || 0),
+        weight: Number(row.weight || 0),
+        notes: String(row.notes || ""),
+        updated_at: toIsoString(row.updated_at)
+      };
+    });
+  } catch (error) {
+    console.warn("[FRONTEND_PORTFOLIO_HOLDINGS_FALLBACK]", error);
+    return [];
+  }
+}
+
+async function queryTickerProfiles(
+  client: SupabaseClient,
+  tickers: string[]
+): Promise<Record<string, TickerProfileItem>> {
+  const requested = Array.from(
+    new Set(
+      tickers
+        .map((item) => String(item || "").toUpperCase().trim())
+        .filter((item) => item.length > 0)
+    )
+  );
+  const fallbackMap: Record<string, TickerProfileItem> = {};
+  for (const ticker of requested) {
+    fallbackMap[ticker] = fallbackTickerProfile(ticker);
+  }
+
+  if (requested.length === 0) {
+    return fallbackMap;
+  }
+
+  try {
+    const { data, error } = await client
+      .from("stock_ticker_profiles_v1")
+      .select("ticker,display_name,asset_type,sector,industry,summary_cn")
+      .eq("is_active", true)
+      .in("ticker", requested)
+      .limit(500);
+    if (error) {
+      throw error;
+    }
+
+    const rows = (data || []) as unknown as Array<Record<string, unknown>>;
+    for (const row of rows) {
+      const ticker = String(row.ticker || "").toUpperCase().trim();
+      if (!ticker) {
+        continue;
+      }
+      fallbackMap[ticker] = {
+        ticker,
+        display_name: String(row.display_name || ticker),
+        asset_type: normalizeAssetType(row.asset_type),
+        sector: String(row.sector || "Unknown"),
+        industry: String(row.industry || "Unknown"),
+        summary_cn: String(row.summary_cn || fallbackTickerProfile(ticker).summary_cn)
+      };
+    }
+    return fallbackMap;
+  } catch (error) {
+    console.warn("[FRONTEND_TICKER_PROFILE_FALLBACK]", error);
+    return fallbackMap;
   }
 }
 
@@ -1778,14 +2049,24 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
   const transmissionEnabled = readTransmissionLayerFlag();
   const aiDebateEnabled = readAiDebateViewFlag();
 
-  const [sentinelSignals, rawOpportunities, marketRegime, v2Snapshot, indirectImpacts, alerts, alertPrefs] = await Promise.all([
+  const [
+    sentinelSignals,
+    rawOpportunities,
+    marketRegime,
+    v2Snapshot,
+    indirectImpacts,
+    alerts,
+    alertPrefs,
+    portfolioHoldings
+  ] = await Promise.all([
     queryV2Signals(client),
     queryV2Opportunities(client),
     queryV2Regime(client),
     queryV2Snapshot(client),
     queryV2IndirectImpacts(client),
     queryAlertCenter(client),
-    queryAlertPrefs(client)
+    queryAlertPrefs(client),
+    queryPortfolioHoldings(client)
   ]);
 
   if (!v2Snapshot && sentinelSignals.length === 0 && rawOpportunities.length === 0) {
@@ -1844,6 +2125,28 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
     queryV2HotClusters(client),
     queryV2Relations(client)
   ]);
+  const tickerUniverse = new Set<string>();
+  for (const item of opportunities) {
+    if (item.ticker) {
+      tickerUniverse.add(item.ticker);
+    }
+  }
+  for (const item of alerts) {
+    if (item.ticker) {
+      tickerUniverse.add(item.ticker);
+    }
+  }
+  for (const item of tickerDigest) {
+    if (item.ticker) {
+      tickerUniverse.add(item.ticker);
+    }
+  }
+  for (const item of portfolioHoldings) {
+    if (item.ticker) {
+      tickerUniverse.add(item.ticker);
+    }
+  }
+  const tickerProfiles = await queryTickerProfiles(client, Array.from(tickerUniverse));
   const hotClusters = v2HotClusters;
   const relations = v2Relations;
 
@@ -1874,6 +2177,8 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
     opportunities,
     alerts,
     alertPrefs,
+    portfolioHoldings,
+    tickerProfiles,
     marketRegime,
     marketSnapshot,
     dataQuality: buildDataQualitySnapshot(dataUpdatedAt, sourceHealth),
@@ -1945,6 +2250,10 @@ export async function getDashboardData(): Promise<DashboardData> {
         watch_tickers: [],
         muted_signal_types: []
       },
+      portfolioHoldings: [],
+      tickerProfiles: Object.fromEntries(
+        fallbackTickerRows.map((row) => [row.ticker, fallbackTickerProfile(row.ticker)])
+      ),
       marketRegime: null,
       marketSnapshot: baseSnapshot(),
       dataQuality: buildDataQualitySnapshot(now, { healthy: 0, degraded: 0, critical: 0 }),
@@ -1972,6 +2281,7 @@ export async function getDashboardData(): Promise<DashboardData> {
   const marketRegime = await queryMarketRegime(client);
   const alerts = await queryAlertCenter(client);
   const alertPrefs = await queryAlertPrefs(client);
+  const portfolioHoldings = await queryPortfolioHoldings(client);
 
   const focusTickers = new Set(opportunities.map((item) => item.ticker));
   const filteredSignals = focusTickers.size
@@ -1997,11 +2307,35 @@ export async function getDashboardData(): Promise<DashboardData> {
   ]);
   const sourceHealth = await querySourceHealth(client);
   const xSourceRadar = buildXSourceRadar(filteredSignals, opportunities);
+  const tickerUniverse = new Set<string>();
+  for (const item of opportunities) {
+    if (item.ticker) {
+      tickerUniverse.add(item.ticker);
+    }
+  }
+  for (const item of alerts) {
+    if (item.ticker) {
+      tickerUniverse.add(item.ticker);
+    }
+  }
+  for (const item of tickerDigest) {
+    if (item.ticker) {
+      tickerUniverse.add(item.ticker);
+    }
+  }
+  for (const item of portfolioHoldings) {
+    if (item.ticker) {
+      tickerUniverse.add(item.ticker);
+    }
+  }
+  const tickerProfiles = await queryTickerProfiles(client, Array.from(tickerUniverse));
 
   return {
     opportunities,
     alerts,
     alertPrefs,
+    portfolioHoldings,
+    tickerProfiles,
     marketRegime,
     marketSnapshot,
     dataQuality: buildDataQualitySnapshot(dataUpdatedAt, sourceHealth),

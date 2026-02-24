@@ -162,6 +162,8 @@ export interface DashboardData {
   opportunities: OpportunityItem[];
   alerts: AlertCenterItem[];
   alertPrefs: AlertUserPrefs;
+  portfolioHoldings: PortfolioHoldingItem[];
+  tickerProfiles: Record<string, TickerProfileItem>;
   marketRegime: MarketRegime | null;
   marketSnapshot: MarketSnapshot;
   dataQuality: DataQualitySnapshot;
@@ -215,4 +217,27 @@ export interface AlertUserPrefs {
   quiet_hours_end: number;
   watch_tickers: string[];
   muted_signal_types: string[];
+}
+
+export interface PortfolioHoldingItem {
+  id: number;
+  portfolio_id: number;
+  user_id: string;
+  ticker: string;
+  side: "LONG" | "SHORT";
+  quantity: number;
+  avg_cost: number;
+  market_value: number;
+  weight: number;
+  notes: string;
+  updated_at: string;
+}
+
+export interface TickerProfileItem {
+  ticker: string;
+  display_name: string;
+  asset_type: "equity" | "etf" | "index" | "macro" | "unknown";
+  sector: string;
+  industry: string;
+  summary_cn: string;
 }
