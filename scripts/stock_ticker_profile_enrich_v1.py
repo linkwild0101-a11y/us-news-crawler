@@ -195,12 +195,14 @@ def _build_prompt(row: Dict[str, Any]) -> str:
     existing_summary = str(row.get("summary_cn") or "").strip()
     return (
         "你是美股研究助理。请输出 JSON，格式为："
-        '{"summary_cn":"", "quality_score":0.0}。'
+        '{"summary_cn":"", "quality_score":0.0, "asset_type":"", "sector":"", "industry":""}。'
         "summary_cn 要求：\n"
         "1) 使用简体中文，20-60字；\n"
         "2) 客观描述该标的业务属性与需关注变量；\n"
         "3) 禁止任何投资建议、保证收益、夸张措辞；\n"
-        "4) 只输出 JSON，不要额外文本。\n\n"
+        "4) asset_type 仅允许: equity/etf/index/macro/unknown；\n"
+        "5) sector 与 industry 用英文常用行业词（如 Technology, Semiconductor, Gold ETF）；\n"
+        "6) 只输出 JSON，不要额外文本。\n\n"
         f"ticker={ticker}\n"
         f"display_name={display_name}\n"
         f"asset_type={asset_type}\n"
@@ -210,15 +212,20 @@ def _build_prompt(row: Dict[str, Any]) -> str:
     )
 
 
-def _parse_llm_payload(payload: Dict[str, Any]) -> Tuple[str, float]:
+def _parse_llm_payload(payload: Dict[str, Any], row: Dict[str, Any]) -> Tuple[str, float, str, str, str]:
     summary = str(payload.get("summary_cn") or "").strip()
     score = max(0.0, min(1.0, _safe_float(payload.get("quality_score"), 0.8)))
+    asset_type = str(payload.get("asset_type") or row.get("asset_type") or "unknown").strip().lower()
+    if asset_type not in {"equity", "etf", "index", "macro", "unknown"}:
+        asset_type = str(row.get("asset_type") or "unknown").strip().lower() or "unknown"
+    sector = str(payload.get("sector") or row.get("sector") or "Unknown").strip()[:64] or "Unknown"
+    industry = str(payload.get("industry") or row.get("industry") or "Unknown").strip()[:64] or "Unknown"
     if not summary:
         summary = "该标的与美股主题相关，建议结合行业景气与财务数据持续跟踪。"
         score = max(score, 0.65)
     if len(summary) > 300:
         summary = summary[:300]
-    return summary, score
+    return summary, score, asset_type, sector, industry
 
 
 def _update_profile_row(
@@ -227,12 +234,18 @@ def _update_profile_row(
     run_id: str,
     summary: str,
     score: float,
+    asset_type: str,
+    sector: str,
+    industry: str,
 ) -> None:
     now_iso = _now_iso()
     payload = {
         "summary_cn": summary,
         "summary_source": "llm",
         "quality_score": score,
+        "asset_type": asset_type,
+        "sector": sector,
+        "industry": industry,
         "last_llm_at": now_iso,
         "run_id": run_id,
         "as_of": now_iso,
@@ -327,16 +340,22 @@ def _process_queue_item(
         if dry_run:
             summary = str(profile_row.get("summary_cn") or "").strip() or "dry-run summary"
             score = max(0.8, _safe_float(profile_row.get("quality_score"), 0.8))
+            asset_type = str(profile_row.get("asset_type") or "unknown").strip().lower() or "unknown"
+            sector = str(profile_row.get("sector") or "Unknown").strip() or "Unknown"
+            industry = str(profile_row.get("industry") or "Unknown").strip() or "Unknown"
         else:
             llm_client = _get_worker_llm_client()
             payload = llm_client.summarize(prompt=prompt, use_cache=False)
-            summary, score = _parse_llm_payload(payload)
+            summary, score, asset_type, sector, industry = _parse_llm_payload(payload, row=profile_row)
             _update_profile_row(
                 supabase=supabase,
                 ticker=ticker,
                 run_id=run_id,
                 summary=summary,
                 score=score,
+                asset_type=asset_type,
+                sector=sector,
+                industry=industry,
             )
             _mark_queue_done(supabase=supabase, queue_id=queue_id, run_id=run_id)
 

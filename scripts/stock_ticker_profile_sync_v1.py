@@ -464,7 +464,7 @@ def _load_existing_profiles(
     try:
         rows = (
             supabase.table("stock_ticker_profiles_v1")
-            .select("ticker,summary_cn,quality_score,summary_source")
+            .select("ticker,summary_cn,quality_score,summary_source,asset_type,sector")
             .in_("ticker", list(tickers[:5000]))
             .limit(6000)
             .execute()
@@ -474,7 +474,7 @@ def _load_existing_profiles(
     except Exception:
         rows = (
             supabase.table("stock_ticker_profiles_v1")
-            .select("ticker,summary_cn")
+            .select("ticker,summary_cn,asset_type,sector")
             .in_("ticker", list(tickers[:5000]))
             .limit(6000)
             .execute()
@@ -586,12 +586,24 @@ def _build_profile_row(
     reason: Optional[str] = None
     prev_exists = bool(existing)
     prev_quality = _safe_float(existing.get("quality_score"), 0.0)
+    prev_source = str(existing.get("summary_source") or "").strip().lower()
+    prev_asset_type = str(existing.get("asset_type") or "").strip().lower()
+    prev_sector = str(existing.get("sector") or "").strip().lower()
     prev_summary = str(existing.get("summary_cn") or "").strip()
+    summary_generic = (
+        "美股观察标的" in prev_summary
+        or "建议结合原文证据" in prev_summary
+    )
+    metadata_unknown = prev_asset_type in ("", "unknown") or prev_sector in ("", "unknown")
+    source_template_like = prev_source in ("", "template", "seed")
+
     if not prev_exists:
         reason = "new_symbol"
     elif not summary_cn and not prev_summary:
         reason = "missing_summary"
-    elif prev_quality < 0.65:
+    elif prev_quality < 0.82:
+        reason = "low_quality"
+    elif source_template_like and (summary_generic or metadata_unknown):
         reason = "low_quality"
 
     now_iso = _now_utc().isoformat()
