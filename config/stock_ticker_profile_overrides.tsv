@@ -1,0 +1,6 @@
+ticker	display_name	asset_type	sector	industry	summary_cn
+EBAY	eBay Inc.	equity	Consumer Discretionary	E-commerce Platform	全球电商平台公司，关注活跃买家趋势、广告与支付生态、利润率变化。
+PYPL	PayPal Holdings, Inc.	equity	Financials	Digital Payments	数字支付平台，核心变量是交易总额增长、活跃账户与成本控制。
+INTC	Intel Corporation	equity	Technology	Semiconductors	传统半导体龙头，关注制程进展、数据中心需求与代工业务执行。
+AMD	Advanced Micro Devices, Inc.	equity	Technology	Semiconductors	高性能计算芯片公司，关注数据中心份额、AI加速器与毛利率表现。
+NFLX	Netflix, Inc.	equity	Communication Services	Streaming Media	流媒体平台，重点看订阅净增、广告业务与内容投入回报。

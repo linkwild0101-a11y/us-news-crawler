@@ -117,3 +117,5 @@
 - [x] workflow 接入可选步骤：`ENABLE_STOCK_P1_SCREENER`
 - [x] 前端持仓录入：`frontend/app/api/portfolio/holdings/route.ts` + Settings 持仓表单
 - [x] 股票代码基础说明：`stock_ticker_profiles_v1` + `scripts/stock_ticker_profile_sync_v1.py`
+- [x] Ticker 基础库增强：覆盖池+队列+运行日志 SQL
+- [x] workflow 接入：`ENABLE_STOCK_P1_TICKER_PROFILE_ENRICH`

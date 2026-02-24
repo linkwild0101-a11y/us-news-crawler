@@ -43,6 +43,7 @@ jobs:
       ENABLE_STOCK_P1_PORTFOLIO_ADVICE: ${{ vars.ENABLE_STOCK_P1_PORTFOLIO_ADVICE || 'false' }}
       ENABLE_STOCK_P1_SCREENER: ${{ vars.ENABLE_STOCK_P1_SCREENER || 'false' }}
       ENABLE_STOCK_P1_TICKER_PROFILE: ${{ vars.ENABLE_STOCK_P1_TICKER_PROFILE || 'true' }}
+      ENABLE_STOCK_P1_TICKER_PROFILE_ENRICH: ${{ vars.ENABLE_STOCK_P1_TICKER_PROFILE_ENRICH || 'true' }}
       ENABLE_STOCK_P0_KPI_REPORT: ${{ vars.ENABLE_STOCK_P0_KPI_REPORT || 'true' }}
       ENABLE_STOCK_EVIDENCE_LAYER: ${{ vars.ENABLE_STOCK_EVIDENCE_LAYER || 'false' }}
       ENABLE_STOCK_TRANSMISSION_LAYER: ${{ vars.ENABLE_STOCK_TRANSMISSION_LAYER || 'false' }}
@@ -271,10 +272,27 @@ jobs:
         run: |
           python -u scripts/stock_ticker_profile_sync_v1.py \
             --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-p1-profile" \
+            --override-file "config/stock_ticker_profile_overrides.tsv" \
             --lookback-hours 240 \
             --opp-limit 5000 \
-            --holding-limit 2000 \
-            --screener-limit 2000
+            --event-limit 1200
+
+      - name: Enrich Stock P1 ticker profiles with LLM (optional)
+        if: ${{ env.ENABLE_STOCK_P1_TICKER_PROFILE == 'true' && env.ENABLE_STOCK_P1_TICKER_PROFILE_ENRICH == 'true' }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
+          ALIBABA_API_KEY: ${{ secrets.ALIBABA_API_KEY }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_ticker_profile_enrich_v1.py \
+            --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-p1-profile-enrich" \
+            --limit 600 \
+            --sleep-ms 80
 
       - name: Run Stock V3 eval (optional)
         if: ${{ env.ENABLE_STOCK_V3_EVAL == 'true' }}
