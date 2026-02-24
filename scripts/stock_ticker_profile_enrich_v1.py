@@ -4,8 +4,10 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import logging
 import os
+import threading
 import time
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
@@ -28,6 +30,16 @@ if not logger.handlers:
     )
     logger.addHandler(handler)
 logger.setLevel(logging.INFO)
+
+_thread_local = threading.local()
+
+_REASON_PRIORITY: Dict[str, int] = {
+    "low_quality": 0,
+    "missing_summary": 1,
+    "new_symbol": 2,
+}
+
+_PRIORITY_SOURCES = {"portfolio", "watchlist", "recent_signal"}
 
 
 def _now_iso() -> str:
@@ -77,18 +89,21 @@ def _table_available(supabase, table_name: str, probe: str = "id") -> bool:
 
 
 def _load_pending_queue(supabase, limit: int) -> List[Dict[str, Any]]:
-    rows = (
+    now_iso = _now_iso()
+    base = (
         supabase.table("stock_ticker_profile_enrich_queue_v1")
-        .select("id,ticker,reason,retry_count")
+        .select("id,ticker,reason,retry_count,next_retry_at")
         .eq("is_active", True)
         .in_("status", ["pending", "failed"])
         .order("updated_at", desc=False)
         .limit(limit)
-        .execute()
-        .data
-        or []
     )
-    return rows
+    # 仅拉取可立即重试的 failed 记录，避免同一错误高频重试。
+    try:
+        data = base.or_(f"next_retry_at.is.null,next_retry_at.lte.{now_iso}").execute().data or []
+    except Exception:
+        data = base.execute().data or []
+    return data
 
 
 def _mark_queue_running(supabase, queue_id: int, run_id: str) -> None:
@@ -99,6 +114,61 @@ def _mark_queue_running(supabase, queue_id: int, run_id: str) -> None:
             "as_of": _now_iso(),
         }
     ).eq("id", queue_id).execute()
+
+
+def _mark_queue_done(supabase, queue_id: int, run_id: str, note: str = "") -> None:
+    supabase.table("stock_ticker_profile_enrich_queue_v1").update(
+        {
+            "status": "done",
+            "last_error": note[:240],
+            "next_retry_at": None,
+            "run_id": run_id,
+            "as_of": _now_iso(),
+        }
+    ).eq("id", queue_id).execute()
+
+
+def _load_priority_tickers(supabase, limit: int = 5000) -> List[str]:
+    if not _table_available(supabase, "stock_universe_members_v1"):
+        return []
+    try:
+        rows = (
+            supabase.table("stock_universe_members_v1")
+            .select("ticker,source_type")
+            .eq("is_active", True)
+            .in_("source_type", sorted(_PRIORITY_SOURCES))
+            .order("updated_at", desc=True)
+            .limit(limit)
+            .execute()
+            .data
+            or []
+        )
+    except Exception as exc:
+        logger.warning("[PROFILE_ENRICH_PRIORITY_LOAD_FAILED] err=%s", str(exc)[:140])
+        return []
+
+    tickers = {
+        str(row.get("ticker") or "").upper().strip()
+        for row in rows
+        if str(row.get("ticker") or "").strip()
+    }
+    return sorted(tickers)
+
+
+def _get_worker_supabase():
+    client = getattr(_thread_local, "supabase", None)
+    if client is None:
+        client = _init_supabase()
+        setattr(_thread_local, "supabase", client)
+    return client
+
+
+def _get_worker_llm_client() -> LLMClient:
+    client = getattr(_thread_local, "llm_client", None)
+    if client is None:
+        client = LLMClient()
+        setattr(_thread_local, "llm_client", client)
+    return client
 
 
 def _load_profile_row(supabase, ticker: str) -> Optional[Dict[str, Any]]:
@@ -224,7 +294,80 @@ def _insert_run_log(supabase, run_id: str, payload: Dict[str, Any]) -> None:
     ).execute()
 
 
-def run_enrich(run_id: str, limit: int, sleep_ms: int, dry_run: bool) -> Dict[str, Any]:
+def _process_queue_item(
+    row: Dict[str, Any],
+    run_id: str,
+    dry_run: bool,
+    sleep_ms: int,
+) -> Dict[str, str]:
+    supabase = _get_worker_supabase()
+    queue_id = _safe_int(row.get("id"), 0)
+    ticker = str(row.get("ticker") or "").upper().strip()
+    prev_retry = _safe_int(row.get("retry_count"), 0)
+    if queue_id <= 0 or not ticker:
+        return {"status": "failed", "ticker": ticker or "UNKNOWN", "error": "bad_queue_row"}
+
+    profile_row = _load_profile_row(supabase, ticker)
+    if not profile_row:
+        if not dry_run:
+            _mark_queue_failed(
+                supabase,
+                queue_id=queue_id,
+                run_id=run_id,
+                prev_retry_count=prev_retry,
+                message="profile_not_found",
+            )
+        return {"status": "failed", "ticker": ticker, "error": "profile_not_found"}
+
+    if not dry_run:
+        _mark_queue_running(supabase, queue_id=queue_id, run_id=run_id)
+
+    prompt = _build_prompt(profile_row)
+    try:
+        if dry_run:
+            summary = str(profile_row.get("summary_cn") or "").strip() or "dry-run summary"
+            score = max(0.8, _safe_float(profile_row.get("quality_score"), 0.8))
+        else:
+            llm_client = _get_worker_llm_client()
+            payload = llm_client.summarize(prompt=prompt, use_cache=False)
+            summary, score = _parse_llm_payload(payload)
+            _update_profile_row(
+                supabase=supabase,
+                ticker=ticker,
+                run_id=run_id,
+                summary=summary,
+                score=score,
+            )
+            _mark_queue_done(supabase=supabase, queue_id=queue_id, run_id=run_id)
+
+        if sleep_ms > 0:
+            time.sleep(sleep_ms / 1000)
+        return {"status": "success", "ticker": ticker, "error": ""}
+    except Exception as exc:
+        err = str(exc)[:180]
+        if not dry_run:
+            _mark_queue_failed(
+                supabase=supabase,
+                queue_id=queue_id,
+                run_id=run_id,
+                prev_retry_count=prev_retry,
+                message=err,
+            )
+        if sleep_ms > 0:
+            time.sleep(sleep_ms / 1000)
+        return {"status": "failed", "ticker": ticker, "error": err}
+
+
+def run_enrich(
+    run_id: str,
+    limit: int,
+    sleep_ms: int,
+    dry_run: bool,
+    workers: int,
+    llm_limit: int,
+    enrich_new_symbols: bool,
+    auto_complete_skipped: bool,
+) -> Dict[str, Any]:
     """批量消费队列并补全 ticker 中文简介。"""
     start_ts = time.time()
     supabase = _init_supabase()
@@ -234,6 +377,8 @@ def run_enrich(run_id: str, limit: int, sleep_ms: int, dry_run: bool) -> Dict[st
             "run_id": run_id,
             "status": "queue_missing",
             "input_count": 0,
+            "llm_target_count": 0,
+            "skipped_new_symbol_count": 0,
             "updated_count": 0,
             "llm_success_count": 0,
             "llm_failed_count": 0,
@@ -245,6 +390,8 @@ def run_enrich(run_id: str, limit: int, sleep_ms: int, dry_run: bool) -> Dict[st
             "run_id": run_id,
             "status": "ok",
             "input_count": 0,
+            "llm_target_count": 0,
+            "skipped_new_symbol_count": 0,
             "updated_count": 0,
             "llm_success_count": 0,
             "llm_failed_count": 0,
@@ -252,12 +399,42 @@ def run_enrich(run_id: str, limit: int, sleep_ms: int, dry_run: bool) -> Dict[st
         }
         _insert_run_log(supabase, run_id=run_id, payload=result)
         return result
+
+    priority_tickers = set(_load_priority_tickers(supabase=supabase, limit=8000))
+    llm_rows: List[Dict[str, Any]] = []
+    skipped_rows: List[Dict[str, Any]] = []
+    for row in queue_rows:
+        ticker = str(row.get("ticker") or "").upper().strip()
+        reason = str(row.get("reason") or "")
+        if (
+            not enrich_new_symbols
+            and reason == "new_symbol"
+            and ticker
+            and ticker not in priority_tickers
+        ):
+            skipped_rows.append(row)
+            continue
+        llm_rows.append(row)
+
+    llm_rows.sort(
+        key=lambda row: (
+            0 if str(row.get("ticker") or "").upper().strip() in priority_tickers else 1,
+            _REASON_PRIORITY.get(str(row.get("reason") or ""), 9),
+            _safe_int(row.get("retry_count"), 0),
+            str(row.get("ticker") or "").upper().strip(),
+        )
+    )
+
+    if llm_limit > 0:
+        llm_rows = llm_rows[:llm_limit]
 
     if not dry_run and not (os.getenv("DASHSCOPE_API_KEY") or os.getenv("ALIBABA_API_KEY")):
         result = {
             "run_id": run_id,
             "status": "llm_key_missing",
             "input_count": len(queue_rows),
+            "llm_target_count": len(llm_rows),
+            "skipped_new_symbol_count": len(skipped_rows),
             "updated_count": 0,
             "llm_success_count": 0,
             "llm_failed_count": 0,
@@ -266,88 +443,77 @@ def run_enrich(run_id: str, limit: int, sleep_ms: int, dry_run: bool) -> Dict[st
         _insert_run_log(supabase, run_id=run_id, payload=result)
         return result
 
-    client = LLMClient()
+    skipped_done = 0
+    if auto_complete_skipped and not dry_run:
+        for row in skipped_rows:
+            queue_id = _safe_int(row.get("id"), 0)
+            if queue_id <= 0:
+                continue
+            _mark_queue_done(
+                supabase=supabase,
+                queue_id=queue_id,
+                run_id=run_id,
+                note="auto_completed_template",
+            )
+            skipped_done += 1
+
     success = 0
     failed = 0
     errors: List[str] = []
 
-    for row in queue_rows:
-        queue_id = _safe_int(row.get("id"), 0)
-        ticker = str(row.get("ticker") or "").upper().strip()
-        prev_retry = _safe_int(row.get("retry_count"), 0)
-        if queue_id <= 0 or not ticker:
-            continue
-
-        profile_row = _load_profile_row(supabase, ticker)
-        if not profile_row:
-            _mark_queue_failed(
-                supabase,
-                queue_id=queue_id,
-                run_id=run_id,
-                prev_retry_count=prev_retry,
-                message="profile_not_found",
-            )
-            failed += 1
-            continue
-
-        if not dry_run:
-            _mark_queue_running(supabase, queue_id=queue_id, run_id=run_id)
-
-        prompt = _build_prompt(profile_row)
-        try:
-            if dry_run:
-                summary = str(profile_row.get("summary_cn") or "").strip() or "dry-run summary"
-                score = max(0.8, _safe_float(profile_row.get("quality_score"), 0.8))
-            else:
-                payload = client.summarize(prompt=prompt, use_cache=False)
-                summary, score = _parse_llm_payload(payload)
-                _update_profile_row(
-                    supabase=supabase,
-                    ticker=ticker,
-                    run_id=run_id,
-                    summary=summary,
-                    score=score,
+    if llm_rows:
+        max_workers = max(1, workers)
+        step_start_ts = time.time()
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = [
+                executor.submit(
+                    _process_queue_item,
+                    row,
+                    run_id,
+                    dry_run,
+                    sleep_ms,
                 )
-                supabase.table("stock_ticker_profile_enrich_queue_v1").update(
-                    {
-                        "status": "done",
-                        "last_error": "",
-                        "next_retry_at": None,
-                        "run_id": run_id,
-                        "as_of": _now_iso(),
-                    }
-                ).eq("id", queue_id).execute()
+                for row in llm_rows
+            ]
 
-            success += 1
-            logger.info(
-                "[PROFILE_ENRICH_PROGRESS] ticker=%s idx=%s/%s success=%s failed=%s",
-                ticker,
-                success + failed,
-                len(queue_rows),
-                success,
-                failed,
-            )
-        except Exception as exc:
-            failed += 1
-            err = str(exc)[:180]
-            errors.append(f"{ticker}:{err}")
-            if not dry_run:
-                _mark_queue_failed(
-                    supabase=supabase,
-                    queue_id=queue_id,
-                    run_id=run_id,
-                    prev_retry_count=prev_retry,
-                    message=err,
-                )
-            logger.warning("[PROFILE_ENRICH_FAILED] ticker=%s err=%s", ticker, err)
+            completed = 0
+            for future in as_completed(futures):
+                completed += 1
+                try:
+                    item = future.result()
+                except Exception as exc:
+                    failed += 1
+                    errors.append(f"INTERNAL:{str(exc)[:180]}")
+                    item = {"status": "failed", "ticker": "UNKNOWN", "error": str(exc)[:180]}
 
-        if sleep_ms > 0:
-            time.sleep(sleep_ms / 1000)
+                if item.get("status") == "success":
+                    success += 1
+                else:
+                    failed += 1
+                    ticker = str(item.get("ticker") or "UNKNOWN")
+                    err = str(item.get("error") or "failed")
+                    errors.append(f"{ticker}:{err}")
+
+                elapsed = max(0.001, time.time() - step_start_ts)
+                avg_cost = elapsed / max(1, completed)
+                eta_sec = max(0.0, (len(llm_rows) - completed) * avg_cost)
+                if completed == 1 or completed % 10 == 0 or completed == len(llm_rows):
+                    logger.info(
+                        "[PROFILE_ENRICH_PROGRESS] idx=%s/%s success=%s failed=%s eta_min=%.1f",
+                        completed,
+                        len(llm_rows),
+                        success,
+                        failed,
+                        eta_sec / 60.0,
+                    )
 
     result = {
         "run_id": run_id,
         "status": "ok",
         "input_count": len(queue_rows),
+        "llm_target_count": len(llm_rows),
+        "skipped_new_symbol_count": len(skipped_rows),
+        "auto_completed_count": skipped_done,
         "updated_count": success,
         "llm_success_count": success,
         "llm_failed_count": failed,
@@ -361,8 +527,28 @@ def run_enrich(run_id: str, limit: int, sleep_ms: int, dry_run: bool) -> Dict[st
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="StockOps P1 ticker profile enrich")
     parser.add_argument("--run-id", type=str, default="")
-    parser.add_argument("--limit", type=int, default=500)
-    parser.add_argument("--sleep-ms", type=int, default=150)
+    parser.add_argument("--limit", type=int, default=1200)
+    parser.add_argument("--sleep-ms", type=int, default=0)
+    parser.add_argument("--workers", type=int, default=8, help="LLM 并行 worker 数")
+    parser.add_argument("--llm-limit", type=int, default=120, help="单轮最多 LLM 处理数量，0 表示不限")
+    parser.add_argument(
+        "--enrich-new-symbols",
+        action="store_true",
+        help="是否对所有 new_symbol 执行 LLM（默认仅处理重点池）",
+    )
+    parser.add_argument(
+        "--auto-complete-skipped",
+        dest="auto_complete_skipped",
+        action="store_true",
+        help="将跳过的 new_symbol 自动标记为 done（默认开启）",
+    )
+    parser.add_argument(
+        "--no-auto-complete-skipped",
+        dest="auto_complete_skipped",
+        action="store_false",
+        help="跳过 new_symbol 时不改队列状态",
+    )
+    parser.set_defaults(auto_complete_skipped=True)
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
 
@@ -373,9 +559,11 @@ def main() -> None:
         timezone.utc
     ).strftime("%Y%m%d%H%M%S")
     logger.info(
-        "[PROFILE_ENRICH_START] run_id=%s limit=%s dry_run=%s",
+        "[PROFILE_ENRICH_START] run_id=%s limit=%s workers=%s llm_limit=%s dry_run=%s",
         run_id,
         args.limit,
+        args.workers,
+        args.llm_limit,
         args.dry_run,
     )
     result = run_enrich(
@@ -383,6 +571,10 @@ def main() -> None:
         limit=max(1, args.limit),
         sleep_ms=max(0, args.sleep_ms),
         dry_run=bool(args.dry_run),
+        workers=max(1, args.workers),
+        llm_limit=max(0, args.llm_limit),
+        enrich_new_symbols=bool(args.enrich_new_symbols),
+        auto_complete_skipped=bool(args.auto_complete_skipped),
     )
     logger.info("[PROFILE_ENRICH_RESULT] %s", result)
 
