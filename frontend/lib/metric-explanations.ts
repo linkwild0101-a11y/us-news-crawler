@@ -28,6 +28,30 @@ export const METRIC_EXPLANATIONS = {
     tip: "先看数量，再看分数和置信度。数量少时更适合精选而非分散。",
     category: "机会"
   },
+  alert_total: {
+    title: "提醒总数",
+    definition: "当前提醒中心展示的提醒条数（按过滤条件前的总量）。",
+    tip: "用于评估当前提醒负荷，过高时建议提高阈值或缩小关注池。",
+    category: "提醒"
+  },
+  alert_unread: {
+    title: "未读提醒",
+    definition: "尚未在当前会话中标记为已读的提醒数量。",
+    tip: "优先处理未读中的 L3/L4 与高 alert_score 提醒。",
+    category: "提醒"
+  },
+  alert_pending_count: {
+    title: "待发送提醒",
+    definition: "状态为 pending 的提醒数量，通常表示刚生成待投递。",
+    tip: "若长期偏高，需检查 dispatch 步骤是否稳定执行。",
+    category: "提醒"
+  },
+  alert_deduped_count: {
+    title: "已去重提醒",
+    definition: "命中冷却窗口后被去重的提醒数量。",
+    tip: "去重偏高代表冷却生效，能减少重复噪音提醒。",
+    category: "提醒"
+  },
   horizon_a: {
     title: "Horizon A",
     definition: "短周期机会，通常由更高强度信号触发。",

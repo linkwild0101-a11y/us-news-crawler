@@ -2,6 +2,10 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 import {
   AiDebateView,
+  AlertCenterItem,
+  AlertFeedbackLabel,
+  AlertStatus,
+  AlertSide,
   DashboardData,
   DataQualitySnapshot,
   EvidenceItem,
@@ -207,6 +211,30 @@ function toLevel(value: unknown): RiskLevel {
   return "L1";
 }
 
+function toAlertSide(value: unknown): AlertSide {
+  const text = String(value || "NEUTRAL").toUpperCase();
+  if (text === "LONG" || text === "SHORT" || text === "NEUTRAL") {
+    return text;
+  }
+  return "NEUTRAL";
+}
+
+function toAlertStatus(value: unknown): AlertStatus {
+  const text = String(value || "pending").toLowerCase();
+  if (text === "pending" || text === "sent" || text === "deduped" || text === "dropped") {
+    return text;
+  }
+  return "pending";
+}
+
+function toAlertFeedbackLabel(value: unknown): AlertFeedbackLabel | null {
+  const text = String(value || "").toLowerCase();
+  if (text === "useful" || text === "noise") {
+    return text;
+  }
+  return null;
+}
+
 function toStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) {
     return [];
@@ -399,6 +427,103 @@ async function querySourceHealth(
   } catch (error) {
     console.warn("[FRONTEND_SOURCE_HEALTH_FALLBACK]", error);
     return fallback;
+  }
+}
+
+async function queryAlertCenter(client: SupabaseClient): Promise<AlertCenterItem[]> {
+  try {
+    const { data: eventRows, error: eventError } = await client
+      .from("stock_alert_events_v1")
+      .select(
+        "id,user_id,ticker,signal_type,signal_level,alert_score,side,title,why_now,"
+        + "session_tag,status,dedupe_window,created_at"
+      )
+      .eq("is_active", true)
+      .order("created_at", { ascending: false })
+      .limit(120);
+    if (eventError) {
+      throw eventError;
+    }
+
+    const events = (eventRows || []) as unknown as Array<Record<string, unknown>>;
+    if (events.length === 0) {
+      return [];
+    }
+
+    const alertIds = events
+      .map((row) => Number(row.id || 0))
+      .filter((id) => Number.isFinite(id) && id > 0);
+    const feedbackStats = new Map<number, {
+      useful: number;
+      noise: number;
+      latestLabel: AlertFeedbackLabel | null;
+      latestAt: string;
+    }>();
+
+    if (alertIds.length > 0) {
+      const { data: feedbackRows, error: feedbackError } = await client
+        .from("stock_alert_feedback_v1")
+        .select("alert_id,label,created_at")
+        .in("alert_id", alertIds)
+        .order("created_at", { ascending: false })
+        .limit(2000);
+      if (feedbackError) {
+        throw feedbackError;
+      }
+      for (const row of (feedbackRows || []) as unknown as Array<Record<string, unknown>>) {
+        const alertId = Number(row.alert_id || 0);
+        if (!Number.isFinite(alertId) || alertId <= 0) {
+          continue;
+        }
+        const label = toAlertFeedbackLabel(row.label);
+        if (!label) {
+          continue;
+        }
+        const createdAt = toIsoString(row.created_at);
+        const prev = feedbackStats.get(alertId) || {
+          useful: 0,
+          noise: 0,
+          latestLabel: null,
+          latestAt: ""
+        };
+        if (label === "useful") {
+          prev.useful += 1;
+        } else {
+          prev.noise += 1;
+        }
+        if (!prev.latestAt || createdAt > prev.latestAt) {
+          prev.latestAt = createdAt;
+          prev.latestLabel = label;
+        }
+        feedbackStats.set(alertId, prev);
+      }
+    }
+
+    return events.map((row) => {
+      const alertId = Number(row.id || 0);
+      const stats = feedbackStats.get(alertId);
+      return {
+        id: alertId,
+        user_id: String(row.user_id || "system"),
+        ticker: String(row.ticker || "").toUpperCase(),
+        signal_type: String(row.signal_type || "opportunity"),
+        signal_level: toLevel(row.signal_level),
+        alert_score: Math.max(0, Math.min(100, Number(row.alert_score || 0))),
+        side: toAlertSide(row.side),
+        title: String(row.title || ""),
+        why_now: String(row.why_now || ""),
+        session_tag: String(row.session_tag || "regular"),
+        status: toAlertStatus(row.status),
+        dedupe_window: toIsoString(row.dedupe_window),
+        created_at: toIsoString(row.created_at),
+        feedback_useful_count: stats?.useful || 0,
+        feedback_noise_count: stats?.noise || 0,
+        latest_feedback_label: stats?.latestLabel || null
+      } as AlertCenterItem;
+    });
+  } catch (error) {
+    console.warn("[FRONTEND_ALERT_CENTER_FALLBACK]", error);
+    return [];
   }
 }
 
@@ -1596,12 +1721,13 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
   const transmissionEnabled = readTransmissionLayerFlag();
   const aiDebateEnabled = readAiDebateViewFlag();
 
-  const [sentinelSignals, rawOpportunities, marketRegime, v2Snapshot, indirectImpacts] = await Promise.all([
+  const [sentinelSignals, rawOpportunities, marketRegime, v2Snapshot, indirectImpacts, alerts] = await Promise.all([
     queryV2Signals(client),
     queryV2Opportunities(client),
     queryV2Regime(client),
     queryV2Snapshot(client),
-    queryV2IndirectImpacts(client)
+    queryV2IndirectImpacts(client),
+    queryAlertCenter(client)
   ]);
 
   if (!v2Snapshot && sentinelSignals.length === 0 && rawOpportunities.length === 0) {
@@ -1688,6 +1814,7 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
 
   return {
     opportunities,
+    alerts,
     marketRegime,
     marketSnapshot,
     dataQuality: buildDataQualitySnapshot(dataUpdatedAt, sourceHealth),
@@ -1748,6 +1875,7 @@ export async function getDashboardData(): Promise<DashboardData> {
         expires_at: new Date(Date.now() + 48 * 3600 * 1000).toISOString(),
         as_of: now
       })),
+      alerts: [],
       marketRegime: null,
       marketSnapshot: baseSnapshot(),
       dataQuality: buildDataQualitySnapshot(now, { healthy: 0, degraded: 0, critical: 0 }),
@@ -1773,6 +1901,7 @@ export async function getDashboardData(): Promise<DashboardData> {
   const tickerDigest = await queryTickerDigest(client, sentinelSignals);
   const opportunities = await queryOpportunities(client, tickerDigest, sentinelSignals);
   const marketRegime = await queryMarketRegime(client);
+  const alerts = await queryAlertCenter(client);
 
   const focusTickers = new Set(opportunities.map((item) => item.ticker));
   const filteredSignals = focusTickers.size
@@ -1801,6 +1930,7 @@ export async function getDashboardData(): Promise<DashboardData> {
 
   return {
     opportunities,
+    alerts,
     marketRegime,
     marketSnapshot,
     dataQuality: buildDataQualitySnapshot(dataUpdatedAt, sourceHealth),

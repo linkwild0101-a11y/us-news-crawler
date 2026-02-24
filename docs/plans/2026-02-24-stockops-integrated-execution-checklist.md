@@ -50,8 +50,9 @@
 
 ## Sprint B（下周）
 
-- [ ] 前端提醒中心列表（并入现有 dashboard）
-- [ ] 提醒卡“有用/噪音”反馈按钮
+- [x] 前端提醒中心列表（并入现有 dashboard）
+- [x] 提醒卡“有用/噪音”反馈按钮
+- [ ] 执行 SQL：`sql/2026-02-24_stock_alert_feedback_insert_policy.sql`
 - [ ] 反馈聚合脚本 `stock_alert_feedback_agg_v1.py`
 - [ ] 阈值建议日报（输出到 `docs/reports/`）
 
@@ -68,4 +69,3 @@
 - M1：能稳定生成 alert events（规则触发可解释）
 - M2：去重冷却生效（重复提醒率明显下降）
 - M3：用户反馈可写入并可统计 useful/noise 比例
-

@@ -13,6 +13,7 @@ import {
 import { METRIC_EXPLANATIONS, MetricKey } from "@/lib/metric-explanations";
 import {
   AiDebateView,
+  AlertCenterItem,
   DashboardData,
   OpportunityItem,
   RiskLevel,
@@ -22,10 +23,11 @@ import {
   TickerSignalDigest
 } from "@/lib/types";
 
-type DashboardTab = "opportunities" | "market" | "signals" | "evidence";
+type DashboardTab = "opportunities" | "alerts" | "market" | "signals" | "evidence";
 
 const TABS: { id: DashboardTab; label: string; icon: string }[] = [
   { id: "opportunities", label: "机会", icon: "🎯" },
+  { id: "alerts", label: "提醒", icon: "🔔" },
   { id: "market", label: "市场", icon: "📈" },
   { id: "signals", label: "信号", icon: "🚨" },
   { id: "evidence", label: "证据", icon: "🧩" }
@@ -185,6 +187,47 @@ function indirectStatusMeta(
     label: "观察中",
     className: "text-riskMid bg-amber-500/10 border-amber-300/30"
   };
+}
+
+function alertStatusMeta(
+  status: AlertCenterItem["status"]
+): { label: string; className: string } {
+  if (status === "sent") {
+    return {
+      label: "已发送",
+      className: "text-riskLow bg-emerald-500/10 border-emerald-300/30"
+    };
+  }
+  if (status === "deduped") {
+    return {
+      label: "已去重",
+      className: "text-textMuted bg-slate-500/10 border-slate-400/30"
+    };
+  }
+  if (status === "dropped") {
+    return {
+      label: "已丢弃",
+      className: "text-riskHigh bg-red-500/10 border-red-400/30"
+    };
+  }
+  return {
+    label: "待发送",
+    className: "text-riskMid bg-amber-500/10 border-amber-300/30"
+  };
+}
+
+function alertSessionLabel(sessionTag: string): string {
+  const tag = sessionTag.toLowerCase();
+  if (tag === "premarket") {
+    return "盘前";
+  }
+  if (tag === "postmarket") {
+    return "盘后";
+  }
+  if (tag === "regular") {
+    return "盘中";
+  }
+  return "闭市";
 }
 
 function rankTicker(items: TickerSignalDigest[]): TickerSignalDigest[] {
@@ -464,6 +507,104 @@ function OpportunityCard({
   );
 }
 
+function AlertCard({
+  item,
+  selectedLabel,
+  submitting,
+  errorText,
+  isRead,
+  onFeedback,
+  onMarkRead
+}: {
+  item: AlertCenterItem;
+  selectedLabel: "useful" | "noise" | null;
+  submitting: boolean;
+  errorText: string;
+  isRead: boolean;
+  onFeedback: (item: AlertCenterItem, label: "useful" | "noise") => void;
+  onMarkRead: (alertId: number) => void;
+}) {
+  const statusMeta = alertStatusMeta(item.status);
+  const sideText = item.side === "NEUTRAL" ? "中性" : item.side;
+  return (
+    <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h3 className="text-base font-semibold">{item.title || `${item.ticker} 提醒`}</h3>
+          <p className="mt-1 text-xs text-textMuted">
+            {item.ticker} · {sideText} · {alertSessionLabel(item.session_tag)} · {formatTime(item.created_at)}
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className={`rounded-md border px-2 py-0.5 text-xs ${statusMeta.className}`}>
+            {statusMeta.label}
+          </span>
+          <span className={`rounded-md border px-2 py-0.5 text-xs font-semibold ${levelClass(item.signal_level)}`}>
+            {item.signal_level} · {Math.round(item.alert_score)}
+          </span>
+        </div>
+      </div>
+
+      <p className="mt-2 text-sm leading-6 text-textMain">{item.why_now || "暂无 why-now 描述。"}</p>
+
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+        <span className="rounded border border-slate-600/70 bg-card/60 px-2 py-0.5 text-textMuted">
+          {isRead ? "已读" : "未读"}
+        </span>
+        <span className="rounded border border-slate-600/70 bg-card/60 px-2 py-0.5 text-textMuted">
+          useful {item.feedback_useful_count}
+        </span>
+        <span className="rounded border border-slate-600/70 bg-card/60 px-2 py-0.5 text-textMuted">
+          noise {item.feedback_noise_count}
+        </span>
+        {selectedLabel && (
+          <span className="rounded border border-cyan-400/40 bg-cyan-500/10 px-2 py-0.5 text-accent">
+            已反馈 {selectedLabel === "useful" ? "有用" : "噪音"}
+          </span>
+        )}
+      </div>
+
+      <div className="mt-3 flex items-center gap-2">
+        <button
+          type="button"
+          disabled={submitting}
+          onClick={() => onFeedback(item, "useful")}
+          className={`rounded-md border px-2 py-1 text-xs ${
+            selectedLabel === "useful"
+              ? "border-emerald-300/60 bg-emerald-500/20 text-riskLow"
+              : "border-slate-600 text-textMuted hover:text-textMain"
+          }`}
+        >
+          👍 有用
+        </button>
+        <button
+          type="button"
+          disabled={submitting}
+          onClick={() => onFeedback(item, "noise")}
+          className={`rounded-md border px-2 py-1 text-xs ${
+            selectedLabel === "noise"
+              ? "border-red-300/60 bg-red-500/20 text-riskHigh"
+              : "border-slate-600 text-textMuted hover:text-textMain"
+          }`}
+        >
+          👎 噪音
+        </button>
+        {submitting && <span className="text-xs text-textMuted">提交中...</span>}
+        {!isRead && (
+          <button
+            type="button"
+            onClick={() => onMarkRead(item.id)}
+            className="rounded-md border border-slate-600 px-2 py-1 text-xs text-textMuted hover:text-textMain"
+          >
+            标记已读
+          </button>
+        )}
+      </div>
+      {errorText && <p className="mt-2 text-xs text-riskHigh">{errorText}</p>}
+    </article>
+  );
+}
+
 function EvidenceDrawer({
   item,
   onClose,
@@ -662,6 +803,11 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
   const [dictOpen, setDictOpen] = useState(false);
   const [selectedOpportunity, setSelectedOpportunity] = useState<OpportunityItem | null>(null);
   const [reviewQueuedMap, setReviewQueuedMap] = useState<Record<number, boolean>>({});
+  const [readAlertMap, setReadAlertMap] = useState<Record<number, boolean>>({});
+  const [alertStatusFilter, setAlertStatusFilter] = useState<"all" | "pending" | "sent" | "deduped">("all");
+  const [feedbackStateMap, setFeedbackStateMap] = useState<
+    Record<number, { label: "useful" | "noise" | null; submitting: boolean; error: string }>
+  >({});
   const showV3ExplainBadge = readDashboardV3ExplainFlag();
   const enableEvidenceLayer = readEvidenceLayerFlag();
   const enableTransmissionLayer = readTransmissionLayerFlag();
@@ -675,6 +821,26 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
   const topClusters = data.hotClusters.slice(0, 12);
   const topRelations = data.relations.slice(0, 10);
   const xRadar = data.xSourceRadar.slice(0, 8);
+  const alerts = useMemo(() => {
+    const filtered = data.alerts.filter((item) => {
+      if (alertStatusFilter === "all") {
+        return true;
+      }
+      return item.status === alertStatusFilter;
+    });
+    return [...filtered].sort((a, b) => {
+      if (a.status !== b.status) {
+        if (a.status === "pending") {
+          return -1;
+        }
+        if (b.status === "pending") {
+          return 1;
+        }
+      }
+      return b.created_at.localeCompare(a.created_at);
+    });
+  }, [data.alerts, alertStatusFilter]);
+  const unreadAlertCount = alerts.filter((item) => !readAlertMap[item.id]).length;
 
   function handleAddToReviewQueue(item: OpportunityItem): void {
     const storageKey = "stock_review_queue_v1";
@@ -697,6 +863,48 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
       console.warn("[FRONTEND_REVIEW_QUEUE_FALLBACK]", error);
     }
     setReviewQueuedMap((prev) => ({ ...prev, [item.id]: true }));
+  }
+
+  function handleMarkAlertRead(alertId: number): void {
+    setReadAlertMap((prev) => ({ ...prev, [alertId]: true }));
+  }
+
+  async function handleAlertFeedback(item: AlertCenterItem, label: "useful" | "noise"): Promise<void> {
+    setFeedbackStateMap((prev) => ({
+      ...prev,
+      [item.id]: { label: prev[item.id]?.label || null, submitting: true, error: "" }
+    }));
+
+    try {
+      const response = await fetch("/api/alerts/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          alertId: item.id,
+          label,
+          reason: "",
+          userId: "system"
+        })
+      });
+      if (!response.ok) {
+        throw new Error("feedback_failed");
+      }
+      setFeedbackStateMap((prev) => ({
+        ...prev,
+        [item.id]: { label, submitting: false, error: "" }
+      }));
+      setReadAlertMap((prev) => ({ ...prev, [item.id]: true }));
+    } catch (error) {
+      console.warn("[FRONTEND_ALERT_FEEDBACK_FALLBACK]", error);
+      setFeedbackStateMap((prev) => ({
+        ...prev,
+        [item.id]: {
+          label: prev[item.id]?.label || null,
+          submitting: false,
+          error: "提交失败，请稍后重试"
+        }
+      }));
+    }
   }
 
   return (
@@ -756,7 +964,7 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
         </div>
       </header>
 
-      <nav className="mb-4 hidden grid-cols-4 gap-2 md:grid">
+      <nav className="mb-4 hidden grid-cols-5 gap-2 md:grid">
         {TABS.map((tab) => (
           <button
             key={tab.id}
@@ -857,6 +1065,89 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
           ) : (
             <article className="rounded-xl border border-slate-700/80 bg-panel p-4 text-sm text-textMuted">
               暂无可交易机会，建议等待新的美股催化信号。
+            </article>
+          )}
+        </section>
+      )}
+
+      {activeTab === "alerts" && (
+        <section className="space-y-4">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
+              <div className="text-xs text-textMuted">
+                <LabelWithHint label="提醒总数" hintKey="alert_total" />
+              </div>
+              <div className="mt-1 text-lg font-semibold">{data.alerts.length}</div>
+            </article>
+            <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
+              <div className="text-xs text-textMuted">
+                <LabelWithHint label="未读" hintKey="alert_unread" />
+              </div>
+              <div className="mt-1 text-lg font-semibold">{unreadAlertCount}</div>
+            </article>
+            <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
+              <div className="text-xs text-textMuted">
+                <LabelWithHint label="待发送" hintKey="alert_pending_count" />
+              </div>
+              <div className="mt-1 text-lg font-semibold text-riskMid">
+                {data.alerts.filter((item) => item.status === "pending").length}
+              </div>
+            </article>
+            <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
+              <div className="text-xs text-textMuted">
+                <LabelWithHint label="已去重" hintKey="alert_deduped_count" />
+              </div>
+              <div className="mt-1 text-lg font-semibold text-textMuted">
+                {data.alerts.filter((item) => item.status === "deduped").length}
+              </div>
+            </article>
+          </div>
+
+          <article className="rounded-xl border border-slate-700/80 bg-panel p-3">
+            <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-textMuted">状态过滤：</span>
+              {(["all", "pending", "sent", "deduped"] as const).map((status) => (
+                <button
+                  key={status}
+                  type="button"
+                  onClick={() => setAlertStatusFilter(status)}
+                  className={`rounded-md border px-2 py-1 ${
+                    alertStatusFilter === status
+                      ? "border-accent/60 bg-cyan-500/10 text-accent"
+                      : "border-slate-600 text-textMuted"
+                  }`}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-textMuted">
+              提醒用于“快速发现线索”，最终请以原文与交易计划复核为准。
+            </p>
+          </article>
+
+          {alerts.length > 0 ? (
+            <div className="grid gap-3 lg:grid-cols-2">
+              {alerts.map((item) => {
+                const localFeedback = feedbackStateMap[item.id];
+                const selectedLabel = localFeedback?.label || item.latest_feedback_label;
+                return (
+                  <AlertCard
+                    key={item.id}
+                    item={item}
+                    selectedLabel={selectedLabel}
+                    submitting={Boolean(localFeedback?.submitting)}
+                    errorText={localFeedback?.error || ""}
+                    isRead={Boolean(readAlertMap[item.id])}
+                    onFeedback={handleAlertFeedback}
+                    onMarkRead={handleMarkAlertRead}
+                  />
+                );
+              })}
+            </div>
+          ) : (
+            <article className="rounded-xl border border-slate-700/80 bg-panel p-4 text-sm text-textMuted">
+              当前过滤条件下暂无提醒。
             </article>
           )}
         </section>
@@ -1017,7 +1308,7 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
         </section>
       )}
 
-      <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 gap-1 border-t border-slate-700/80 bg-panel/95 px-2 py-2 backdrop-blur md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-5 gap-1 border-t border-slate-700/80 bg-panel/95 px-2 py-2 backdrop-blur md:hidden">
         {TABS.map((tab) => (
           <button
             key={tab.id}

@@ -160,6 +160,7 @@ export interface MarketRegime {
 
 export interface DashboardData {
   opportunities: OpportunityItem[];
+  alerts: AlertCenterItem[];
   marketRegime: MarketRegime | null;
   marketSnapshot: MarketSnapshot;
   dataQuality: DataQualitySnapshot;
@@ -179,4 +180,27 @@ export interface DataQualitySnapshot {
   source_health_healthy: number;
   source_health_degraded: number;
   source_health_critical: number;
+}
+
+export type AlertSide = "LONG" | "SHORT" | "NEUTRAL";
+export type AlertStatus = "pending" | "sent" | "deduped" | "dropped";
+export type AlertFeedbackLabel = "useful" | "noise";
+
+export interface AlertCenterItem {
+  id: number;
+  user_id: string;
+  ticker: string;
+  signal_type: string;
+  signal_level: RiskLevel;
+  alert_score: number;
+  side: AlertSide;
+  title: string;
+  why_now: string;
+  session_tag: string;
+  status: AlertStatus;
+  dedupe_window: string;
+  created_at: string;
+  feedback_useful_count: number;
+  feedback_noise_count: number;
+  latest_feedback_label: AlertFeedbackLabel | null;
 }
