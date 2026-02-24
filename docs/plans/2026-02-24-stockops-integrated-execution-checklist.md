@@ -29,8 +29,9 @@
 ## C. 时段治理与通知质量（待执行）
 
 - [x] 盘前/盘后开关贯通（规则 + 偏好 + 前端）
-- [ ] 执行 SQL：`sql/2026-02-24_stock_alert_user_prefs_write_policy.sql`
-- [ ] 每日提醒上限与静默时段
+- [ ] 执行 SQL：`sql/2026-02-24_stock_alert_user_prefs_quiet_hours.sql`
+- [ ] 重新执行 SQL：`sql/2026-02-24_stock_alert_user_prefs_write_policy.sql`
+- [x] 每日提醒上限与静默时段
 - [x] 飞书模板升级（why-now + 风险 + 失效条件 + 原文）
 - [x] 噪音反馈率周报
 

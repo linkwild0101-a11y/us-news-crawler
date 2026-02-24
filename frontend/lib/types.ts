@@ -211,6 +211,8 @@ export interface AlertUserPrefs {
   enable_premarket: boolean;
   enable_postmarket: boolean;
   daily_alert_cap: number;
+  quiet_hours_start: number;
+  quiet_hours_end: number;
   watch_tickers: string[];
   muted_signal_types: string[];
 }

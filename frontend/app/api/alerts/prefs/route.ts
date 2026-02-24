@@ -8,6 +8,8 @@ interface PrefsPayload {
   enable_premarket: boolean;
   enable_postmarket: boolean;
   daily_alert_cap: number;
+  quiet_hours_start: number;
+  quiet_hours_end: number;
 }
 
 function readSupabaseConfig(): { url: string; key: string } | null {
@@ -28,14 +30,21 @@ function parsePayload(body: unknown): PrefsPayload | null {
   const enablePremarket = Boolean(row.enablePremarket);
   const enablePostmarket = Boolean(row.enablePostmarket);
   const dailyCap = Number(row.dailyAlertCap || 20);
+  const quietHoursStart = Number(row.quietHoursStart || 0);
+  const quietHoursEnd = Number(row.quietHoursEnd || 0);
   if (!Number.isFinite(dailyCap)) {
+    return null;
+  }
+  if (!Number.isFinite(quietHoursStart) || !Number.isFinite(quietHoursEnd)) {
     return null;
   }
   return {
     user_id: userId,
     enable_premarket: enablePremarket,
     enable_postmarket: enablePostmarket,
-    daily_alert_cap: Math.max(1, Math.min(200, Math.round(dailyCap)))
+    daily_alert_cap: Math.max(1, Math.min(200, Math.round(dailyCap))),
+    quiet_hours_start: Math.max(0, Math.min(23, Math.round(quietHoursStart))),
+    quiet_hours_end: Math.max(0, Math.min(23, Math.round(quietHoursEnd)))
   };
 }
 
@@ -50,7 +59,10 @@ export async function GET(): Promise<NextResponse> {
 
   const { data, error } = await client
     .from("stock_alert_user_prefs_v1")
-    .select("user_id,enable_premarket,enable_postmarket,daily_alert_cap,watch_tickers,muted_signal_types")
+    .select(
+      "user_id,enable_premarket,enable_postmarket,daily_alert_cap,quiet_hours_start,"
+      + "quiet_hours_end,watch_tickers,muted_signal_types"
+    )
     .eq("is_active", true)
     .eq("user_id", "system")
     .order("updated_at", { ascending: false })
@@ -67,6 +79,8 @@ export async function GET(): Promise<NextResponse> {
         enable_premarket: false,
         enable_postmarket: true,
         daily_alert_cap: 20,
+        quiet_hours_start: 0,
+        quiet_hours_end: 0,
         watch_tickers: [],
         muted_signal_types: []
       },
@@ -96,6 +110,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     enable_premarket: payload.enable_premarket,
     enable_postmarket: payload.enable_postmarket,
     daily_alert_cap: payload.daily_alert_cap,
+    quiet_hours_start: payload.quiet_hours_start,
+    quiet_hours_end: payload.quiet_hours_end,
     watch_tickers: [],
     muted_signal_types: [],
     run_id: `frontend-prefs-${Date.now()}`,

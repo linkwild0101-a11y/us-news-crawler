@@ -534,6 +534,8 @@ async function queryAlertPrefs(client: SupabaseClient): Promise<AlertUserPrefs> 
     enable_premarket: false,
     enable_postmarket: true,
     daily_alert_cap: 20,
+    quiet_hours_start: 0,
+    quiet_hours_end: 0,
     watch_tickers: [],
     muted_signal_types: []
   };
@@ -542,7 +544,8 @@ async function queryAlertPrefs(client: SupabaseClient): Promise<AlertUserPrefs> 
     const { data, error } = await client
       .from("stock_alert_user_prefs_v1")
       .select(
-        "user_id,enable_premarket,enable_postmarket,daily_alert_cap,watch_tickers,muted_signal_types"
+        "user_id,enable_premarket,enable_postmarket,daily_alert_cap,quiet_hours_start,"
+        + "quiet_hours_end,watch_tickers,muted_signal_types"
       )
       .eq("is_active", true)
       .eq("user_id", "system")
@@ -555,19 +558,22 @@ async function queryAlertPrefs(client: SupabaseClient): Promise<AlertUserPrefs> 
       }
       return fallback;
     }
+    const row = data as unknown as Record<string, unknown>;
 
     return {
-      user_id: String(data.user_id || "system"),
-      enable_premarket: Boolean(data.enable_premarket),
-      enable_postmarket: Boolean(data.enable_postmarket),
-      daily_alert_cap: Math.max(1, Math.min(200, Number(data.daily_alert_cap || 20))),
-      watch_tickers: Array.isArray(data.watch_tickers)
-        ? data.watch_tickers
+      user_id: String(row.user_id || "system"),
+      enable_premarket: Boolean(row.enable_premarket),
+      enable_postmarket: Boolean(row.enable_postmarket),
+      daily_alert_cap: Math.max(1, Math.min(200, Number(row.daily_alert_cap || 20))),
+      quiet_hours_start: Math.max(0, Math.min(23, Number(row.quiet_hours_start || 0))),
+      quiet_hours_end: Math.max(0, Math.min(23, Number(row.quiet_hours_end || 0))),
+      watch_tickers: Array.isArray(row.watch_tickers)
+        ? row.watch_tickers
           .map((item: unknown) => String(item || "").toUpperCase().trim())
           .filter((item: string) => item.length > 0)
         : [],
-      muted_signal_types: Array.isArray(data.muted_signal_types)
-        ? data.muted_signal_types
+      muted_signal_types: Array.isArray(row.muted_signal_types)
+        ? row.muted_signal_types
           .map((item: unknown) => String(item || "").toLowerCase().trim())
           .filter((item: string) => item.length > 0)
         : []
@@ -1934,6 +1940,8 @@ export async function getDashboardData(): Promise<DashboardData> {
         enable_premarket: false,
         enable_postmarket: true,
         daily_alert_cap: 20,
+        quiet_hours_start: 0,
+        quiet_hours_end: 0,
         watch_tickers: [],
         muted_signal_types: []
       },

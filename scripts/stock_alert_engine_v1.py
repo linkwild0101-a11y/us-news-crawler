@@ -56,6 +56,8 @@ class UserPref:
     daily_alert_cap: int
     watch_tickers: List[str]
     muted_signal_types: List[str]
+    quiet_hours_start: int
+    quiet_hours_end: int
 
 
 def _now_utc() -> datetime:
@@ -107,6 +109,17 @@ def _window_floor(now_utc: datetime, cooldown_sec: int) -> datetime:
     bucket = max(60, cooldown_sec)
     floored = (ts // bucket) * bucket
     return datetime.fromtimestamp(floored, tz=timezone.utc)
+
+
+def _in_quiet_hours(now_utc: datetime, start_hour: int, end_hour: int) -> bool:
+    start = max(0, min(23, int(start_hour)))
+    end = max(0, min(23, int(end_hour)))
+    if start == end:
+        return False
+    current_hour = now_utc.astimezone(NY_TZ).hour
+    if start < end:
+        return start <= current_hour < end
+    return current_hour >= start or current_hour < end
 
 
 class StockAlertEngineV1:
@@ -182,7 +195,7 @@ class StockAlertEngineV1:
                 self.supabase.table("stock_alert_user_prefs_v1")
                 .select(
                     "user_id,enable_premarket,enable_postmarket,daily_alert_cap,"
-                    "watch_tickers,muted_signal_types"
+                    "watch_tickers,muted_signal_types,quiet_hours_start,quiet_hours_end"
                 )
                 .eq("is_active", True)
                 .limit(300)
@@ -214,6 +227,8 @@ class StockAlertEngineV1:
                     daily_alert_cap=max(1, _safe_int(row.get("daily_alert_cap"), 20)),
                     watch_tickers=watch_tickers,
                     muted_signal_types=muted_types,
+                    quiet_hours_start=max(0, min(23, _safe_int(row.get("quiet_hours_start"), 0))),
+                    quiet_hours_end=max(0, min(23, _safe_int(row.get("quiet_hours_end"), 0))),
                 )
             )
 
@@ -228,6 +243,8 @@ class StockAlertEngineV1:
                 daily_alert_cap=20,
                 watch_tickers=[],
                 muted_signal_types=[],
+                quiet_hours_start=0,
+                quiet_hours_end=0,
             )
         ]
 
@@ -302,8 +319,10 @@ class StockAlertEngineV1:
                 counts[user_id] += 1
         return counts
 
-    def _session_allowed(self, session_tag: str, pref: UserPref, rule: AlertRule) -> bool:
+    def _session_allowed(self, session_tag: str, pref: UserPref, rule: AlertRule, now_utc: datetime) -> bool:
         if rule.session_scope not in ("all", session_tag):
+            return False
+        if _in_quiet_hours(now_utc, pref.quiet_hours_start, pref.quiet_hours_end):
             return False
         if session_tag == "premarket" and not pref.enable_premarket:
             return False
@@ -381,7 +400,7 @@ class StockAlertEngineV1:
                     signal_type = str(rule.signal_type or "opportunity").lower()
                     if signal_type in pref.muted_signal_types:
                         continue
-                    if not self._session_allowed(session_tag, pref, rule):
+                    if not self._session_allowed(session_tag, pref, rule, now_utc):
                         continue
                     if not self._rule_match(rule, level=level, score=opp_score, signal_type="opportunity"):
                         continue

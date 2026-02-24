@@ -13,6 +13,8 @@ CREATE POLICY stock_alert_user_prefs_v1_public_insert
     WITH CHECK (
       user_id = 'system'
       AND daily_alert_cap BETWEEN 1 AND 200
+      AND quiet_hours_start BETWEEN 0 AND 23
+      AND quiet_hours_end BETWEEN 0 AND 23
       AND coalesce(array_length(watch_tickers, 1), 0) <= 200
       AND coalesce(array_length(muted_signal_types, 1), 0) <= 50
     );
@@ -25,6 +27,8 @@ CREATE POLICY stock_alert_user_prefs_v1_public_update
     WITH CHECK (
       user_id = 'system'
       AND daily_alert_cap BETWEEN 1 AND 200
+      AND quiet_hours_start BETWEEN 0 AND 23
+      AND quiet_hours_end BETWEEN 0 AND 23
       AND coalesce(array_length(watch_tickers, 1), 0) <= 200
       AND coalesce(array_length(muted_signal_types, 1), 0) <= 50
     );

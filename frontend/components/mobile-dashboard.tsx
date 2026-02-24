@@ -811,6 +811,12 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
   >({});
   const [alertPrefs, setAlertPrefs] = useState(data.alertPrefs);
   const [dailyCapInput, setDailyCapInput] = useState(String(data.alertPrefs.daily_alert_cap || 20));
+  const [quietHoursStartInput, setQuietHoursStartInput] = useState(
+    String(data.alertPrefs.quiet_hours_start || 0)
+  );
+  const [quietHoursEndInput, setQuietHoursEndInput] = useState(
+    String(data.alertPrefs.quiet_hours_end || 0)
+  );
   const [prefsSaving, setPrefsSaving] = useState(false);
   const [prefsMessage, setPrefsMessage] = useState("");
   const showV3ExplainBadge = readDashboardV3ExplainFlag();
@@ -916,6 +922,8 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
     enable_premarket?: boolean;
     enable_postmarket?: boolean;
     daily_alert_cap?: number;
+    quiet_hours_start?: number;
+    quiet_hours_end?: number;
   }): Promise<void> {
     const nextPrefs = {
       ...alertPrefs,
@@ -932,7 +940,9 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
           userId: nextPrefs.user_id || "system",
           enablePremarket: Boolean(nextPrefs.enable_premarket),
           enablePostmarket: Boolean(nextPrefs.enable_postmarket),
-          dailyAlertCap: Math.max(1, Math.min(200, Number(nextPrefs.daily_alert_cap || 20)))
+          dailyAlertCap: Math.max(1, Math.min(200, Number(nextPrefs.daily_alert_cap || 20))),
+          quietHoursStart: Math.max(0, Math.min(23, Number(nextPrefs.quiet_hours_start || 0))),
+          quietHoursEnd: Math.max(0, Math.min(23, Number(nextPrefs.quiet_hours_end || 0)))
         })
       });
       if (!response.ok) {
@@ -940,6 +950,8 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
       }
       setAlertPrefs(nextPrefs);
       setDailyCapInput(String(nextPrefs.daily_alert_cap));
+      setQuietHoursStartInput(String(nextPrefs.quiet_hours_start));
+      setQuietHoursEndInput(String(nextPrefs.quiet_hours_end));
       setPrefsMessage("设置已保存");
     } catch (error) {
       console.warn("[FRONTEND_ALERT_PREFS_SAVE_FALLBACK]", error);
@@ -1424,6 +1436,59 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
             </div>
             <p className="mt-2 text-xs text-textMuted">
               当前值：{alertPrefs.daily_alert_cap}（超过上限后当日不再生成新提醒）
+            </p>
+          </article>
+
+          <article className="rounded-xl border border-slate-700/80 bg-panel p-4">
+            <h2 className="mb-3 text-sm font-semibold">静默时段（美东时间）</h2>
+            <div className="grid grid-cols-2 gap-2">
+              <label>
+                <span className="mb-1 block text-xs text-textMuted">开始小时（0-23）</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={23}
+                  value={quietHoursStartInput}
+                  onChange={(event) => setQuietHoursStartInput(event.target.value)}
+                  className="w-full rounded-md border border-slate-600 bg-card/60 px-3 py-2 text-sm text-textMain outline-none"
+                />
+              </label>
+              <label>
+                <span className="mb-1 block text-xs text-textMuted">结束小时（0-23）</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={23}
+                  value={quietHoursEndInput}
+                  onChange={(event) => setQuietHoursEndInput(event.target.value)}
+                  className="w-full rounded-md border border-slate-600 bg-card/60 px-3 py-2 text-sm text-textMain outline-none"
+                />
+              </label>
+            </div>
+            <div className="mt-2 flex items-center gap-2">
+              <button
+                type="button"
+                disabled={prefsSaving}
+                onClick={() => {
+                  const startParsed = Number(quietHoursStartInput || 0);
+                  const endParsed = Number(quietHoursEndInput || 0);
+                  const startHour = Math.max(0, Math.min(23, Number.isFinite(startParsed) ? startParsed : 0));
+                  const endHour = Math.max(0, Math.min(23, Number.isFinite(endParsed) ? endParsed : 0));
+                  void saveAlertPrefs({
+                    quiet_hours_start: startHour,
+                    quiet_hours_end: endHour
+                  });
+                }}
+                className="rounded-md border border-cyan-400/40 bg-cyan-500/10 px-3 py-2 text-xs text-accent disabled:opacity-60"
+              >
+                保存静默时段
+              </button>
+              <span className="text-xs text-textMuted">
+                当前：{alertPrefs.quiet_hours_start}:00 ~ {alertPrefs.quiet_hours_end}:00
+              </span>
+            </div>
+            <p className="mt-2 text-xs text-textMuted">
+              设为相同小时（如 0-0）表示关闭静默时段。
             </p>
             {prefsMessage && <p className="mt-2 text-xs text-textMuted">{prefsMessage}</p>}
           </article>
