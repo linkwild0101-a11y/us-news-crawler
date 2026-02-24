@@ -523,7 +523,7 @@ function AlertCard({
   errorText: string;
   isRead: boolean;
   onFeedback: (item: AlertCenterItem, label: "useful" | "noise") => void;
-  onMarkRead: (alertId: number) => void;
+  onMarkRead: (alertId: number) => void | Promise<void>;
 }) {
   const statusMeta = alertStatusMeta(item.status);
   const sideText = item.side === "NEUTRAL" ? "中性" : item.side;
@@ -594,7 +594,9 @@ function AlertCard({
         {!isRead && (
           <button
             type="button"
-            onClick={() => onMarkRead(item.id)}
+            onClick={() => {
+              void onMarkRead(item.id);
+            }}
             className="rounded-md border border-slate-600 px-2 py-1 text-xs text-textMuted hover:text-textMain"
           >
             标记已读
@@ -876,8 +878,23 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
     setReviewQueuedMap((prev) => ({ ...prev, [item.id]: true }));
   }
 
-  function handleMarkAlertRead(alertId: number): void {
+  async function handleMarkAlertRead(alertId: number): Promise<void> {
     setReadAlertMap((prev) => ({ ...prev, [alertId]: true }));
+    try {
+      const response = await fetch("/api/alerts/open", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          alertId,
+          userId: "system"
+        })
+      });
+      if (!response.ok) {
+        throw new Error("mark_open_failed");
+      }
+    } catch (error) {
+      console.warn("[FRONTEND_ALERT_OPEN_FALLBACK]", error);
+    }
   }
 
   async function handleAlertFeedback(item: AlertCenterItem, label: "useful" | "noise"): Promise<void> {
@@ -904,7 +921,7 @@ export function MobileDashboard({ data }: { data: DashboardData }) {
         ...prev,
         [item.id]: { label, submitting: false, error: "" }
       }));
-      setReadAlertMap((prev) => ({ ...prev, [item.id]: true }));
+      await handleMarkAlertRead(item.id);
     } catch (error) {
       console.warn("[FRONTEND_ALERT_FEEDBACK_FALLBACK]", error);
       setFeedbackStateMap((prev) => ({

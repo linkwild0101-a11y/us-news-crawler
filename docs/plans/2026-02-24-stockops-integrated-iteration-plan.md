@@ -44,6 +44,8 @@
 - P0 反馈日报/周报已落地并接入 workflow 可选步骤。
 - P1 数据层已启动：新增 `portfolio + screener + macro map` SQL 草案。
 - P1 建议引擎 MVP 已落地：`scripts/stock_portfolio_advice_v1.py`。
+- P0 KPI 基础设施已启动：`alert_open_events + kpi_view + kpi_report`。
+- P1 筛选器 MVP 与 FastAPI 旁路已落地（可灰度开关）。
 
 ---
 

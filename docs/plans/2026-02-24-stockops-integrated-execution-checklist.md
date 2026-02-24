@@ -17,7 +17,7 @@
 - [x] workflow 接入 `ENABLE_STOCK_ALERT_V1`
 - [x] 端到端验证：sent + deduped 行为正确
 
-## B. 提醒中心与反馈入口（进行中）
+## B. 提醒中心与反馈入口（已完成）
 
 - [x] 前端提醒中心（并入 dashboard）
 - [x] 提醒卡“有用/噪音”反馈按钮
@@ -26,7 +26,7 @@
 - [x] 新增 `scripts/stock_alert_feedback_agg_v1.py`
 - [x] 每日报告：`docs/reports/stock-alert-feedback-daily-*.md`
 
-## C. 时段治理与通知质量（待执行）
+## C. 时段治理与通知质量（已完成）
 
 - [x] 盘前/盘后开关贯通（规则 + 偏好 + 前端）
 - [x] 执行 SQL：`sql/2026-02-24_stock_alert_user_prefs_quiet_hours.sql`
@@ -42,6 +42,13 @@
 - [ ] 噪音反馈率 <= 30%
 - [ ] 7 日留存 >= 25%
 
+## P0 KPI 基础设施（已启动）
+
+- [x] 新增 SQL：`sql/2026-02-24_stock_alert_open_events_and_kpi_view.sql`
+- [x] 前端打开事件回传 API：`frontend/app/api/alerts/open/route.ts`
+- [x] KPI 日报脚本：`scripts/stock_p0_kpi_report_v1.py`
+- [x] workflow 接入可选步骤：`ENABLE_STOCK_P0_KPI_REPORT`
+
 ---
 
 ## P1（2026-03-23 ~ 2026-04-19）
@@ -49,15 +56,15 @@
 ## D. Portfolio Intelligence + Macro
 
 - [ ] 持仓输入与风险暴露模型
-- [ ] 建议生成（优先级/解释/风险提示）
+- [x] 建议生成（优先级/解释/风险提示）
 - [ ] 事件→行业→标的三级映射
-- [ ] 建议卡强制输出“触发依据 2~3 条”
+- [x] 建议卡强制输出“触发依据 2~3 条”
 
 ## E. Screener + FastAPI + A/B
 
-- [ ] 策略模板（事件驱动/趋势/反转）
-- [ ] 参数化筛选与回测预览（命中率/回撤/波动）
-- [ ] FastAPI 旁路：`/health` `/alerts` `/alerts/{id}/feedback`
+- [x] 策略模板（事件驱动/趋势/反转）
+- [x] 参数化筛选与回测预览（命中率/回撤/波动）
+- [x] FastAPI 旁路：`/health` `/alerts` `/alerts/{id}/feedback`
 - [ ] 建议排序/文案 A-B 实验埋点
 
 ## P1 KPI 门禁
@@ -105,3 +112,6 @@
 - [x] 新增 SQL：`sql/2026-02-24_stock_p1_portfolio_screener_schema.sql`
 - [x] 新增脚本：`scripts/stock_portfolio_advice_v1.py`
 - [x] workflow 接入可选步骤：`ENABLE_STOCK_P1_PORTFOLIO_ADVICE`
+- [x] 新增脚本：`scripts/stock_screener_run_v1.py`
+- [x] FastAPI 旁路：`apps/stockops_api/main.py`
+- [x] workflow 接入可选步骤：`ENABLE_STOCK_P1_SCREENER`

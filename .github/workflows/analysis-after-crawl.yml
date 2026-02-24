@@ -41,6 +41,8 @@ jobs:
       ENABLE_STOCK_ALERT_FEEDBACK_AGG: ${{ vars.ENABLE_STOCK_ALERT_FEEDBACK_AGG || 'true' }}
       ENABLE_STOCK_ALERT_NOISE_WEEKLY: ${{ vars.ENABLE_STOCK_ALERT_NOISE_WEEKLY || 'true' }}
       ENABLE_STOCK_P1_PORTFOLIO_ADVICE: ${{ vars.ENABLE_STOCK_P1_PORTFOLIO_ADVICE || 'false' }}
+      ENABLE_STOCK_P1_SCREENER: ${{ vars.ENABLE_STOCK_P1_SCREENER || 'false' }}
+      ENABLE_STOCK_P0_KPI_REPORT: ${{ vars.ENABLE_STOCK_P0_KPI_REPORT || 'true' }}
       ENABLE_STOCK_EVIDENCE_LAYER: ${{ vars.ENABLE_STOCK_EVIDENCE_LAYER || 'false' }}
       ENABLE_STOCK_TRANSMISSION_LAYER: ${{ vars.ENABLE_STOCK_TRANSMISSION_LAYER || 'false' }}
       ENABLE_STOCK_AI_DEBATE_VIEW: ${{ vars.ENABLE_STOCK_AI_DEBATE_VIEW || 'false' }}
@@ -237,6 +239,24 @@ jobs:
             --opportunity-limit 4000 \
             --min-score 68
 
+      - name: Build Stock P1 screener runs (optional)
+        if: ${{ env.ENABLE_STOCK_P1_SCREENER == 'true' }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_screener_run_v1.py \
+            --run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-p1-screener" \
+            --user-id "system" \
+            --lookback-hours 96 \
+            --opportunity-limit 5000 \
+            --template-limit 20 \
+            --topn 40
+
       - name: Run Stock V3 eval (optional)
         if: ${{ env.ENABLE_STOCK_V3_EVAL == 'true' }}
         continue-on-error: true
@@ -397,6 +417,19 @@ jobs:
             --duration-sec "$duration" \
             --health-date "$(date -u +%F)" \
             --health-run-id "gha-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
+      - name: Build StockOps P0 KPI report (optional)
+        if: ${{ env.ENABLE_STOCK_P0_KPI_REPORT == 'true' }}
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python -u scripts/stock_p0_kpi_report_v1.py \
+            --days 7 \
+            --md-dir docs/reports \
+            --csv-dir data/reports
 
       - name: Upload Stock V3 reports artifact (optional)
         if: ${{ env.ENABLE_STOCK_V3_SCORECARD == 'true' || env.ENABLE_STOCK_V3_SHADOW_REPORT == 'true' || env.ENABLE_STOCK_V3_VALIDATION == 'true' }}

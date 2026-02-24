@@ -116,7 +116,7 @@ def _load_opportunities(supabase, lookback_hours: int, limit: int) -> Dict[str, 
         supabase.table("stock_opportunities_v2")
         .select(
             "id,ticker,side,horizon,risk_level,opportunity_score,confidence,catalysts,"
-            "source_signal_ids,source_event_ids,summary_cn,summary_en,as_of"
+            "source_signal_ids,source_event_ids,why_now,invalid_if,as_of"
         )
         .eq("is_active", True)
         .gte("as_of", cutoff)
@@ -166,7 +166,7 @@ def _build_trigger_points(holding: Dict[str, Any], opp: Optional[Dict[str, Any]]
             snippet = "；".join(catalysts[:2])
             points.append(f"核心催化：{snippet}。")
         else:
-            summary = str(opp.get("summary_cn") or opp.get("summary_en") or "")
+            summary = str(opp.get("why_now") or "")
             if summary:
                 points.append(f"摘要线索：{summary[:80]}。")
     else:

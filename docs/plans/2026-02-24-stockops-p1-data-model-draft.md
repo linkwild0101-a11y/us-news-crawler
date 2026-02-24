@@ -42,9 +42,15 @@
    - 基于 `stock_portfolio_holdings_v1` + `stock_opportunities_v2` 生成建议。
    - 输出 `add/reduce/hold/review/watch`，并写入 `stock_portfolio_advice_v1`。
    - 每条建议生成 2~3 条依据与失效条件。
-2. Actions 接入可选步骤
+2. 新增脚本 `scripts/stock_screener_run_v1.py`
+   - 基于 `stock_screener_templates_v1` 对机会池执行参数化筛选。
+   - 输出候选分数、理由点、回测代理指标（hit/drawdown/vol proxy）。
+3. FastAPI 旁路 `apps/stockops_api/main.py`
+   - 提供 `/health`、`/alerts`、`/alerts/{id}/feedback` 最小服务闭环。
+4. Actions 接入可选步骤
    - `analysis-after-crawl.yml` 新增开关：`ENABLE_STOCK_P1_PORTFOLIO_ADVICE`。
-   - 开启后自动跑建议脚本，run_id 与主流程对齐。
+   - 新增 `ENABLE_STOCK_P1_SCREENER`，可灰度启用筛选器。
+   - 开启后自动跑建议脚本/筛选脚本，run_id 与主流程对齐。
 
 ## 4. 开关与执行建议
 
