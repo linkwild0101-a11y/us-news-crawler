@@ -24,13 +24,13 @@
 - [x] 反馈 API：`frontend/app/api/alerts/feedback/route.ts`
 - [x] 执行 SQL：`sql/2026-02-24_stock_alert_feedback_insert_policy.sql`
 - [x] 新增 `scripts/stock_alert_feedback_agg_v1.py`
-- [ ] 每日报告：`docs/reports/stock-alert-feedback-daily-*.md`
+- [x] 每日报告：`docs/reports/stock-alert-feedback-daily-*.md`
 
 ## C. 时段治理与通知质量（待执行）
 
 - [x] 盘前/盘后开关贯通（规则 + 偏好 + 前端）
-- [ ] 执行 SQL：`sql/2026-02-24_stock_alert_user_prefs_quiet_hours.sql`
-- [ ] 重新执行 SQL：`sql/2026-02-24_stock_alert_user_prefs_write_policy.sql`
+- [x] 执行 SQL：`sql/2026-02-24_stock_alert_user_prefs_quiet_hours.sql`
+- [x] 重新执行 SQL：`sql/2026-02-24_stock_alert_user_prefs_write_policy.sql`
 - [x] 每日提醒上限与静默时段
 - [x] 飞书模板升级（why-now + 风险 + 失效条件 + 原文）
 - [x] 噪音反馈率周报
@@ -94,8 +94,8 @@
 
 ## 本周 Next 5
 
-- [ ] 完成 `stock_alert_feedback_agg_v1.py`
-- [ ] 产出首份反馈调优日报
-- [ ] 完成盘前/盘后 + 上限治理 SQL 与脚本
-- [ ] 将 Alert CTR/Noise Ratio 接入周报
+- [x] 完成 `stock_alert_feedback_agg_v1.py`
+- [x] 产出首份反馈调优日报
+- [x] 完成盘前/盘后 + 上限治理 SQL 与脚本
+- [x] 将 Alert CTR/Noise Ratio 接入周报
 - [ ] 启动 P1 数据模型设计稿（portfolio + screener）
