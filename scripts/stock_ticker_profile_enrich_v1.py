@@ -228,6 +228,20 @@ def _parse_llm_payload(payload: Dict[str, Any], row: Dict[str, Any]) -> Tuple[st
     return summary, score, asset_type, sector, industry
 
 
+def _looks_generic_profile(summary: str, asset_type: str, sector: str, industry: str) -> bool:
+    text = str(summary or "").strip()
+    text_lower = text.lower()
+    return (
+        not text
+        or "美股观察标的" in text
+        or "建议结合原文证据" in text
+        or text_lower == "unknown"
+        or str(asset_type or "").strip().lower() in {"", "unknown"}
+        or str(sector or "").strip().lower() in {"", "unknown"}
+        or str(industry or "").strip().lower() in {"", "unknown"}
+    )
+
+
 def _update_profile_row(
     supabase,
     ticker: str,
@@ -346,7 +360,11 @@ def _process_queue_item(
         else:
             llm_client = _get_worker_llm_client()
             payload = llm_client.summarize(prompt=prompt, use_cache=False)
+            if not isinstance(payload, dict) or payload.get("parsed") is False:
+                raise ValueError("llm_payload_invalid")
             summary, score, asset_type, sector, industry = _parse_llm_payload(payload, row=profile_row)
+            if _looks_generic_profile(summary, asset_type, sector, industry):
+                raise ValueError("llm_profile_generic")
             _update_profile_row(
                 supabase=supabase,
                 ticker=ticker,

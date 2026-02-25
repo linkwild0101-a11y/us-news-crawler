@@ -464,7 +464,7 @@ def _load_existing_profiles(
     try:
         rows = (
             supabase.table("stock_ticker_profiles_v1")
-            .select("ticker,summary_cn,quality_score,summary_source,asset_type,sector")
+            .select("ticker,summary_cn,quality_score,summary_source,asset_type,sector,industry")
             .in_("ticker", list(tickers[:5000]))
             .limit(6000)
             .execute()
@@ -474,7 +474,7 @@ def _load_existing_profiles(
     except Exception:
         rows = (
             supabase.table("stock_ticker_profiles_v1")
-            .select("ticker,summary_cn,asset_type,sector")
+            .select("ticker,summary_cn,asset_type,sector,industry")
             .in_("ticker", list(tickers[:5000]))
             .limit(6000)
             .execute()
@@ -583,13 +583,50 @@ def _build_profile_row(
         summary_source = "seed"
         quality_score = 0.88
 
+    existing_source = str(existing.get("summary_source") or "").strip().lower()
+    existing_quality = _safe_float(existing.get("quality_score"), 0.0)
+    existing_summary = str(existing.get("summary_cn") or "").strip()
+    existing_asset_type = str(existing.get("asset_type") or "").strip().lower()
+    existing_sector = str(existing.get("sector") or "").strip()
+    existing_industry = str(existing.get("industry") or "").strip()
+
+    # 保留高质量 LLM 结果，避免 sync 覆盖成模板文案。
+    if (
+        not override
+        and existing_source == "llm"
+        and existing_quality >= 0.82
+        and existing_summary
+    ):
+        summary_cn = existing_summary
+        summary_source = "llm"
+        quality_score = max(quality_score, min(1.0, existing_quality))
+        if existing_asset_type in {"equity", "etf", "index", "macro"}:
+            asset_type = existing_asset_type
+        if existing_sector and existing_sector.lower() != "unknown":
+            sector = existing_sector
+        if existing_industry and existing_industry.lower() != "unknown":
+            industry = existing_industry
+
+    # 对非覆盖项，优先复用已有的非 Unknown 元数据，减少 Unknown 回退。
+    if not override:
+        if asset_type == "unknown" and existing_asset_type in {"equity", "etf", "index", "macro"}:
+            asset_type = existing_asset_type
+        if (not sector or sector.lower() == "unknown") and existing_sector and existing_sector.lower() != "unknown":
+            sector = existing_sector
+        if (
+            (not industry or industry.lower() == "unknown")
+            and existing_industry
+            and existing_industry.lower() != "unknown"
+        ):
+            industry = existing_industry
+
     reason: Optional[str] = None
     prev_exists = bool(existing)
-    prev_quality = _safe_float(existing.get("quality_score"), 0.0)
-    prev_source = str(existing.get("summary_source") or "").strip().lower()
-    prev_asset_type = str(existing.get("asset_type") or "").strip().lower()
-    prev_sector = str(existing.get("sector") or "").strip().lower()
-    prev_summary = str(existing.get("summary_cn") or "").strip()
+    prev_quality = existing_quality
+    prev_source = existing_source
+    prev_asset_type = existing_asset_type
+    prev_sector = existing_sector.lower()
+    prev_summary = existing_summary
     summary_generic = (
         "美股观察标的" in prev_summary
         or "建议结合原文证据" in prev_summary
