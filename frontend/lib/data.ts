@@ -2211,11 +2211,6 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
     ? sentinelSignals.filter((item) => signalMentionsTicker(item, focusTickers))
     : sentinelSignals;
 
-  const [marketSnapshotRaw, v2HotClusters, v2Relations] = await Promise.all([
-    queryMarketSnapshot(client, filteredSignals),
-    queryV2HotClusters(client),
-    queryV2Relations(client)
-  ]);
   const tickerUniverse = new Set<string>();
   for (const item of opportunities) {
     if (item.ticker) {
@@ -2237,7 +2232,13 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
       tickerUniverse.add(item.ticker);
     }
   }
+  // Fetch ticker profiles early, before optional heavy sections, to avoid subrequest cap fallback.
   const tickerProfiles = await queryTickerProfiles(client, Array.from(tickerUniverse));
+  const [marketSnapshotRaw, v2HotClusters, v2Relations] = await Promise.all([
+    queryMarketSnapshot(client, filteredSignals),
+    queryV2HotClusters(client),
+    queryV2Relations(client)
+  ]);
   const hotClusters = v2HotClusters;
   const relations = v2Relations;
 
@@ -2382,25 +2383,6 @@ export async function getDashboardData(): Promise<DashboardData> {
     ? sentinelSignals.filter((item) => signalMentionsTicker(item, focusTickers))
     : sentinelSignals;
 
-  const [marketSnapshot, hotClusters, relations] = await Promise.all([
-    queryMarketSnapshot(client, filteredSignals),
-    queryHotClusters(client, filteredSignals, opportunities),
-    queryEntityRelations(client)
-  ]);
-
-  const topOpportunityTime = opportunities[0]?.as_of || "";
-  const topSignalTime = filteredSignals[0]?.created_at || "";
-  const topClusterTime = hotClusters[0]?.created_at || "";
-  const topRelationTime = relations[0]?.last_seen || "";
-  const dataUpdatedAt = getLatestTimestamp([
-    marketSnapshot.updated_at,
-    topOpportunityTime,
-    topSignalTime,
-    topClusterTime,
-    topRelationTime
-  ]);
-  const sourceHealth = await querySourceHealth(client);
-  const xSourceRadar = buildXSourceRadar(filteredSignals, opportunities);
   const tickerUniverse = new Set<string>();
   for (const item of opportunities) {
     if (item.ticker) {
@@ -2422,7 +2404,27 @@ export async function getDashboardData(): Promise<DashboardData> {
       tickerUniverse.add(item.ticker);
     }
   }
+  // Fetch ticker profiles early, before optional heavy sections, to avoid subrequest cap fallback.
   const tickerProfiles = await queryTickerProfiles(client, Array.from(tickerUniverse));
+  const [marketSnapshot, hotClusters, relations] = await Promise.all([
+    queryMarketSnapshot(client, filteredSignals),
+    queryHotClusters(client, filteredSignals, opportunities),
+    queryEntityRelations(client)
+  ]);
+
+  const topOpportunityTime = opportunities[0]?.as_of || "";
+  const topSignalTime = filteredSignals[0]?.created_at || "";
+  const topClusterTime = hotClusters[0]?.created_at || "";
+  const topRelationTime = relations[0]?.last_seen || "";
+  const dataUpdatedAt = getLatestTimestamp([
+    marketSnapshot.updated_at,
+    topOpportunityTime,
+    topSignalTime,
+    topClusterTime,
+    topRelationTime
+  ]);
+  const sourceHealth = await querySourceHealth(client);
+  const xSourceRadar = buildXSourceRadar(filteredSignals, opportunities);
 
   return {
     opportunities,
