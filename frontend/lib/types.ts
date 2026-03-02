@@ -156,6 +156,7 @@ export interface MarketRegime {
   liquidity_state: string;
   regime_score: number;
   summary: string;
+  source_payload?: Record<string, unknown>;
 }
 
 export interface DashboardData {

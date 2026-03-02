@@ -1059,6 +1059,41 @@ function deriveBriefFromSignals(signals: SentinelSignal[]): string {
   return `系统已捕获 ${signals.length} 条美股低风险告警，市场情绪整体可控。${latest}`;
 }
 
+function readPayloadMetric(
+  payload: Record<string, unknown> | null | undefined,
+  keys: string[]
+): number | null {
+  if (!payload) {
+    return null;
+  }
+  for (const key of keys) {
+    const value = toNumber(payload[key]);
+    if (value !== null) {
+      return value;
+    }
+  }
+  return null;
+}
+
+function applyMarketPayloadFallback(
+  snapshot: MarketSnapshot,
+  payload: Record<string, unknown> | null | undefined
+): MarketSnapshot {
+  if (!payload) {
+    return snapshot;
+  }
+
+  return {
+    ...snapshot,
+    spy: snapshot.spy ?? readPayloadMetric(payload, ["spy", "sp500"]),
+    qqq: snapshot.qqq ?? readPayloadMetric(payload, ["qqq", "nasdaq"]),
+    dia: snapshot.dia ?? readPayloadMetric(payload, ["dia", "dow"]),
+    vix: snapshot.vix ?? readPayloadMetric(payload, ["vix"]),
+    us10y: snapshot.us10y ?? readPayloadMetric(payload, ["us10y", "us_10y", "ten_year"]),
+    dxy: snapshot.dxy ?? readPayloadMetric(payload, ["dxy", "usd_index"])
+  };
+}
+
 async function querySentinelSignals(client: SupabaseClient): Promise<SentinelSignal[]> {
   try {
     const { data, error } = await client
@@ -1292,7 +1327,7 @@ async function queryV2Regime(client: SupabaseClient): Promise<MarketRegime | nul
   try {
     const { data, error } = await client
       .from("stock_market_regime_v2")
-      .select("regime_date,risk_state,vol_state,liquidity_state,regime_score,summary,as_of")
+      .select("regime_date,risk_state,vol_state,liquidity_state,regime_score,summary,source_payload,as_of")
       .eq("is_active", true)
       .order("as_of", { ascending: false })
       .limit(1)
@@ -1311,7 +1346,14 @@ async function queryV2Regime(client: SupabaseClient): Promise<MarketRegime | nul
       vol_state: String(data.vol_state || "mid_vol"),
       liquidity_state: String(data.liquidity_state || "neutral"),
       regime_score: Number(data.regime_score || 0),
-      summary: String(data.summary || "")
+      summary: String(data.summary || ""),
+      source_payload: (
+        data.source_payload
+        && typeof data.source_payload === "object"
+        && !Array.isArray(data.source_payload)
+      )
+        ? (data.source_payload as Record<string, unknown>)
+        : undefined
     };
   } catch (error) {
     console.warn("[FRONTEND_V2_REGIME_FALLBACK]", error);
@@ -2434,12 +2476,12 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
     relations = await queryEntityRelations(client);
   }
 
-  const marketSnapshot: MarketSnapshot = {
+  const marketSnapshot: MarketSnapshot = applyMarketPayloadFallback({
     ...marketSnapshotRaw,
     risk_level: v2Snapshot?.risk_badge || marketSnapshotRaw.risk_level,
     daily_brief: v2Snapshot?.market_brief || marketSnapshotRaw.daily_brief,
     updated_at: v2Snapshot?.as_of || marketSnapshotRaw.updated_at
-  };
+  }, marketRegime?.source_payload);
 
   const topOpportunityTime = opportunities[0]?.as_of || "";
   const topSignalTime = filteredSignals[0]?.created_at || "";
@@ -2598,11 +2640,12 @@ export async function getDashboardData(): Promise<DashboardData> {
   }
   // Fetch ticker profiles early, before optional heavy sections, to avoid subrequest cap fallback.
   const tickerProfiles = await queryTickerProfiles(client, Array.from(tickerUniverse));
-  const [marketSnapshot, rawHotClusters, rawRelations] = await Promise.all([
+  const [marketSnapshotRaw, rawHotClusters, rawRelations] = await Promise.all([
     queryMarketSnapshot(client, filteredSignals),
     queryHotClusters(client, filteredSignals, opportunities),
     queryEntityRelations(client)
   ]);
+  const marketSnapshot = applyMarketPayloadFallback(marketSnapshotRaw, marketRegime?.source_payload);
 
   const hotClusters = rawHotClusters.length > 0
     ? rawHotClusters
