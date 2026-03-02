@@ -1168,23 +1168,34 @@ async function queryV2Opportunities(client: SupabaseClient): Promise<Opportunity
     + "catalysts,source_signal_ids,source_event_ids,source_mix,expires_at,as_of"
   );
 
-  async function runQuery(selectClause: string): Promise<Array<Record<string, unknown>>> {
-    const { data, error } = await client
+  async function runQuery(
+    selectClause: string,
+    options: { activeOnly: boolean; preferRecent: boolean }
+  ): Promise<Array<Record<string, unknown>>> {
+    let query = client
       .from("stock_opportunities_v2")
-      .select(selectClause)
-      .eq("is_active", true)
-      .order("opportunity_score", { ascending: false })
-      .limit(40);
+      .select(selectClause);
+
+    if (options.activeOnly) {
+      query = query.eq("is_active", true);
+    }
+
+    query = options.preferRecent
+      ? query.order("as_of", { ascending: false })
+      : query.order("opportunity_score", { ascending: false });
+
+    const { data, error } = await query.limit(40);
     if (error) {
       throw error;
     }
     return (data || []) as unknown as Array<Record<string, unknown>>;
   }
 
-  try {
-    let rows: Array<Record<string, unknown>> = [];
+  async function runQueryWithColumnFallback(
+    options: { activeOnly: boolean; preferRecent: boolean }
+  ): Promise<Array<Record<string, unknown>>> {
     try {
-      rows = await runQuery(selectWithEvidence);
+      return await runQuery(selectWithEvidence, options);
     } catch (firstError) {
       const errorText = String(firstError || "");
       if (
@@ -1194,13 +1205,13 @@ async function queryV2Opportunities(client: SupabaseClient): Promise<Opportunity
         || errorText.includes("uncertainty_flags")
       ) {
         console.warn("[FRONTEND_V2_OPP_SELECT_FALLBACK]", firstError);
-        rows = await runQuery(selectLegacy);
-      } else {
-        throw firstError;
+        return runQuery(selectLegacy, options);
       }
+      throw firstError;
     }
+  }
 
-    const now = new Date().toISOString();
+  function normalizeRows(rows: Array<Record<string, unknown>>): OpportunityItem[] {
     return rows
       .map((row) => {
         const side: OpportunityItem["side"] = String(row.side || "LONG").toUpperCase() === "SHORT"
@@ -1249,7 +1260,28 @@ async function queryV2Opportunities(client: SupabaseClient): Promise<Opportunity
           as_of: toIsoString(row.as_of)
         };
       })
-      .filter((item) => item.ticker && item.expires_at >= now);
+      .filter((item) => item.ticker);
+  }
+
+  try {
+    const rows = await runQueryWithColumnFallback({ activeOnly: true, preferRecent: false });
+    const normalized = normalizeRows(rows);
+    const now = new Date().toISOString();
+    const fresh = normalized.filter((item) => item.expires_at >= now);
+    if (fresh.length > 0) {
+      return fresh;
+    }
+    if (normalized.length > 0) {
+      console.warn("[FRONTEND_V2_OPPORTUNITY_HISTORY_FALLBACK] active opportunities are all expired");
+      return normalized;
+    }
+
+    const historicalRows = await runQueryWithColumnFallback({ activeOnly: false, preferRecent: true });
+    const historical = normalizeRows(historicalRows);
+    if (historical.length > 0) {
+      console.warn("[FRONTEND_V2_OPPORTUNITY_HISTORY_FALLBACK] using historical opportunities");
+    }
+    return historical;
   } catch (error) {
     console.warn("[FRONTEND_V2_OPPORTUNITY_FALLBACK]", error);
     return [];
@@ -1369,24 +1401,39 @@ async function queryV2EvidenceMap(
   if (opportunityIds.length === 0) {
     return new Map();
   }
-  try {
-    const { data, error } = await client
+  async function runQuery(activeOnly: boolean): Promise<Array<Record<string, unknown>>> {
+    let query = client
       .from("stock_evidence_v2")
       .select(
         "id,opportunity_id,ticker,source_type,source_ref,source_url,source_name,published_at,"
         + "quote_snippet,numeric_facts,confidence,as_of"
       )
-      .eq("is_active", true)
       .in("opportunity_id", opportunityIds)
       .order("confidence", { ascending: false })
       .limit(1200);
 
+    if (activeOnly) {
+      query = query.eq("is_active", true);
+    }
+
+    const { data, error } = await query;
     if (error) {
       throw error;
     }
+    return (data || []) as unknown as Array<Record<string, unknown>>;
+  }
+
+  try {
+    let rows = await runQuery(true);
+    if (rows.length === 0) {
+      rows = await runQuery(false);
+      if (rows.length > 0) {
+        console.warn("[FRONTEND_V2_EVIDENCE_HISTORY_FALLBACK] using historical evidence rows");
+      }
+    }
 
     const map = new Map<number, EvidenceItem[]>();
-    for (const row of (data || []) as unknown as Array<Record<string, unknown>>) {
+    for (const row of rows) {
       const oppId = Number(row.opportunity_id || 0);
       if (!Number.isFinite(oppId) || oppId <= 0) {
         continue;
@@ -1426,24 +1473,39 @@ async function queryV2TransmissionMap(
   if (opportunityIds.length === 0) {
     return new Map();
   }
-  try {
-    const { data, error } = await client
+  async function runQuery(activeOnly: boolean): Promise<Array<Record<string, unknown>>> {
+    let query = client
       .from("stock_transmission_paths_v2")
       .select(
         "id,opportunity_id,path_key,ticker,macro_factor,industry,direction,strength,reason,"
         + "evidence_ids,as_of"
       )
-      .eq("is_active", true)
       .in("opportunity_id", opportunityIds)
       .order("strength", { ascending: false })
       .limit(800);
 
+    if (activeOnly) {
+      query = query.eq("is_active", true);
+    }
+
+    const { data, error } = await query;
     if (error) {
       throw error;
     }
+    return (data || []) as unknown as Array<Record<string, unknown>>;
+  }
+
+  try {
+    let rows = await runQuery(true);
+    if (rows.length === 0) {
+      rows = await runQuery(false);
+      if (rows.length > 0) {
+        console.warn("[FRONTEND_V2_PATH_HISTORY_FALLBACK] using historical transmission rows");
+      }
+    }
 
     const map = new Map<number, TransmissionPath[]>();
-    for (const row of (data || []) as unknown as Array<Record<string, unknown>>) {
+    for (const row of rows) {
       const oppId = Number(row.opportunity_id || 0);
       if (!Number.isFinite(oppId) || oppId <= 0) {
         continue;
@@ -1574,8 +1636,17 @@ async function queryOpportunities(
       };
     });
 
+    const normalized = rows.filter((item) => item.ticker);
     const now = new Date().toISOString();
-    return rows.filter((item) => item.ticker && item.expires_at >= now);
+    const fresh = normalized.filter((item) => item.expires_at >= now);
+    if (fresh.length > 0) {
+      return fresh;
+    }
+    if (normalized.length > 0) {
+      console.warn("[FRONTEND_OPPORTUNITY_HISTORY_FALLBACK] using historical legacy opportunities");
+      return normalized;
+    }
+    return [];
   } catch (error) {
     console.warn("[FRONTEND_OPPORTUNITY_FALLBACK]", error);
     const map = new Map(tickerDigest.map((item) => [item.ticker, item]));
@@ -1647,6 +1718,7 @@ async function queryMarketSnapshot(
 ): Promise<MarketSnapshot> {
   const derivedRisk = calculateTopRisk(signals);
   const derivedBrief = deriveBriefFromSignals(signals);
+  const hasSignalContext = signals.length > 0;
 
   try {
     const { data, error } = await client
@@ -1655,31 +1727,45 @@ async function queryMarketSnapshot(
         "snapshot_date,spy,qqq,dia,vix,us10y,dxy,risk_level,daily_brief,updated_at"
       )
       .order("snapshot_date", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .limit(30);
 
     if (error) {
       throw error;
     }
 
-    if (!data) {
+    const rows = (data || []) as unknown as Array<Record<string, unknown>>;
+
+    if (rows.length === 0) {
       const snapshot = baseSnapshot();
       snapshot.risk_level = derivedRisk;
       snapshot.daily_brief = derivedBrief;
       return snapshot;
     }
 
+    const hasAnyMetric = (row: Record<string, unknown>): boolean => {
+      const fields = [row.spy, row.qqq, row.dia, row.vix, row.us10y, row.dxy];
+      return fields.some((value) => toNumber(value) !== null);
+    };
+
+    const selected = rows.find((row) => hasAnyMetric(row)) || rows[0];
+    if (selected !== rows[0]) {
+      console.warn("[FRONTEND_MARKET_SNAPSHOT_HISTORY_FALLBACK] using latest non-empty historical snapshot");
+    }
+
+    const dbRisk = toLevel(selected.risk_level);
+    const dbBrief = String(selected.daily_brief || "").trim();
+
     return {
-      snapshot_date: toIsoString(data.snapshot_date),
-      spy: toNumber(data.spy),
-      qqq: toNumber(data.qqq),
-      dia: toNumber(data.dia),
-      vix: toNumber(data.vix),
-      us10y: toNumber(data.us10y),
-      dxy: toNumber(data.dxy),
-      risk_level: derivedRisk,
-      daily_brief: derivedBrief,
-      updated_at: toIsoString(data.updated_at)
+      snapshot_date: toIsoString(selected.snapshot_date),
+      spy: toNumber(selected.spy),
+      qqq: toNumber(selected.qqq),
+      dia: toNumber(selected.dia),
+      vix: toNumber(selected.vix),
+      us10y: toNumber(selected.us10y),
+      dxy: toNumber(selected.dxy),
+      risk_level: hasSignalContext ? derivedRisk : dbRisk,
+      daily_brief: hasSignalContext ? derivedBrief : (dbBrief || derivedBrief),
+      updated_at: toIsoString(selected.updated_at)
     };
   } catch (error) {
     console.warn("[FRONTEND_MARKET_SNAPSHOT_FALLBACK]", error);
@@ -1954,20 +2040,98 @@ function buildXSourceRadar(
     .slice(0, 10);
 }
 
+function buildFallbackHotClustersFromOpportunities(
+  opportunities: OpportunityItem[]
+): HotCluster[] {
+  return opportunities
+    .filter((item) => item.ticker)
+    .slice(0, 20)
+    .map((item, idx) => {
+      const summaryText = String(
+        item.why_now || item.catalysts?.[0] || item.counter_view || ""
+      ).trim();
+      const sourceCount = Math.max(
+        1,
+        item.source_event_ids?.length || 0,
+        item.evidence_ids?.length || 0
+      );
+      return {
+        id: stableIdFromText(`opp-fallback-cluster:${item.id || idx}:${item.ticker}`),
+        category: "经济",
+        primary_title: `${item.ticker} ${item.side === "SHORT" ? "空头" : "多头"}机会`,
+        summary: toZhTextOrPending(summaryText, "历史机会摘要加载中"),
+        article_count: sourceCount,
+        created_at: toIsoString(item.as_of)
+      };
+    })
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .slice(0, 20);
+}
+
+function buildFallbackRelationsFromOpportunities(
+  opportunities: OpportunityItem[]
+): EntityRelationItem[] {
+  const unique = Array.from(
+    new Map(
+      opportunities
+        .filter((item) => item.ticker)
+        .map((item) => [item.ticker, item] as const)
+    ).values()
+  ).slice(0, 12);
+
+  if (unique.length < 2) {
+    return [];
+  }
+
+  const rows: EntityRelationItem[] = [];
+  for (let i = 0; i < unique.length - 1; i += 1) {
+    const left = unique[i];
+    const right = unique[i + 1];
+    const avgConfidence = Math.max(
+      0.35,
+      Math.min(0.95, ((left.confidence || 0.5) + (right.confidence || 0.5)) / 2)
+    );
+    rows.push({
+      id: stableIdFromText(`opp-fallback-relation:${left.ticker}:${right.ticker}`),
+      entity1_name: left.ticker,
+      entity2_name: right.ticker,
+      relation_text: "同一时间窗内出现机会共振（历史回退）",
+      confidence: avgConfidence,
+      last_seen: left.as_of > right.as_of ? left.as_of : right.as_of
+    });
+  }
+
+  return rows.slice(0, 20);
+}
+
 async function queryV2HotClusters(client: SupabaseClient): Promise<HotCluster[]> {
-  try {
-    const { data, error } = await client
+  async function runEventQuery(activeOnly: boolean): Promise<Array<Record<string, unknown>>> {
+    let query = client
       .from("stock_events_v2")
       .select("id,event_type,summary,details,as_of")
-      .eq("is_active", true)
       .order("as_of", { ascending: false })
       .limit(240);
 
+    if (activeOnly) {
+      query = query.eq("is_active", true);
+    }
+
+    const { data, error } = await query;
     if (error) {
       throw error;
     }
+    return (data || []) as unknown as Array<Record<string, unknown>>;
+  }
 
-    const rows = (data || []) as unknown as Array<Record<string, unknown>>;
+  try {
+    let rows = await runEventQuery(true);
+    if (rows.length === 0) {
+      rows = await runEventQuery(false);
+      if (rows.length > 0) {
+        console.warn("[FRONTEND_V2_CLUSTER_HISTORY_FALLBACK] using historical event rows");
+      }
+    }
+
     const grouped = new Map<string, Array<Record<string, unknown>>>();
     for (const row of rows) {
       const eventType = String(row.event_type || "news").toLowerCase();
@@ -2035,18 +2199,33 @@ async function queryV2HotClusters(client: SupabaseClient): Promise<HotCluster[]>
 }
 
 async function queryV2Relations(client: SupabaseClient): Promise<EntityRelationItem[]> {
-  try {
-    const { data: eventRows, error: eventError } = await client
+  async function runEventQuery(activeOnly: boolean): Promise<Array<Record<string, unknown>>> {
+    let query = client
       .from("stock_events_v2")
       .select("id,as_of")
-      .eq("is_active", true)
       .order("as_of", { ascending: false })
       .limit(300);
 
-    if (eventError) {
-      throw eventError;
+    if (activeOnly) {
+      query = query.eq("is_active", true);
     }
-    const eventList = (eventRows || []) as unknown as Array<Record<string, unknown>>;
+
+    const { data, error } = await query;
+    if (error) {
+      throw error;
+    }
+    return (data || []) as unknown as Array<Record<string, unknown>>;
+  }
+
+  try {
+    let eventList = await runEventQuery(true);
+    if (eventList.length === 0) {
+      eventList = await runEventQuery(false);
+      if (eventList.length > 0) {
+        console.warn("[FRONTEND_V2_RELATION_HISTORY_FALLBACK] using historical event rows");
+      }
+    }
+
     const eventIds = eventList
       .map((item) => Number(item.id || 0))
       .filter((item) => item > 0);
@@ -2239,8 +2418,21 @@ async function getDashboardDataFromV2(client: SupabaseClient): Promise<Dashboard
     queryV2HotClusters(client),
     queryV2Relations(client)
   ]);
-  const hotClusters = v2HotClusters;
-  const relations = v2Relations;
+  let hotClusters = v2HotClusters;
+  if (hotClusters.length === 0 && opportunities.length > 0) {
+    hotClusters = buildFallbackHotClustersFromOpportunities(opportunities);
+  }
+  if (hotClusters.length === 0) {
+    hotClusters = await queryHotClusters(client, filteredSignals, opportunities);
+  }
+
+  let relations = v2Relations;
+  if (relations.length === 0 && opportunities.length > 1) {
+    relations = buildFallbackRelationsFromOpportunities(opportunities);
+  }
+  if (relations.length === 0) {
+    relations = await queryEntityRelations(client);
+  }
 
   const marketSnapshot: MarketSnapshot = {
     ...marketSnapshotRaw,
@@ -2406,11 +2598,18 @@ export async function getDashboardData(): Promise<DashboardData> {
   }
   // Fetch ticker profiles early, before optional heavy sections, to avoid subrequest cap fallback.
   const tickerProfiles = await queryTickerProfiles(client, Array.from(tickerUniverse));
-  const [marketSnapshot, hotClusters, relations] = await Promise.all([
+  const [marketSnapshot, rawHotClusters, rawRelations] = await Promise.all([
     queryMarketSnapshot(client, filteredSignals),
     queryHotClusters(client, filteredSignals, opportunities),
     queryEntityRelations(client)
   ]);
+
+  const hotClusters = rawHotClusters.length > 0
+    ? rawHotClusters
+    : buildFallbackHotClustersFromOpportunities(opportunities);
+  const relations = rawRelations.length > 0
+    ? rawRelations
+    : buildFallbackRelationsFromOpportunities(opportunities);
 
   const topOpportunityTime = opportunities[0]?.as_of || "";
   const topSignalTime = filteredSignals[0]?.created_at || "";
